@@ -1,0 +1,9 @@
+# Lists the installed languages
+# Each entry maps a language code to its display name
+en = "English"
+de = "Deutsch"
+fr = "Français"
+it = "Italiano"
+nl = "Nederlands"
+ru = "Русский"
+

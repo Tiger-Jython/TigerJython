@@ -1,0 +1,6 @@
+[submodule "TigerPython-Parser"]
+	path = TigerPython-Parser
+	url = git@github.com:Tobias-Kohn/TigerPython-Parser.git
+[submodule "TigerJython-Localisation"]
+	path = TigerJython-Localisation
+	url = git@github.com:Tiger-Jython/TigerJython-Localisation.git
