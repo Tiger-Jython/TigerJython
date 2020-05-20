@@ -14,6 +14,7 @@ import javafx.scene.control._
 import javafx.scene.layout.BorderPane
 import javafx.stage.Stage
 import tigerjython.core.{BuildInfo, Preferences}
+import tigerjython.plugins.{MainWindow, PluginsManager}
 
 /**
  * This is the _JavaFX_ application that creates the entire UI for the IDE.
@@ -32,6 +33,10 @@ object TigerJythonApplication {
 
   def mainStage: Stage = _mainStage
 
+  private var _mainWindow: MainWindow = _
+
+  def mainWindow: MainWindow = _mainWindow
+
   /**
    * Launches the IDE.
    *
@@ -44,7 +49,7 @@ object TigerJythonApplication {
 
 class TigerJythonApplication extends Application {
 
-  import TigerJythonApplication.{_mainStage, _scene, _zoomingPane}
+  import TigerJythonApplication.{_mainStage, _mainWindow, _scene, _zoomingPane}
 
   lazy val menuManager: MenuManager = new DefaultMenuManager(this)
 
@@ -85,6 +90,10 @@ class TigerJythonApplication extends Application {
     primaryStage.show()
     _mainStage = primaryStage
     _scene = scene
+    _mainWindow = new MainWindow(menuManager)
+    Platform.runLater(() => {
+      PluginsManager.initialize()
+    })
   }
 
   def getFocusedControl: Node =

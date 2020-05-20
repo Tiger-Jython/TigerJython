@@ -96,6 +96,16 @@ object UIString {
   }
 
   /**
+   *
+   * @param name  The name that identifies the text value to load.
+   * @return      A `UIString` instance, if it already exists, or `None` otherwise.
+   */
+  def get(name: String): Option[UIString] = {
+    assert(name != null)
+    registry.get(name)
+  }
+
+  /**
    * Load the texts for the user interface for the given language.  This will look for the file
    * `resources/uitexts_XX.txt`, where `XX` stands for the language.
    */

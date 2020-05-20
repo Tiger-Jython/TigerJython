@@ -192,6 +192,13 @@ class DefaultMenuManager(val application: TigerJythonApplication) extends MenuMa
     menu
   }
 
+  protected def createToolsMenu: Menu = {
+    val menu = new Menu("Tools")
+    UIString("menu.tools") += menu.textProperty()
+    menu.setId("tools-menu")
+    menu
+  }
+
   def createMenu: MenuBar = {
     val menuBar = new MenuBar()
     menuBar.setUseSystemMenuBar(true)

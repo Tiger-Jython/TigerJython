@@ -61,22 +61,6 @@ class PythonEditor extends CodeArea with ZoomMixin {
           onFX(() => { insertText(getCaretPosition, text) })
           key.consume()
         }
-        // getStyleAtPosition(0)
-        // getParagraphs.get(1).getStyledSegments
-        // getTextStyleForInsertionAt
-      }/* else
-      if (key.getCode == KeyCode.Y) {
-        /* println(getStyleAtPosition(getCaretPosition))
-        getStyleAtPosition(getCaretPosition) */
-        println(getParagraphs.get(getCurrentParagraph)
-          .getSegments.get(getCaretColumn))
-        setStyle()
-      }*/
-    })
-    addEventFilter(KeyEvent.KEY_RELEASED, (key: KeyEvent) => {
-      if (key.getCode == KeyCode.Y) {
-        val pos = getCaretPosition
-        setStyleClass(pos-1, pos, "active-var")
       }
     })
 
@@ -138,8 +122,8 @@ class PythonEditor extends CodeArea with ZoomMixin {
       val styleClass =
         if (matcher.group("KEYWORD") != null)
           "keyword"
-        else if (matcher.group("VAR") != null)
-          "active-var"
+        else if (matcher.group("STRING") != null)
+          "string"
         else
           "comment"
       spansBuilder.add(java.util.Collections.emptyList(), matcher.start() - lastKwEnd)
@@ -153,13 +137,19 @@ class PythonEditor extends CodeArea with ZoomMixin {
 object PythonEditor {
 
   private val KEYWORDS = Array(
-    "def", "else", "from", "if", "import", "pass", "return", "while"
+    "and", "as", "assert", "async", "await", "break", "class", "continue", "def", "del", "elif", "else",
+    "except", "finally", "for", "from", "global", "if", "import", "in", "is", "lambda", "nonlocal", "not",
+    "or", "pass", "raise", "return", "try", "while", "with", "yield",
+    "False", "None", "True"
   )
 
+  private val COMMENT_PATTERN = "#[^\\n]*"
   private val KEYWORD_PATTERN = "\\b(" + KEYWORDS.mkString("|") + ")\\b"
+  private val STRING_PATTERN = "\\\"([^\\\"\\\\\\\\]|\\\\\\\\.)*\\\""
 
   private lazy val PATTERN = Pattern.compile(
     "(?<KEYWORD>" + KEYWORD_PATTERN + ")" +
-      "|(?<VAR>\\b(x)\\b)"
+    "|(?<STRING>" + STRING_PATTERN + ")" +
+    "|(?<COMMENT>" + COMMENT_PATTERN + ")"
   )
 }

@@ -9,6 +9,7 @@ package tigerjython.core
 
 import org.python.core.Options
 import org.python.util.PythonInterpreter
+import tigerjython.jython
 
 /**
  * The Jython executor is responsible for invoking Jython and executing the Python file as specified by the filename.
@@ -20,7 +21,7 @@ object JythonExecutor {
   var interpreter: PythonInterpreter = _
 
   /**
-   * Run the given file using the internally packages Jython.
+   * Run the given file using the internally packaged Jython.
    *
    * @param filename  The name or full path of the file to execute.
    */
@@ -28,6 +29,7 @@ object JythonExecutor {
     Options.importSite = false
     Options.Qnew = true
     PythonInterpreter.initialize(System.getProperties, null, null)
+    jython.JythonBuiltins.initialize()
     interpreter = new PythonInterpreter()
     interpreter.execfile(filename)
   }

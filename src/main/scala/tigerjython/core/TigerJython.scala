@@ -7,6 +7,8 @@
  */
 package tigerjython.core
 
+import tigerjython.plugins.MainWindow
+import tigerjython.ui.TigerJythonApplication
 import tigerjython.utils.OSPlatform
 
 /**
@@ -18,6 +20,11 @@ import tigerjython.utils.OSPlatform
  * @author Tobias Kohn
  */
 object TigerJython {
+
+  /**
+   * Returns the `MainWindow`, which is an interface for plugins to access the main window, add menu entries, etc.
+   */
+  def getMainWindow: MainWindow = TigerJythonApplication.mainWindow
 
   /**
    * There are several command-line options available:
