@@ -22,7 +22,7 @@ object JythonBuiltins {
    * This is the list of all names of methods to be redefined.
    */
   val builtinNames: Array[String] = Array(
-  //  "input", "msgDlg", "raw_input"
+    "input", "msgDlg", "raw_input"
   )
 
   /**

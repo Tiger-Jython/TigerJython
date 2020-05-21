@@ -90,7 +90,7 @@ class TigerJythonApplication extends Application {
     primaryStage.show()
     _mainStage = primaryStage
     _scene = scene
-    _mainWindow = new MainWindow(menuManager)
+    _mainWindow = new MainWindow(menuManager, tabManager)
     Platform.runLater(() => {
       PluginsManager.initialize()
     })

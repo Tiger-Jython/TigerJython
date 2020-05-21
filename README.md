@@ -8,6 +8,12 @@ TigerJython is an educational development environment for Python with enhanced e
 
 
 
+## Plugins
+
+You can write simple plugins for TigerJython.  The plugins are written in Python and run using the internal Jython interpreter.  More information can be found in the [Plugins Guide](PLUGINS.md).
+
+
+
 ## Publications
 
 The _TigerJython_ IDE has been presented in the paper 

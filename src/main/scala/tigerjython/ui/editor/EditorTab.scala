@@ -168,10 +168,19 @@ abstract class EditorTab extends TabFrame {
       hideError()
   }
 
-  def getFile: java.io.File = file
+  def getCaretPosition: Int =
+    editor.getCaretPosition
 
   def getExecutableFile: java.io.File =
     _execFile
+
+  def getFile: java.io.File = file
+
+  def getSelectedText: String =
+    editor.getSelectedText
+
+  def getText: String =
+    editor.getText
 
   def hasExecutableFile: Boolean =
     if (file != null) {
@@ -265,6 +274,9 @@ abstract class EditorTab extends TabFrame {
       save()
     }
   }
+
+  def setSelectedText(s: String): Unit =
+    editor.replaceSelection(s)
 
   def stop(): Unit = {
     if (executor != null)

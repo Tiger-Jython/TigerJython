@@ -7,20 +7,13 @@
  */
 package tigerjython.jython;
 
-import java.util.Optional;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.Alert.AlertType;
+import javax.swing.JOptionPane;
 import org.python.core.Py;
 import org.python.core.PyObject;
 
 /**
  * Since Scala has no static methods, we need to define the static methods for built-in replacements inside a
  * Java class.
- *
- * TODO: we need to properly initialise JavaFX in order to use these JavaFX controls as below.  Otherwise we just
- * get exceptions back.
  *
  * @author Tobias Kohn
  */
@@ -31,11 +24,9 @@ public class Builtins {
     }
 
     public static PyObject raw_input(String prompt) {
-        TextInputDialog dialog = new TextInputDialog("");
-        dialog.setHeaderText(prompt);
-        Optional<String> result = dialog.showAndWait();
-        if (result.isPresent())
-            return Py.newString(result.get());
+        String result = JOptionPane.showInputDialog(prompt);
+        if (result != null)
+            return Py.newString(result);
         else
             return Py.None;
     }
@@ -45,18 +36,19 @@ public class Builtins {
     }
 
     public static PyObject input(String prompt) {
-        TextInputDialog dialog = new TextInputDialog("");
-        dialog.setHeaderText(prompt);
-        Optional<String> result = dialog.showAndWait();
-        if (result.isPresent())
-            return Py.newString(result.get());
-        else
+        PyObject eval = Py.getSystemState().builtins.__getitem__(Py.newString("eval"));
+        String result = JOptionPane.showInputDialog(prompt);
+        if (result != null) {
+            if (eval != null)
+                return eval.__call__(Py.newString(result));
+            else
+                return Py.newString(result);
+        } else
             return Py.None;
     }
 
     public static PyObject msgDlg(PyObject message) {
-        Alert alert = new Alert(AlertType.NONE, message.toString(), ButtonType.OK);
-        alert.showAndWait();
+        JOptionPane.showMessageDialog(null, message);
         return Py.None;
     }
 }
