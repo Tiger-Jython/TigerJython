@@ -151,7 +151,7 @@ object Parser {
   def fromResource(name: String): Parser = {
     val res = getClass.getClassLoader.getResourceAsStream("resources/" + name)
     if (res != null) {
-      val source = scala.io.Source.fromInputStream(res)
+      val source = scala.io.Source.fromInputStream(res)("utf-8")
       tigerjython.config.Parser(source.getLines())
     } else
       null

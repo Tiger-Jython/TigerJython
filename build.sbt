@@ -41,6 +41,9 @@ version := "3.0"
 // We use a recent version of Scala
 scalaVersion := "2.13.2"
 
+// Unfortunately, we need to limit the Java version as Java 8 is still fairly common
+javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
+
 // Actual build information, such as the date of building the application
 val currentDate = java.time.LocalDate.now
 val buildDate = "%d %s %d".format(
@@ -51,7 +54,7 @@ val buildDate = "%d %s %d".format(
 
 val buildTag = "-SNAPSHOT"
 
-val buildVersion = "0002-ALPHA"
+val buildVersion = "0003-ALPHA"
 
 // This is needed to run/test the project without having to restart SBT afterwards
 fork in run := true
