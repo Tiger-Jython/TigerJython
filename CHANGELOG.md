@@ -14,7 +14,8 @@ Implemented:
 - Display error messages;
 - Perform static error checking of the Python programs;
 - Persistent storage of preferences and settings (not all settings are fully implemented, yet);
-- Jython is included as a dependency from Maven central, i.e. updating it to the newest version takes a few seconds.
+- Jython is included as a dependency from Maven central, i.e. updating it to the newest version takes a few seconds;
+- Plugins.
 
 Still missing:
 - Syntax highlighting;
@@ -23,7 +24,7 @@ Still missing:
 - Full customisation of the interface (such as selecting font family or themes);
 - Interaction with the server (check for updates, send usage statistics);
 - Adding custom Python interpreters (that are not detected by TigerJython);
-- Plugins.
+- Interctive concole and/or notebooks.
 
 
 ## Changes From Version 2
