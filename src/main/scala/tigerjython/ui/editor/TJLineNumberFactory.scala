@@ -21,6 +21,7 @@ import javafx.scene.paint.Color
 import org.fxmisc.richtext.GenericStyledArea
 import org.reactfx.collection.LiveList
 import org.reactfx.value.Val
+import tigerjython.core.Configuration
 
 /**
  * Most of this code is basically just a Scala version of the `LineNumberFactory` included in _RichTextFX_.  See:
@@ -64,6 +65,8 @@ class TJLineNumberFactory private (val area: GenericStyledArea[_, _, _],
 
   final private val nParagraphs: Val[Integer] = LiveList.sizeOf(area.getParagraphs)
 
+  final private val _fixedWidth: Boolean = Configuration.getJavaVersion < 11
+
   override def apply(idx: Int): Node = {
     val formatted = nParagraphs.map((n: Integer) => format(idx + 1, n))
     val lineNo = new Label
@@ -72,7 +75,10 @@ class TJLineNumberFactory private (val area: GenericStyledArea[_, _, _],
     lineNo.setAlignment(Pos.TOP_RIGHT)
     lineNo.getStyleClass.add("lineno")
     lineNo.textProperty.bind(formatted.conditionOnShowing(lineNo))
-    lineNo.prefWidthProperty.bind(lineNo.heightProperty.multiply(2.25))
+    if (_fixedWidth)
+      lineNo.setPrefWidth(40)
+    else
+      lineNo.prefWidthProperty.bind(lineNo.heightProperty.multiply(2.25))
     if (currentLineNo != null)
       currentLineNo.widthProperty().removeListener(widthListener)
     currentLineNo = lineNo

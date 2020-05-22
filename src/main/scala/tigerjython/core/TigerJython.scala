@@ -45,7 +45,7 @@ object TigerJython {
       }
     } else {
       println("TigerJython " + BuildInfo.fullVersion)
-      println("  on Java " + System.getProperty("java.version"))
+      println("  on Java " + Configuration.getJavaVersion.toString)
       println("  on " + OSPlatform.system.toString)
 
       tigerjython.execute.PythonInstallations.initialize()

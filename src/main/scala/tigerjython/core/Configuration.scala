@@ -39,6 +39,19 @@ object Configuration {
   def availableLanguages: Seq[(String, String)] = _availableLanguages
 
   /**
+   * Returns the version of the JRE the program is running on.  This only returns the major version.
+   */
+  lazy val getJavaVersion: Int = {
+    val versionStr = System.getProperty("java.version")
+    val version =
+      if (versionStr.startsWith("1."))
+        versionStr.drop(2).takeWhile(_.isDigit)
+      else
+        versionStr.takeWhile(_.isDigit)
+    version.toInt
+  }
+
+  /**
    * Returns the two-character language code given a display-name.  For instance, `"English"` is turned into
    * `"en"`.  If the language cannot be found, `"en"` is returned as default.
    */
