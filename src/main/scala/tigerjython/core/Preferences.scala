@@ -137,7 +137,13 @@ object Preferences {
 
   val pythonInterpreter: StringProperty = new PrefStringProperty("python.interpreter")
 
+  val repeatLoop: BooleanProperty = new PrefBooleanProperty("repeat-loop", false)
+
   val sendStatistics: BooleanProperty = new PrefBooleanProperty("send-statistics")
+
+  val syntaxCheckIsStrict: BooleanProperty = new PrefBooleanProperty("syntaxcheck-strict", true)
+
+  val syntaxCheckRejectDeadCode: BooleanProperty = new PrefBooleanProperty("syntaxcheck-deadcode", false)
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }

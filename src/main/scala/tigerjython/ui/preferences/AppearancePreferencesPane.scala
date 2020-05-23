@@ -7,10 +7,12 @@
  */
 package tigerjython.ui.preferences
 
+import javafx.beans.property.{SimpleStringProperty, StringProperty}
 import javafx.scene.Node
 import javafx.scene.control.{ComboBox, Label, Spinner, SpinnerValueFactory}
 import javafx.scene.layout.{StackPane, VBox}
 import javafx.scene.text._
+import tigerjython.ui.UIString
 
 /**
  * The preference settings for the general appearance; hence one of the key preference panes.
@@ -19,7 +21,8 @@ import javafx.scene.text._
  */
 class AppearancePreferencesPane extends PreferencePane {
 
-  override def caption: String = "Appearance"
+  val caption: StringProperty = new SimpleStringProperty("Appearance")
+  UIString("prefs.appearance") += caption
 
   // Testing of mono-spaced fonts as suggested in: https://yo-dave.com/2015/07/27/finding-mono-spaced-fonts-in-javafx/
   protected lazy val availableFonts: Array[String] = {

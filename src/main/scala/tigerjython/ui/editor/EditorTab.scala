@@ -21,6 +21,7 @@ import org.fxmisc.flowless.VirtualizedScrollPane
 import org.fxmisc.richtext.CodeArea
 import tigerjython.errorhandling._
 import tigerjython.execute.PythonExecutor
+import tigerjython.plugins.EventManager
 import tigerjython.ui.{TabFrame, TigerJythonApplication, ZoomMixin}
 
 /**
@@ -236,6 +237,7 @@ abstract class EditorTab extends TabFrame {
       outputPane.clear()
       errorPane.clear()
       infoPane.getSelectionModel.select(0)
+      EventManager.fireOnRun()
 
       // Check syntax
       onFX(() => {
@@ -287,6 +289,7 @@ abstract class EditorTab extends TabFrame {
     if (running) {
       this.executor = executor
       _running = true
+      EventManager.fireOnStarted()
     } else {
       _running = false
       this.executor = null
@@ -295,5 +298,6 @@ abstract class EditorTab extends TabFrame {
         if (errorText != "")
           handleError(errorText)
       })
+      EventManager.fireOnStopped()
     }
 }

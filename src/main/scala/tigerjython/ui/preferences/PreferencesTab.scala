@@ -26,7 +26,7 @@ class PreferencesTab protected () extends TabFrame {
     for (pane <- panes) {
       val titlePane = new TitledPane()
       titlePane.setContent(new StackPane(pane.node))
-      titlePane.setText(pane.caption)
+      titlePane.textProperty().bind(pane.caption)
       mainBox.getPanes.add(titlePane)
     }
     mainBox.prefWidthProperty.bind(widthProperty())

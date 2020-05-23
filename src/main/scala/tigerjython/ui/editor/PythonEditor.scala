@@ -11,11 +11,13 @@ import java.time.Duration
 import java.util.Optional
 import java.util.concurrent.Executors
 import java.util.regex.Pattern
+
 import javafx.concurrent.Task
 import javafx.scene.input.{KeyCode, KeyEvent}
 import javafx.scene.shape.Rectangle
 import org.fxmisc.richtext._
 import org.fxmisc.richtext.model.{StyleSpans, StyleSpansBuilder}
+import tigerjython.plugins.EventManager
 import tigerjython.ui.ZoomMixin
 
 /**
@@ -50,19 +52,32 @@ class PythonEditor extends CodeArea with ZoomMixin {
     gutterRect.heightProperty.bind(this.heightProperty)
     gutterRect.getStyleClass.add("lineno")
 
-    addEventFilter(KeyEvent.KEY_PRESSED, (key: KeyEvent) => {
-      if (key.getCode == KeyCode.ENTER) {
-        val currentLine = getText(getCurrentParagraph)
-        var indentation = currentLine.takeWhile(_ == ' ')
-        if (currentLine.endsWith(":"))
-          indentation += " " * 4
-        if (indentation != "") {
-          val text = "\n" + indentation
-          onFX(() => { insertText(getCaretPosition, text) })
-          key.consume()
-        }
-      }
+    addEventFilter(KeyEvent.KEY_TYPED, (key: KeyEvent) => {
+      val char = key.getCharacter
+      if (char != null && char != KeyEvent.CHAR_UNDEFINED)
+        EventManager.fireOnKeyPressed(getCaretPosition, char)
     })
+    addEventFilter(KeyEvent.KEY_PRESSED, (key: KeyEvent) =>
+      key.getCode match {
+        case KeyCode.ENTER =>
+          val currentLine = getText(getCurrentParagraph)
+          var indentation = currentLine.takeWhile(_ == ' ')
+          if (currentLine.endsWith(":"))
+            indentation += " " * 4
+          if (indentation != "") {
+            val text = "\n" + indentation
+            onFX(() => { insertText(getCaretPosition, text) })
+            key.consume()
+          }
+          EventManager.fireOnKeyPressed(getCaretPosition, KeyCode.ENTER.toString)
+        case code @ (KeyCode.BACK_SPACE | KeyCode.DELETE) =>
+          EventManager.fireOnKeyPressed(getCaretPosition, code.toString)
+        case code @ (KeyCode.LEFT | KeyCode.RIGHT | KeyCode.UP | KeyCode.DOWN |
+                     KeyCode.PAGE_UP | KeyCode.PAGE_DOWN | KeyCode.HOME | KeyCode.END) =>
+          EventManager.fireOnKeyPressed(getCaretPosition, code.toString)
+        case _ =>
+      }
+    )
 
     val cleanupWhenDone = this.multiPlainChanges()
       .successionEnds(Duration.ofMillis(50))

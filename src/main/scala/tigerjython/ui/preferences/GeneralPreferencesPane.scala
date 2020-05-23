@@ -7,11 +7,13 @@
  */
 package tigerjython.ui.preferences
 
+import javafx.beans.property.{SimpleStringProperty, StringProperty}
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.scene.Node
 import javafx.scene.control.{CheckBox, ComboBox, Label}
 import javafx.scene.layout.{StackPane, VBox}
 import tigerjython.core.{Configuration, Preferences}
+import tigerjython.ui.UIString
 
 /**
  * The pane for general settings such as language or zoom level.  This is the one displayed first when the user opens
@@ -21,7 +23,8 @@ import tigerjython.core.{Configuration, Preferences}
  */
 class GeneralPreferencesPane extends PreferencePane {
 
-  override def caption: String = "General"
+  val caption: StringProperty = new SimpleStringProperty("General")
+  UIString("prefs.general") += caption
 
   protected def createLanguageChooser(): Seq[Node] = {
     val availableLanguages = Configuration.availableLanguages

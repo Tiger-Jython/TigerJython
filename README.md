@@ -23,7 +23,9 @@ Some key features include:
 
 ## Plugins
 
-You can write simple plugins for TigerJython.  The plugins are written in Python and run using the internal Jython interpreter.  More information can be found in the [Plugins Guide](PLUGINS.md).
+You can write simple plugins for TigerJython.  The plugins are written in Python and run using the internal Jython interpreter.  On the one hand, plugins allow you to add additional tools and capabilities to TigerJython.  On the other hand, plugins also support research on how students learn programming in that you can easily write a plugin that monitors keystrokes.
+
+More information can be found in the [Plugins Guide](PLUGINS.md).
 
 
 

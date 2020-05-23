@@ -7,7 +7,7 @@
  */
 package tigerjython.core
 
-import tigerjython.plugins.MainWindow
+import tigerjython.plugins.{EventManager, MainWindow}
 import tigerjython.ui.TigerJythonApplication
 import tigerjython.utils.OSPlatform
 
@@ -20,6 +20,11 @@ import tigerjython.utils.OSPlatform
  * @author Tobias Kohn
  */
 object TigerJython {
+
+  /**
+   * Returns the event manager which allows to register listening to events.
+   */
+  def getEventManager: EventManager.type = EventManager
 
   /**
    * Returns the `MainWindow`, which is an interface for plugins to access the main window, add menu entries, etc.

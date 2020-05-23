@@ -7,6 +7,7 @@
  */
 package tigerjython.ui.preferences
 
+import javafx.beans.property.StringProperty
 import javafx.scene.Node
 
 /**
@@ -18,7 +19,7 @@ import javafx.scene.Node
  */
 trait PreferencePane {
 
-  def caption: String
+  def caption: StringProperty
 
   def node: Node
 }

@@ -7,6 +7,7 @@
  */
 package tigerjython.ui.preferences
 
+import javafx.beans.property.{SimpleStringProperty, StringProperty}
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.scene.Node
 import javafx.scene.control.{ComboBox, Label}
@@ -20,7 +21,7 @@ import tigerjython.execute.PythonInstallations
  */
 class PythonPreferencesPane extends PreferencePane {
 
-  override def caption: String = "Python"
+  val caption: StringProperty = new SimpleStringProperty("Python")
 
   protected def createInstallationChooser(): Seq[Node] = {
     val label = new Label("Choose an installation:")
