@@ -80,5 +80,5 @@ Use the following methods to add or remove a specific listener:
 - `EventManager.addOnStartedListener(listener)`, `EventManager.removeOnStartedListener(listener)`
 - `EventManager.addOnStoppedListener(listener)`, `EventManager.removeOnStoppedListener(listener)`
 
-The listeners themselves are of types: [`tigerjython.plugins.ErrorNotification`](src/main(scala/tigerjython/plugins/ErrorNotification.scala), [`tigerjython.plugins.KeyPressNotification`](src/main(scala/tigerjython/plugins/KeyPressNotification.scala), abd [`tigerjython.plugins.TimedNotification`](src/main(scala/tigerjython/plugins/TimedNotification.scala), respectively.
+The listeners themselves are of types: [`tigerjython.plugins.ErrorNotification`](src/main/scala/tigerjython/plugins/ErrorNotification.scala), [`tigerjython.plugins.KeyPressNotification`](src/main/scala/tigerjython/plugins/KeyPressNotification.scala), abd [`tigerjython.plugins.TimedNotification`](src/main/scala/tigerjython/plugins/TimedNotification.scala), respectively.
 

@@ -7,6 +7,7 @@ Implemented:
 - Plugins can listen to various events for recording user action;
 - Add custom Python interpreter;
 - Syntax checker honours Python version and other preferences;
+- Customise appearance with font, font-size, and themes;
 
 Bugfixes:
 - Line numbers on JRE 8 were not displayed correctly;
