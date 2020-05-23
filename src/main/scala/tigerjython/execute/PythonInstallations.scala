@@ -9,6 +9,8 @@ package tigerjython.execute
 
 import java.nio.file.{Path, Paths}
 import java.util.prefs.Preferences
+import tigerjython.ui.Utils
+import tigerjython.utils.OSProcess
 
 /**
  * The Python-Installations holds a list of all installations on the system, from which the user can choose one to
@@ -18,13 +20,14 @@ import java.util.prefs.Preferences
  */
 object PythonInstallations {
 
-  private final val APP_NAME = "Jython (%s)".format(org.python.Version.PY_VERSION)
+  private final val JYTHON_NAME = "Jython (%s)".format(org.python.Version.PY_VERSION)
+  private final val JYTHON_VERSION: Int = org.python.Version.PY_MAJOR_VERSION
 
   private val _availableVersions = collection.mutable.ArrayBuffer[String](
-    APP_NAME
+    JYTHON_NAME
   )
-  private val _executablePaths = collection.mutable.Map[String, Path](
-    APP_NAME -> getInternalJythonPath
+  private val _executablePaths = collection.mutable.Map[String, (Int, Path)](
+    JYTHON_NAME -> (JYTHON_VERSION, getInternalJythonPath)
   )
   private var _selectedIndex: Int = 0
 
@@ -45,6 +48,17 @@ object PythonInstallations {
   }
 
   /**
+   * Extracts the version number from the version string (which is something like `python3` or `Python 3.6`).
+   */
+  private def extractVersion(versionString: String): Int = {
+    val s = versionString.dropWhile(!_.isDigit).takeWhile(_.isDigit)
+    if (s.length >= 1 && (s(0) == '2' || s(0) == '3'))
+      s(0).toInt - '0'
+    else
+      0
+  }
+
+  /**
    * Adds another Python version to choose from for running Python programs.  This also allows to overwrite other
    * Python installations already registered---except for "TigerJython" itself, which is protected and will cause
    * the addition to be renamed.
@@ -56,14 +70,14 @@ object PythonInstallations {
    * @param path      The path to the executable.
    */
   def add(version: String, path: Path): Unit = synchronized {
-    if (version == APP_NAME) {
+    if (version == JYTHON_NAME) {
       var i = 1
-      while (_executablePaths.contains("%s (%d)".format(APP_NAME, i)))
+      while (_executablePaths.contains("%s (%d)".format(JYTHON_NAME, i)))
         i += 1
-      add("%s (%d)".format(APP_NAME, i), path)
+      add("%s (%d)".format(JYTHON_NAME, i), path)
     } else if (version != null && path != null) {
       _availableVersions += version
-      _executablePaths(version) = path
+      _executablePaths(version) = (extractVersion(version), path)
       val p = Preferences.userNodeForPackage(getClass).node("Python")
       if (p != null)
         p.put(version, path.toAbsolutePath.toString)
@@ -73,12 +87,26 @@ object PythonInstallations {
   def add(version: String, path: String): Unit =
     add(version, Path.of(path))
 
+  def add(file: java.io.File, onSuccess: ()=>Unit = null): Unit =
+    if (file.exists() && file.canExecute) {
+      val process = new OSProcess(file)
+      process.exec("--version")
+      val output = process.waitForOutput()
+      if (output.length > 8 && output.drop(1).startsWith("ython ")) {
+        add(output.takeWhile(_ >= ' '), file.toPath)
+        if (onSuccess != null)
+          onSuccess()
+      } else
+        Utils.alertError("This does not seem to be a Python interpreter: '%s'".format(file.getCanonicalPath))
+    } else
+      Utils.alertError("Could not find the executable '%s'".format(file.getCanonicalPath))
+
   private def addVersions(versions: Array[(String, Path)]): Unit =
     synchronized {
       for ((version, path) <- versions)
         if (!_executablePaths.contains(version)) {
           _availableVersions += version
-          _executablePaths(version) = path
+          _executablePaths(version) = (extractVersion(version), path)
         }
     }
 
@@ -86,9 +114,11 @@ object PythonInstallations {
 
   def getSelectedIndex: Int = _selectedIndex
 
-  def getSelectedPath: Path = _executablePaths(getSelectedVersion)
+  def getSelectedPath: Path = _executablePaths(getSelectedCaption)._2
 
-  def getSelectedVersion: String = _availableVersions(_selectedIndex)
+  def getSelectedCaption: String = _availableVersions(_selectedIndex)
+
+  def getSelectedVersionNumber: Int = _executablePaths(getSelectedCaption)._1
 
   /**
    * Loads previously saved preferences and tries to discover any installed Python versions on the system.

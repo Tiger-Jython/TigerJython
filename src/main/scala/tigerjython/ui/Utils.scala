@@ -9,7 +9,8 @@ package tigerjython.ui
 
 import javafx.application.Platform
 import javafx.beans.property.{ObjectProperty, StringProperty}
-import javafx.scene.control.Tooltip
+import javafx.scene.control.Alert.AlertType
+import javafx.scene.control.{Alert, ButtonType, Tooltip}
 
 /**
  * These utility and helper functions are merely an interface, but this objects allows to conveniently include the
@@ -18,6 +19,24 @@ import javafx.scene.control.Tooltip
  * @author Tobias Kohn
  */
 object Utils {
+
+  /**
+   * Displays the message to the user.
+   */
+  def alert(message: String): Unit =
+    onFX(() => {
+      val alert = new Alert(AlertType.NONE, message, ButtonType.OK)
+      alert.showAndWait()
+    })
+
+  /**
+   * Informs the user about an error that has occurred.
+   */
+  def alertError(message: String): Unit =
+    onFX(() => {
+      val alert = new Alert(AlertType.ERROR, message, ButtonType.OK)
+      alert.showAndWait()
+    })
 
   /**
    * Binds the given string property to a specific "user interface" string.  This allows to directly change all such

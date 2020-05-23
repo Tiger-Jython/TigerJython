@@ -17,6 +17,7 @@ import javafx.scene.input.{KeyCode, KeyEvent}
 import javafx.scene.shape.Rectangle
 import org.fxmisc.richtext._
 import org.fxmisc.richtext.model.{StyleSpans, StyleSpansBuilder}
+import tigerjython.core.Preferences
 import tigerjython.plugins.EventManager
 import tigerjython.ui.ZoomMixin
 
@@ -52,6 +53,8 @@ class PythonEditor extends CodeArea with ZoomMixin {
     gutterRect.heightProperty.bind(this.heightProperty)
     gutterRect.getStyleClass.add("lineno")
 
+    setStyle("-fx-font-family: \"%s\";".format(Preferences.fontFamily.get))
+
     addEventFilter(KeyEvent.KEY_TYPED, (key: KeyEvent) => {
       val char = key.getCharacter
       if (char != null && char != KeyEvent.CHAR_UNDEFINED)
@@ -62,16 +65,40 @@ class PythonEditor extends CodeArea with ZoomMixin {
         case KeyCode.ENTER =>
           val currentLine = getText(getCurrentParagraph)
           var indentation = currentLine.takeWhile(_ == ' ')
-          if (currentLine.endsWith(":"))
-            indentation += " " * 4
+          val column = getCaretColumn
+          if (column > 0 && currentLine(column-1) == ':')
+            indentation += " " * Preferences.tabWidth.get
           if (indentation != "") {
             val text = "\n" + indentation
             onFX(() => { insertText(getCaretPosition, text) })
             key.consume()
           }
           EventManager.fireOnKeyPressed(getCaretPosition, KeyCode.ENTER.toString)
-        case code @ (KeyCode.BACK_SPACE | KeyCode.DELETE) =>
-          EventManager.fireOnKeyPressed(getCaretPosition, code.toString)
+        case KeyCode.TAB =>
+          val tabWidth = Preferences.tabWidth.get
+          val x = tabWidth - (getCaretColumn % tabWidth)
+          onFX(() => { insertText(getCaretPosition, " " * x) })
+          key.consume()
+          EventManager.fireOnKeyPressed(getCaretPosition, KeyCode.TAB.toString)
+        case KeyCode.BACK_SPACE =>
+          val tabWidth = Preferences.tabWidth.get
+          val currentLine = getText(getCurrentParagraph)
+          val indentation = currentLine.segmentLength(_ == ' ')
+          val back_width = {
+            val value = indentation % tabWidth
+            if (value == 0 && indentation >= tabWidth)
+              tabWidth
+            else
+              value
+          }
+          if (back_width > 1 && getCaretColumn == indentation) {
+            val pos = getCaretPosition
+            onFX(() => { replaceText(pos - back_width, pos, "") })
+            key.consume()
+          }
+          EventManager.fireOnKeyPressed(getCaretPosition, KeyCode.BACK_SPACE.toString)
+        case KeyCode.DELETE =>
+          EventManager.fireOnKeyPressed(getCaretPosition, KeyCode.DELETE.toString)
         case code @ (KeyCode.LEFT | KeyCode.RIGHT | KeyCode.UP | KeyCode.DOWN |
                      KeyCode.PAGE_UP | KeyCode.PAGE_DOWN | KeyCode.HOME | KeyCode.END) =>
           EventManager.fireOnKeyPressed(getCaretPosition, code.toString)

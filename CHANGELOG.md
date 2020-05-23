@@ -1,6 +1,17 @@
 # Changelog
 
 
+### 3.0 Early Access Preview 3 (May 2020)
+
+Implemented:
+- Plugins can listen to various events for recording user action;
+- Add custom Python interpreter;
+- Syntax checker honours Python version and other preferences;
+
+Bugfixes:
+- Line numbers on JRE 8 were not displayed correctly;
+
+
 ### 3.0 Early Access Preview 1 (19 May 2020)
 
 _This is a very early access release with most features not yet implemented._
@@ -15,7 +26,7 @@ Implemented:
 - Perform static error checking of the Python programs;
 - Persistent storage of preferences and settings (not all settings are fully implemented, yet);
 - Jython is included as a dependency from Maven central, i.e. updating it to the newest version takes a few seconds;
-- Plugins.
+- Basic plugins.
 
 Still missing:
 - Syntax highlighting;

@@ -1,0 +1,8 @@
+github = "GitHub"
+monokai = "ACE Monokai"
+tigerjython = "TigerJython"
+tigerjython2 = "TigerJython (old)"
+cobalt = "ACE Cobalt"
+idle = "IDLE"
+textmate = "TextMate"
+twilight = "ACE Twilight"

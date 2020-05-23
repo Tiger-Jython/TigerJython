@@ -77,11 +77,19 @@ class TigerJythonApplication extends Application {
     tabManager.addTab(editor.PythonEditorTab())
 
     val scene = new Scene(root)
-    scene.getStylesheets.add("themes/python-keywords.css")
+    scene.getStylesheets.add("themes/%s.css".format(Preferences.theme.get()))
     scene.focusOwnerProperty().addListener(new ChangeListener[Node] {
       override def changed(observableValue: ObservableValue[_ <: Node], oldNode: Node, newNode: Node): Unit = {
         menuManager.focusChanged(newNode)
         tabManager.focusChanged(newNode)
+      }
+    })
+    Preferences.theme.addListener(new ChangeListener[String] {
+      override def changed(observableValue: ObservableValue[_ <: String], oldValue: String, newValue: String): Unit = {
+        Platform.runLater(() => {
+          scene.getStylesheets.add("themes/%s.css".format(newValue))
+          scene.getStylesheets.remove("themes/%s.css".format(oldValue))
+        })
       }
     })
     primaryStage.setScene(scene)

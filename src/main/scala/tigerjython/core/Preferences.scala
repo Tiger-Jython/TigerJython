@@ -82,7 +82,7 @@ object Preferences {
 
   // Private methods used to obtain some system standard values
 
-  private def getDefaultFontSize: Double =
+  lazy val getDefaultFontSize: Double =
     try {
       new Text().getFont.getSize
     } catch {
@@ -92,6 +92,8 @@ object Preferences {
 
   private def getDefaultLanguage: String =
     Locale.getDefault.getLanguage
+
+  private def getDefaultTheme: String = "tigerjython"
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -109,7 +111,7 @@ object Preferences {
 
   val tabWidth: IntegerProperty = new PrefIntegerProperty("tabWidth", 4)
 
-  val theme: StringProperty = new PrefStringProperty("editor.theme")
+  val theme: StringProperty = new PrefStringProperty("editor.theme", getDefaultTheme)
 
   val windowHeight: DoubleProperty = new PrefDoubleProperty("window.height", 600)
 

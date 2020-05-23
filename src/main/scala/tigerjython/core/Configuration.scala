@@ -33,10 +33,20 @@ object Configuration {
     ).sortBy(_._1)
   }
 
+  private lazy val _availableThemes: Seq[(String, String)] = {
+    val themesMap = Parser.parseResource("themes.txt")
+    themesMap.map(pair => (pair._1, pair._2.value)).toSeq.sortBy(_._2)
+  }
+
   /**
    * Returns a list with all available languages as tuples of the form `(abbreviation, human-readable-form)`.
    */
   def availableLanguages: Seq[(String, String)] = _availableLanguages
+
+  /**
+   * Returns a list with all available themes.
+   */
+  def availableThemes: Seq[(String, String)] = _availableThemes
 
   /**
    * Returns the version of the JRE the program is running on.  This only returns the major version.

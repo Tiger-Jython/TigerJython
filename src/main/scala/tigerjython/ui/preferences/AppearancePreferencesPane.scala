@@ -7,11 +7,15 @@
  */
 package tigerjython.ui.preferences
 
+import java.lang
+
 import javafx.beans.property.{SimpleStringProperty, StringProperty}
+import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.scene.Node
 import javafx.scene.control.{ComboBox, Label, Spinner, SpinnerValueFactory}
 import javafx.scene.layout.{StackPane, VBox}
 import javafx.scene.text._
+import tigerjython.core.{Configuration, Preferences}
 import tigerjython.ui.UIString
 
 /**
@@ -42,9 +46,16 @@ class AppearancePreferencesPane extends PreferencePane {
 
   protected def createBasicProperties(): Seq[Node] = {
     val label = new Label("Tab width:")
-    val tabWidth = new Spinner(new SpinnerValueFactory.IntegerSpinnerValueFactory(2, 12))
-    label.setLabelFor(tabWidth)
-    Seq(label, tabWidth)
+    val tabWidthFactory = new SpinnerValueFactory.IntegerSpinnerValueFactory(2, 12)
+    val tabWidthSpinner = new Spinner(tabWidthFactory)
+    tabWidthFactory.setValue(Preferences.tabWidth.get)
+    tabWidthFactory.valueProperty().addListener(new ChangeListener[Integer] {
+      override def changed(observableValue: ObservableValue[_ <: Integer], oldValue: Integer, newValue: Integer): Unit = {
+        Preferences.tabWidth.setValue(newValue)
+      }
+    })
+    label.setLabelFor(tabWidthSpinner)
+    Seq(label, tabWidthSpinner)
   }
 
   protected def createFontSelection(): Seq[Node] = {
@@ -52,14 +63,46 @@ class AppearancePreferencesPane extends PreferencePane {
     val fontChooser = new ComboBox[String]()
     fontLabel.setLabelFor(fontChooser)
     fontChooser.getItems.addAll(availableFonts: _*)
+    fontChooser.getSelectionModel.select(Preferences.fontFamily.get)
+    fontChooser.valueProperty().addListener(new ChangeListener[String] {
+      override def changed(observableValue: ObservableValue[_ <: String], oldValue: String, newValue: String): Unit = {
+        Preferences.fontFamily.setValue(newValue)
+      }
+    })
     val sizeLabel = new Label("Size:")
-    val sizeChooser = new Spinner(new SpinnerValueFactory.IntegerSpinnerValueFactory(6, 64))
+    val sizeFactory = new SpinnerValueFactory.DoubleSpinnerValueFactory(6.0, 64.0)
+    val sizeChooser = new Spinner(sizeFactory)
+    sizeFactory.setAmountToStepBy(1.0)
+    sizeFactory.setValue(Preferences.fontSize.get)
+    sizeFactory.valueProperty().addListener(new ChangeListener[lang.Double] {
+      override def changed(observableValue: ObservableValue[_ <: lang.Double], oldValue: lang.Double, newValue: lang.Double): Unit = {
+        Preferences.fontSize.setValue(newValue)
+      }
+    })
     sizeLabel.setLabelFor(sizeChooser)
     Seq(fontLabel, fontChooser, sizeLabel, sizeChooser)
   }
 
   protected def createThemes(): Seq[Node] = {
-    Seq()
+    val label = new Label("Theme:")
+    val themeChooser = new ComboBox[String]()
+    themeChooser.getItems.addAll(
+      Configuration.availableThemes.map(_._2): _*
+    )
+    themeChooser.getSelectionModel.select(
+      Configuration.availableThemes.indexWhere(_._1 == Preferences.theme.get)
+    )
+    label.setLabelFor(themeChooser)
+    themeChooser.valueProperty().addListener(new ChangeListener[String] {
+      override def changed(observableValue: ObservableValue[_ <: String], oldValue: String, newValue: String): Unit = {
+        Configuration.availableThemes.find(_._2 == newValue) match {
+          case Some((value, _)) =>
+            Preferences.theme.setValue(value)
+          case _ =>
+        }
+      }
+    })
+    Seq(label, themeChooser)
   }
 
   override lazy val node: Node = {

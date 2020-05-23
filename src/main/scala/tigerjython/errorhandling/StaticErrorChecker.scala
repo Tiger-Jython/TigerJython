@@ -7,6 +7,8 @@
  */
 package tigerjython.errorhandling
 
+import tigerjython.core.Preferences
+import tigerjython.execute.PythonInstallations
 import tigerpython.parser.SyntaxChecker
 
 /**
@@ -29,7 +31,15 @@ object StaticErrorChecker {
    *                     If no error has been found, `None`.
    */
   def checkSyntax(filename: String, programCode: String): Option[(Int, Int, String)] = {
-    val syntaxChecker = new SyntaxChecker(programCode, filename)
+    val pyVersion = PythonInstallations.getSelectedVersionNumber
+    val syntaxChecker =
+      if (pyVersion == 2 || pyVersion == 3)
+        new SyntaxChecker(programCode, filename, pyVersion)
+      else
+        new SyntaxChecker(programCode, filename)
+    syntaxChecker.strictCode = Preferences.syntaxCheckIsStrict.get
+    syntaxChecker.rejectDeadCode = Preferences.syntaxCheckRejectDeadCode.get
+    syntaxChecker.repeatStatement = Preferences.repeatLoop.get
     syntaxChecker.check() match {
       case Some((pos, msg)) =>
         val line = syntaxChecker.lineFromPosition(pos)

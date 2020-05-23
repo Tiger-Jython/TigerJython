@@ -1,0 +1,58 @@
+.run-triangle {
+    -fx-fill: green;
+}
+
+.stop-square {
+    -fx-fill: maroon;
+}
+
+.error-label {
+    -fx-background-color: mistyrose;
+    -fx-border-style: solid;
+    -fx-border-color: maroon;
+    -fx-padding: 5;
+}
+
+.output-pane {
+    -fx-font-family: monospace;
+    -fx-text-fill: navy;
+}
+
+.problems-pane {
+    -fx-font-family: monospace;
+    -fx-text-fill: maroon;
+}
+
+.lineno {
+    -fx-fill: #e8e8e8;
+    -fx-background-color: -fx-fill;
+    -fx-min-width: 40;
+    -fx-pref-width: 40;
+    -fx-text-fill: #AAA;
+}
+
+.styled-text-area {
+    -fx-background-color: white;
+}
+
+.styled-text-area .text {
+    -fx-fill: black;
+}
+
+.styled-text-area .paragraph-box:has-caret {
+    -fx-background-color: #F5F5F5;
+}
+
+.styled-text-area .keyword {
+    -fx-font-weight: bold;
+    -fx-fill: orange;
+}
+
+.styled-text-area .string {
+    -fx-fill: green;
+}
+
+.styled-text-area .comment {
+	-fx-fill: red;
+	-fx-font-style: italic;
+}

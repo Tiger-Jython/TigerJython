@@ -1,0 +1,78 @@
+.run-triangle {
+    -fx-fill: green;
+}
+
+.stop-square {
+    -fx-fill: maroon;
+}
+
+.error-label {
+    -fx-background-color: mistyrose;
+    -fx-border-style: solid;
+    -fx-border-color: maroon;
+    -fx-padding: 5;
+}
+
+.lineno {
+    -fx-fill: #FFDDAA;
+    -fx-background-color: -fx-fill;
+    -fx-min-width: 40;
+    -fx-pref-width: 40;
+    -fx-font-style: italic;
+    -fx-text-fill: #4A1100;
+}
+
+.output-pane {
+    -fx-font-family: monospace;
+    -fx-text-fill: navy;
+}
+
+.problems-pane {
+    -fx-font-family: monospace;
+    -fx-text-fill: maroon;
+}
+
+.styled-text-area {
+    -fx-background-color: white;
+}
+
+.styled-text-area .text {
+    -fx-fill: black;
+}
+
+.styled-text-area .paragraph-box:has-caret {
+    -fx-background-color: #FFFFAA;
+}
+
+.styled-text-area .keyword {
+    -fx-fill: #0033AA;
+    -fx-font-weight: bold;
+}
+
+.styled-text-area .semicolon {
+    -fx-font-weight: bold;
+}
+
+.styled-text-area .paren {
+    -fx-fill: #003366;
+    -fx-font-weight: bold;
+}
+
+.styled-text-area .bracket {
+    -fx-fill: #003366;
+    -fx-font-weight: bold;
+}
+
+.styled-text-area .brace {
+    -fx-fill: #003366;
+    -fx-font-weight: bold;
+}
+
+.styled-text-area .string {
+    -fx-fill: #CC6600;
+}
+
+.styled-text-area .comment {
+	-fx-fill: green;
+    -fx-font-style: italic;
+}

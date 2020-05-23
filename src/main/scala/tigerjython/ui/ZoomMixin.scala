@@ -8,11 +8,12 @@
 package tigerjython.ui
 
 import javafx.beans.property.{DoubleProperty, SimpleDoubleProperty}
-import javafx.beans.value.ObservableValue
+import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.event.Event
 import javafx.geometry.Bounds
 import javafx.scene.Node
 import javafx.scene.input.{ScrollEvent, ZoomEvent}
+import tigerjython.core.Preferences
 
 /**
  * For various text-based controls, it is convenient being able to zoom in and out using `CTRL` and the mouse wheel
@@ -35,8 +36,23 @@ trait ZoomMixin { self: Node =>
 
   private def setZoomIndex(index: Int): Unit = {
     zoomIndex = index
-    setStyle("-fx-font-size: %g%%;".format(zoomFactors(index) * 100))
+    val size: Double = Preferences.fontSize.get * zoomFactors(index)
+    setStyle("-fx-font-size: %g; -fx-font-family: \"%s\";".format(
+      size,
+      Preferences.fontFamily.get
+    ))
   }
+
+  Preferences.fontFamily.addListener(new ChangeListener[String] {
+    override def changed(observableValue: ObservableValue[_ <: String], oldValue: String, newValue: String): Unit = {
+      setZoomIndex(zoomIndex)
+    }
+  })
+  Preferences.fontSize.addListener(new ChangeListener[Number] {
+    override def changed(observableValue: ObservableValue[_ <: Number], oldValue: Number, newValue: Number): Unit = {
+      setZoomIndex(zoomIndex)
+    }
+  })
 
   val zoomProperty: DoubleProperty = new SimpleDoubleProperty(1.0) with ObservableValue[Number] {
 
