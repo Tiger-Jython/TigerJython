@@ -39,6 +39,10 @@
     -fx-fill: black;
 }
 
+.styled-text-area .selection {
+    -fx-fill: #B5D5FF;
+}
+
 .styled-text-area .paragraph-box:has-caret {
     -fx-background-color: #F5F5F5;
 }

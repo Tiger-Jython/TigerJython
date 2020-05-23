@@ -1,9 +1,9 @@
 .run-triangle {
-    -fx-fill: green;
+    -fx-fill: black;
 }
 
 .stop-square {
-    -fx-fill: maroon;
+    -fx-fill: black;
 }
 
 .error-label {
@@ -11,6 +11,15 @@
     -fx-border-style: solid;
     -fx-border-color: maroon;
     -fx-padding: 5;
+}
+
+.lineno {
+    -fx-fill: #FFDDAA;
+    -fx-background-color: -fx-fill;
+    -fx-min-width: 40;
+    -fx-pref-width: 40;
+    -fx-font-style: italic;
+    -fx-text-fill: #4A1100;
 }
 
 .output-pane {
@@ -23,14 +32,6 @@
     -fx-text-fill: maroon;
 }
 
-.lineno {
-    -fx-fill: #f0f0f0;
-    -fx-background-color: -fx-fill;
-    -fx-min-width: 40;
-    -fx-pref-width: 40;
-    -fx-text-fill: #333;
-}
-
 .styled-text-area {
     -fx-background-color: white;
 }
@@ -39,24 +40,20 @@
     -fx-fill: black;
 }
 
-.styled-text-area .selection {
-    -fx-fill: #B5D5FF;
-}
-
 .styled-text-area .paragraph-box:has-caret {
-    -fx-background-color: #F5F5F5;
+    -fx-background-color: #FFFFAA;
 }
 
 .styled-text-area .keyword {
+    -fx-fill: #0033AA;
     -fx-font-weight: bold;
-    -fx-fill: #687687;
 }
 
 .styled-text-area .string {
-    -fx-fill: #036A07;
+    -fx-fill: #CC6600;
 }
 
 .styled-text-area .comment {
-	-fx-fill: #4C886B;
-	-fx-font-style: italic;
+	-fx-fill: green;
+    -fx-font-style: italic;
 }

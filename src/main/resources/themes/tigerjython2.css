@@ -49,25 +49,6 @@
     -fx-font-weight: bold;
 }
 
-.styled-text-area .semicolon {
-    -fx-font-weight: bold;
-}
-
-.styled-text-area .paren {
-    -fx-fill: #003366;
-    -fx-font-weight: bold;
-}
-
-.styled-text-area .bracket {
-    -fx-fill: #003366;
-    -fx-font-weight: bold;
-}
-
-.styled-text-area .brace {
-    -fx-fill: #003366;
-    -fx-font-weight: bold;
-}
-
 .styled-text-area .string {
     -fx-fill: #CC6600;
 }

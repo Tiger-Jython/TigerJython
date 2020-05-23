@@ -24,7 +24,7 @@
 }
 
 .lineno {
-    -fx-fill: #f0f0f0;
+    -fx-fill: #ebebeb;
     -fx-background-color: -fx-fill;
     -fx-min-width: 40;
     -fx-pref-width: 40;
@@ -52,11 +52,24 @@
     -fx-fill: #687687;
 }
 
+.styled-text-area .semicolon {
+    -fx-font-weight: bold;
+}
+
+.styled-text-area .paren {
+    -fx-font-weight: bold;
+}
+.styled-text-area .bracket {
+    -fx-font-weight: bold;
+}
+.styled-text-area .brace {
+    -fx-font-weight: bold;
+}
+
 .styled-text-area .string {
-    -fx-fill: #036A07;
+    -fx-fill: #1A1AA6;
 }
 
 .styled-text-area .comment {
-	-fx-fill: #4C886B;
-	-fx-font-style: italic;
+	-fx-fill: #236e24;
 }

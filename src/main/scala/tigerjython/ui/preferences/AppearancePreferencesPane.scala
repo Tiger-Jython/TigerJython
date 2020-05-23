@@ -30,7 +30,9 @@ class AppearancePreferencesPane extends PreferencePane {
 
   // Testing of mono-spaced fonts as suggested in: https://yo-dave.com/2015/07/27/finding-mono-spaced-fonts-in-javafx/
   protected lazy val availableFonts: Array[String] = {
-    val result = collection.mutable.ArrayBuffer[String]()
+    val result = collection.mutable.ArrayBuffer[String](
+      "monospace"
+    )
     val textA = new Text("il  .")
     val textB = new Text("MNXPW")
     javafx.scene.text.Font.getFamilies.forEach({

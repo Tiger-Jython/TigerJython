@@ -13,16 +13,24 @@
     -fx-padding: 5;
 }
 
+.output-pane .content {
+    -fx-background-color: #202020;
+}
+
 .output-pane {
     -fx-font-family: monospace;
     -fx-text-fill: #F8F8F2;
-    -fx-background-color: #272822;
+    -fx-background-color: #202020;
 }
 
 .problems-pane {
     -fx-font-family: monospace;
     -fx-text-fill: #FF3333;
-    -fx-background-color: #272822;
+    -fx-background-color: #202020;
+}
+
+.problems-pane .content {
+    -fx-background-color: #202020;
 }
 
 .lineno {
@@ -39,6 +47,14 @@
 
 .styled-text-area .text {
     -fx-fill: #F8F8F2;
+}
+
+.styled-text-area .caret {
+    -fx-stroke: #F8F8F0;
+}
+
+.styled-text-area .selection {
+    -fx-fill: #49483E;
 }
 
 .styled-text-area .paragraph-box:has-caret {

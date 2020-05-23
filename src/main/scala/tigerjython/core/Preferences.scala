@@ -99,7 +99,7 @@ object Preferences {
 
   // UI Preferences
 
-  val fontFamily: StringProperty = new PrefStringProperty("editor.font-family")
+  val fontFamily: StringProperty = new PrefStringProperty("editor.font-family", "monospace")
 
   val fontSize: DoubleProperty = new PrefDoubleProperty("editor.font-size", getDefaultFontSize)
 
