@@ -1,7 +1,7 @@
 # Changelog
 
 
-### 3.0 Early Access Preview 3 (May 2020)
+### 3.0 Early Access Preview 3 (25 May 2020)
 
 Implemented:
 - Plugins can listen to various events for recording user action;
