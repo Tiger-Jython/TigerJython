@@ -51,4 +51,12 @@ public class Builtins {
         JOptionPane.showMessageDialog(null, message);
         return Py.None;
     }
+
+    public static java.awt.Color makeColor(String value) {
+        javafx.scene.paint.Color color = javafx.scene.paint.Color.valueOf(value);
+        int r = (int)Math.round(color.getRed() * 255);
+        int g = (int)Math.round(color.getGreen() * 255);
+        int b = (int)Math.round(color.getBlue() * 255);
+        return new java.awt.Color(r, g, b);
+    }
 }

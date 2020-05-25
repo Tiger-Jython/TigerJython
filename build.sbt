@@ -54,7 +54,7 @@ val buildDate = "%d %s %d".format(
 
 val buildTag = "-SNAPSHOT"
 
-val buildVersion = "ea+03"
+val buildVersion = "ea+04"
 
 // This is needed to run/test the project without having to restart SBT afterwards
 fork in run := true
@@ -96,7 +96,7 @@ libraryDependencies += "org.openjfx" % "javafx-graphics" % fxVersion classifier 
 
 // Other dependencies
 libraryDependencies += "org.fxmisc.richtext" % "richtextfx" % "0.10.5"
-libraryDependencies += "org.python" % "jython" % "2.7.2"
+libraryDependencies += "org.python" % "jython-standalone" % "2.7.2"
 
 // When building a common JAR, some files are typically shared and we need to discard
 // any superfluous files

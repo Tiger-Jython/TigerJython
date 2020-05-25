@@ -20,7 +20,7 @@ import javafx.stage.Popup
 import org.fxmisc.flowless.VirtualizedScrollPane
 import org.fxmisc.richtext.CodeArea
 import tigerjython.errorhandling._
-import tigerjython.execute.PythonExecutor
+import tigerjython.execute.{PythonCodeTranslator, PythonExecutor}
 import tigerjython.plugins.EventManager
 import tigerjython.ui.{TabFrame, TigerJythonApplication, ZoomMixin}
 
@@ -177,6 +177,8 @@ abstract class EditorTab extends TabFrame {
 
   def getFile: java.io.File = file
 
+  def getDefaultFileSuffix: String = ".py"
+
   def getSelectedText: String =
     editor.getSelectedText
 
@@ -185,19 +187,15 @@ abstract class EditorTab extends TabFrame {
 
   def hasExecutableFile: Boolean =
     if (file != null) {
-      save()
       _execFile = file
+      saveExecutable()
       true
-    } else
-    if (!isEmpty) {
+    } else if (!isEmpty) {
       if (_execFile == null) {
-        _execFile = java.io.File.createTempFile(caption.getValue, ".py")
+        _execFile = java.io.File.createTempFile(caption.getValue + " (", ")" + getDefaultFileSuffix)
         _execFile.deleteOnExit()
       }
-      val writer = new FileWriter(_execFile)
-      val printer = new PrintWriter(writer)
-      printer.print(editor.getText())
-      printer.close()
+      saveExecutable()
       true
     } else
       false
@@ -233,33 +231,33 @@ abstract class EditorTab extends TabFrame {
   }
 
   def run(): Unit = {
+    if (isRunning)
+      stop()
+    outputPane.clear()
+    errorPane.clear()
+    infoPane.getSelectionModel.select(0)
+    EventManager.fireOnRun()
+
+    // Check syntax
+    onFX(() => {
+      StaticErrorChecker.checkSyntax(caption.get(), editor.getText()) match {
+        case Some((line, offs, msg)) =>
+          displayError(line, offs, msg)
+        case None =>
+          Platform.runLater(() => _run())
+      }
+    })
+  }
+
+  protected def _run(): Unit =
     if (hasExecutableFile) {
-      outputPane.clear()
-      errorPane.clear()
-      infoPane.getSelectionModel.select(0)
-      EventManager.fireOnRun()
-
-      // Check syntax
-      onFX(() => {
-        StaticErrorChecker.checkSyntax(caption.get(), editor.getText()) match {
-          case Some((line, offs, msg)) =>
-            displayError(line, offs, msg)
-          case None =>
-            Platform.runLater(() => _run())
-        }
-      })
-    } else
-      new Alert(Alert.AlertType.ERROR, "Please save the file first!", ButtonType.OK).showAndWait()
-  }
-
-  protected def _run(): Unit = {
-    // Execute the code
-    val executor = PythonExecutor(this)
-    if (executor != null)
-      executor.run()
-    else
-      new Alert(Alert.AlertType.ERROR, "Please choose an appropriate interpreter", ButtonType.OK).showAndWait()
-  }
+      // Execute the code
+      val executor = PythonExecutor(this)
+      if (executor != null)
+        executor.run()
+      else
+        new Alert(Alert.AlertType.ERROR, "Please choose an appropriate interpreter", ButtonType.OK).showAndWait()
+    }
 
   def save(): Unit =
     if (file != null) synchronized {
@@ -268,6 +266,23 @@ abstract class EditorTab extends TabFrame {
       printer.print(editor.getText())
       printer.close()
     }
+
+  protected def saveExecutable(): Unit = {
+    val editorText = editor.getText()
+    val text =
+      PythonCodeTranslator.translate(editorText) match {
+        case Some(text) =>
+          text
+        case None =>
+          editorText
+      }
+    synchronized {
+      val writer = new FileWriter(_execFile)
+      val printer = new PrintWriter(writer)
+      printer.print(text)
+      printer.close()
+    }
+  }
 
   def setFile(file: java.io.File): Unit = {
     this.file = file
@@ -299,5 +314,6 @@ abstract class EditorTab extends TabFrame {
           handleError(errorText)
       })
       EventManager.fireOnStopped()
+      save()
     }
 }

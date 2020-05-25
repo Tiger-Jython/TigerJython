@@ -28,7 +28,9 @@ object JythonExecutor {
   def run(filename: String): Unit = {
     Options.importSite = false
     Options.Qnew = true
-    PythonInterpreter.initialize(System.getProperties, null, null)
+    val postProperties = new java.util.Properties()
+    postProperties.setProperty("python.cachedir.skip", "false")
+    PythonInterpreter.initialize(System.getProperties, postProperties, null)
     jython.JythonBuiltins.initialize()
     interpreter = new PythonInterpreter()
     interpreter.execfile(filename)

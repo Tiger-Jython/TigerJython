@@ -1,5 +1,11 @@
 # Changelog
 
+### 3.0 Early Access Preview 4 (... 2020)
+
+Implemented:
+- Support for `repeat` loops;
+- TigerJython specific libraries (only as part of the release, no sources);
+
 
 ### 3.0 Early Access Preview 3 (25 May 2020)
 
@@ -9,7 +15,7 @@ Implemented:
 - Syntax checker honours Python version and other preferences;
 - Customise appearance with font, font-size, and themes;
 
-Bugfixes:
+Bug fixes:
 - Line numbers on JRE 8 were not displayed correctly;
 
 

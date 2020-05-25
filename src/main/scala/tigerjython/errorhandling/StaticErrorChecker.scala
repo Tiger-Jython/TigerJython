@@ -39,7 +39,8 @@ object StaticErrorChecker {
         else
           new SyntaxChecker(programCode, filename)
       syntaxChecker.strictCode = Preferences.syntaxCheckIsStrict.get
-      syntaxChecker.rejectDeadCode = Preferences.syntaxCheckRejectDeadCode.get
+      // syntaxChecker.rejectDeadCode = Preferences.syntaxCheckRejectDeadCode.get
+      syntaxChecker.rejectDeadCode = Preferences.syntaxCheckIsStrict.get
       syntaxChecker.repeatStatement = Preferences.repeatLoop.get
       syntaxChecker.check() match {
         case Some((pos, msg)) =>

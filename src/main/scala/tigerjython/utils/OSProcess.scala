@@ -99,8 +99,8 @@ class OSProcess(val cmd: String) {
   def abort(): Unit =
     if (process != null) synchronized {
       process.destroy()
-      _execTime = System.currentTimeMillis() - _execTime
-      _completed(-1)
+      //_execTime = System.currentTimeMillis() - _execTime
+      //_completed(-1)
     }
 
   private def _completed(result: Int): Unit = {

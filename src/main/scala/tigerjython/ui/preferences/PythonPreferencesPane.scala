@@ -77,13 +77,23 @@ class PythonPreferencesPane extends PreferencePane {
     checkErrors.selectedProperty().bindBidirectional(Preferences.checkSyntax)
     strictErrorChecking.setSelected(Preferences.syntaxCheckIsStrict.get)
     strictErrorChecking.selectedProperty().bindBidirectional(Preferences.syntaxCheckIsStrict)
+    strictErrorChecking.disableProperty().bind(checkErrors.selectedProperty().not())
     Seq(checkErrors, strictErrorChecking)
+  }
+
+  protected def createExtOptions(): Seq[Node] = {
+    val repeatLoop = new CheckBox("Repeat loop")
+    UIString("prefs.jython.repeatloop") += repeatLoop.textProperty()
+    repeatLoop.setSelected(Preferences.repeatLoop.get)
+    repeatLoop.selectedProperty().bindBidirectional(Preferences.repeatLoop)
+    Seq(repeatLoop)
   }
 
   override lazy val node: Node = {
     val result = new VBox()
     result.getChildren.addAll(createInstallationChooser(): _*)
     result.getChildren.addAll(createErrorCheckOptions(): _*)
+    result.getChildren.addAll(createExtOptions(): _*)
     new StackPane(result)
   }
 }
