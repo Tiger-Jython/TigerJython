@@ -13,6 +13,7 @@ import javafx.scene.control._
 import javafx.stage.FileChooser
 import javafx.stage.FileChooser.ExtensionFilter
 import org.fxmisc.richtext.StyleClassedTextArea
+import tigerjython.core.Configuration
 import tigerjython.ui.editor.EditorTab
 
 /**
@@ -84,6 +85,7 @@ class DefaultMenuManager(val application: TigerJythonApplication) extends MenuMa
 
   protected lazy val fileChooser: FileChooser = {
     val result = new FileChooser()
+    result.setInitialDirectory(Configuration.userHome.toFile)
     result.getExtensionFilters.addAll(
       new ExtensionFilter("Python Files", "*.py"),
       new ExtensionFilter("All Files", "*.*")

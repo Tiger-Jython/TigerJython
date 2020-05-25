@@ -135,6 +135,8 @@ object Preferences {
 
   // General and Python-Related Preferences
 
+  val checkSyntax: BooleanProperty = new PrefBooleanProperty("syntaxcheck", true)
+
   val checkUpdates: BooleanProperty = new PrefBooleanProperty("check-updates", true)
 
   val pythonInterpreter: StringProperty = new PrefStringProperty("python.interpreter")

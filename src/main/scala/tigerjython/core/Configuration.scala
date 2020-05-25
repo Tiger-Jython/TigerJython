@@ -8,6 +8,7 @@
 package tigerjython.core
 
 import java.net.URI
+import java.nio.file.{Path, Paths}
 
 import tigerjython.config.Parser
 
@@ -77,6 +78,11 @@ object Configuration {
    * This is the "source" of the application, i.e. the full path of the JAR-file.
    */
   var sourcePath: URI = _
+
+  /**
+   * The user's home path.
+   */
+  lazy val userHome: Path = Paths.get(System.getProperty("user.home"))
 
   /**
    * Load the configurations from the respective files and resources.

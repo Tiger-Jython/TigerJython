@@ -10,12 +10,13 @@ package tigerjython.ui.preferences
 import javafx.beans.property.{SimpleStringProperty, StringProperty}
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.scene.Node
-import javafx.scene.control.{Button, ComboBox, Label}
+import javafx.scene.control.{Button, CheckBox, ComboBox, Label}
 import javafx.scene.layout.{StackPane, VBox}
 import javafx.stage.FileChooser
 import javafx.stage.FileChooser.ExtensionFilter
+import tigerjython.core.Preferences
 import tigerjython.execute.PythonInstallations
-import tigerjython.ui.TigerJythonApplication
+import tigerjython.ui.{TigerJythonApplication, UIString}
 import tigerjython.utils.OSPlatform
 
 /**
@@ -67,9 +68,22 @@ class PythonPreferencesPane extends PreferencePane {
     Seq(label, interpreterSelectionBox, addButton)
   }
 
+  protected def createErrorCheckOptions(): Seq[Node] = {
+    val checkErrors = new CheckBox("Check for syntax errors")
+    val strictErrorChecking = new CheckBox("Strict checking")
+    UIString("prefs.jython.exterrors") += checkErrors.textProperty()
+    UIString("prefs.jython.strictchecking") += strictErrorChecking.textProperty()
+    checkErrors.setSelected(Preferences.checkSyntax.get)
+    checkErrors.selectedProperty().bindBidirectional(Preferences.checkSyntax)
+    strictErrorChecking.setSelected(Preferences.syntaxCheckIsStrict.get)
+    strictErrorChecking.selectedProperty().bindBidirectional(Preferences.syntaxCheckIsStrict)
+    Seq(checkErrors, strictErrorChecking)
+  }
+
   override lazy val node: Node = {
     val result = new VBox()
     result.getChildren.addAll(createInstallationChooser(): _*)
+    result.getChildren.addAll(createErrorCheckOptions(): _*)
     new StackPane(result)
   }
 }

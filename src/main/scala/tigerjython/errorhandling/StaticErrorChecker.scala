@@ -30,23 +30,25 @@ object StaticErrorChecker {
    * @return             If an error has been found, its location (line, offset) and the error message is reported.
    *                     If no error has been found, `None`.
    */
-  def checkSyntax(filename: String, programCode: String): Option[(Int, Int, String)] = {
-    val pyVersion = PythonInstallations.getSelectedVersionNumber
-    val syntaxChecker =
-      if (pyVersion == 2 || pyVersion == 3)
-        new SyntaxChecker(programCode, filename, pyVersion)
-      else
-        new SyntaxChecker(programCode, filename)
-    syntaxChecker.strictCode = Preferences.syntaxCheckIsStrict.get
-    syntaxChecker.rejectDeadCode = Preferences.syntaxCheckRejectDeadCode.get
-    syntaxChecker.repeatStatement = Preferences.repeatLoop.get
-    syntaxChecker.check() match {
-      case Some((pos, msg)) =>
-        val line = syntaxChecker.lineFromPosition(pos)
-        val offs = syntaxChecker.lineOffsetFromPosition(pos)
-        Some((line, offs, msg))
-      case None =>
-        None
-    }
-  }
+  def checkSyntax(filename: String, programCode: String): Option[(Int, Int, String)] =
+    if (Preferences.checkSyntax.get) {
+      val pyVersion = PythonInstallations.getSelectedVersionNumber
+      val syntaxChecker =
+        if (pyVersion == 2 || pyVersion == 3)
+          new SyntaxChecker(programCode, filename, pyVersion)
+        else
+          new SyntaxChecker(programCode, filename)
+      syntaxChecker.strictCode = Preferences.syntaxCheckIsStrict.get
+      syntaxChecker.rejectDeadCode = Preferences.syntaxCheckRejectDeadCode.get
+      syntaxChecker.repeatStatement = Preferences.repeatLoop.get
+      syntaxChecker.check() match {
+        case Some((pos, msg)) =>
+          val line = syntaxChecker.lineFromPosition(pos)
+          val offs = syntaxChecker.lineOffsetFromPosition(pos)
+          Some((line, offs, msg))
+        case None =>
+          None
+      }
+    } else
+      None
 }

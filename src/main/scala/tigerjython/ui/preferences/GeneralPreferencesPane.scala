@@ -49,6 +49,8 @@ class GeneralPreferencesPane extends PreferencePane {
   protected def createServerElements(): Seq[Node] = {
     val updates = new CheckBox("Check for updates")
     val statistics = new CheckBox("Send anonymised usage statistics")
+    UIString("prefs.checkupdate") += updates.textProperty()
+    UIString("prefs.feedback.sendhttp") += statistics.textProperty()
     updates.selectedProperty().bindBidirectional(Preferences.checkUpdates)
     statistics.selectedProperty().bindBidirectional(Preferences.sendStatistics)
     Seq(updates, statistics)
