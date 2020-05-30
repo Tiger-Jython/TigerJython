@@ -67,6 +67,11 @@ class DefaultOutputPane(val editorTab: EditorTab, val captionID: String) extends
   def getContentText: String =
     textArea.getText()
 
+  def isEmpty: Boolean = {
+    val text = textArea.getText
+    text == null || text.length == 0
+  }
+
   /**
    * Set the `onKeyPress` handler to enable keyboard input.
    */

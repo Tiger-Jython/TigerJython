@@ -25,4 +25,6 @@ trait OutputPane extends Tab {
   def clear(): Unit
 
   def getContentText: String
+
+  def isEmpty: Boolean
 }

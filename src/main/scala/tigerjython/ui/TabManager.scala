@@ -8,6 +8,7 @@
 package tigerjython.ui
 
 import javafx.scene.Node
+import tigerjython.files.Document
 
 /**
  * The `TabManager` is responsible for managing the different tabs in the main window.  It has a default implementation
@@ -23,6 +24,8 @@ trait TabManager {
    * @return
    */
   def addTab(frame: TabFrame): Option[TabFrame]
+
+  def saveAll(): Boolean
 
   /**
    *
@@ -48,6 +51,12 @@ trait TabManager {
    * @param receivingNode
    */
   def focusChanged(receivingNode: Node): Unit
+
+  /**
+   *
+   * @param document
+   */
+  def openDocument(document: Document): Unit
 
   /**
    *

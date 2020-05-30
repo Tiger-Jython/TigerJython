@@ -157,7 +157,11 @@ class PythonEditor extends CodeArea with ZoomMixin {
   }
 
   private def computeHighlighting(text: String): StyleSpans[java.util.Collection[String]] = {
-    val matcher = PythonEditor.PATTERN.matcher(text)
+    val matcher =
+      if (Preferences.repeatLoop.get)
+        PythonEditor.PATTERN.matcher(text)
+      else
+        PythonEditor.PATTERN_PLAIN.matcher(text)
     val spansBuilder = new StyleSpansBuilder[java.util.Collection[String]]()
     var lastKwEnd = 0
     while (matcher.find()) {
@@ -186,12 +190,19 @@ object PythonEditor {
   )
 
   private val COMMENT_PATTERN = "#[^\\n]*"
-  private val KEYWORD_PATTERN = "\\b(" + KEYWORDS.mkString("|") + ")\\b"
+  private val KEYWORD_PATTERN = "\\b(" + KEYWORDS.mkString("|") + "|repeat)\\b"
+  private val KEYWORD_PATTERN_PLAIN = "\\b(" + KEYWORDS.mkString("|") + ")\\b"
   private val STRING_PATTERN = "\\\"([^\\\"\\\\\\\\]|\\\\\\\\.)*\\\""
 
   private lazy val PATTERN = Pattern.compile(
     "(?<KEYWORD>" + KEYWORD_PATTERN + ")" +
     "|(?<STRING>" + STRING_PATTERN + ")" +
     "|(?<COMMENT>" + COMMENT_PATTERN + ")"
+  )
+
+  private lazy val PATTERN_PLAIN = Pattern.compile(
+    "(?<KEYWORD>" + KEYWORD_PATTERN_PLAIN + ")" +
+      "|(?<STRING>" + STRING_PATTERN + ")" +
+      "|(?<COMMENT>" + COMMENT_PATTERN + ")"
   )
 }

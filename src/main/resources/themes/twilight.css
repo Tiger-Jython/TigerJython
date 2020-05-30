@@ -33,6 +33,43 @@
     -fx-background-color: #141414;
 }
 
+.document-item {
+    -fx-padding: 10;
+}
+
+.document-item:hover {
+    -fx-background-color: skyblue;
+    -fx-border-style: solid;
+    -fx-border-color: navy;
+}
+
+.document-item .title {
+    -fx-font-size: 150%;
+    -fx-font-weight: bold;
+}
+
+.document-item .paper {
+    -fx-fill: silver;
+}
+
+.document-item .description {
+    -fx-font-family: monospaced;
+    -fx-font-size: 90%;
+    -fx-text-fill: gray;
+}
+
+.document-item:hover .title {
+    -fx-text-fill: blue;
+}
+
+.document-item:hover .description {
+    -fx-text-fill: navy;
+}
+
+.document-item:hover .paper {
+    -fx-fill: white;
+}
+
 .lineno {
     -fx-fill: #232323;
     -fx-background-color: -fx-fill;

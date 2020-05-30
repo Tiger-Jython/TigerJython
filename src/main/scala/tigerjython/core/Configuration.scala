@@ -10,7 +10,7 @@ package tigerjython.core
 import java.net.URI
 import java.nio.file.{Path, Paths}
 
-import tigerjython.config.Parser
+import tigerjython.configparser.Parser
 
 /**
  * In contrast to the `Preferences`, which are basically entirely user-controlled, the configurations are rather

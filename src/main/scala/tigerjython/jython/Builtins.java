@@ -8,8 +8,8 @@
 package tigerjython.jython;
 
 import javax.swing.JOptionPane;
-import org.python.core.Py;
-import org.python.core.PyObject;
+
+import org.python.core.*;
 
 /**
  * Since Scala has no static methods, we need to define the static methods for built-in replacements inside a
@@ -47,6 +47,19 @@ public class Builtins {
             return Py.None;
     }
 
+    public static PyObject isInteger(PyObject obj) {
+        if (obj instanceof PyInteger || obj instanceof PyLong)
+            return Py.True;
+        if (obj instanceof PyFloat) {
+            double f = obj.asDouble();
+            if ((Math.floor(f) == f) && !Double.isInfinite(f))
+                return Py.True;
+            else
+                return Py.False;
+        } else
+            return Py.False;
+    }
+
     public static PyObject msgDlg(PyObject message) {
         JOptionPane.showMessageDialog(null, message);
         return Py.None;
@@ -58,5 +71,9 @@ public class Builtins {
         int g = (int)Math.round(color.getGreen() * 255);
         int b = (int)Math.round(color.getBlue() * 255);
         return new java.awt.Color(r, g, b);
+    }
+
+    public static PyObject getTigerJythonFlag(String name) {
+        return TigerJythonBuiltins.getTigerJythonSeting(name);
     }
 }

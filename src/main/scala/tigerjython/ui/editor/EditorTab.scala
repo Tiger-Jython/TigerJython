@@ -7,8 +7,6 @@
  */
 package tigerjython.ui.editor
 
-import java.io.{FileWriter, PrintWriter}
-
 import javafx.application.Platform
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.geometry.Orientation
@@ -20,7 +18,8 @@ import javafx.stage.Popup
 import org.fxmisc.flowless.VirtualizedScrollPane
 import org.fxmisc.richtext.CodeArea
 import tigerjython.errorhandling._
-import tigerjython.execute.{PythonCodeTranslator, PythonExecutor}
+import tigerjython.execute.PythonExecutor
+import tigerjython.files.{Document, Documents}
 import tigerjython.plugins.EventManager
 import tigerjython.ui.{TabFrame, TigerJythonApplication, ZoomMixin}
 
@@ -44,12 +43,17 @@ abstract class EditorTab extends TabFrame {
   protected val splitPane: SplitPane = new SplitPane()
   protected val topToolBar: Node = createTopToolBar
 
-  protected var file: java.io.File = _
+  protected var document: Document = _
   protected var executor: PythonExecutor = _
-  private var _execFile: java.io.File = _
   private var _running: Boolean = false
 
   protected var errorLabel: Node = _
+
+  protected def file: java.io.File =
+    if (document != null)
+      document.file
+    else
+      null
 
   private object CaretChangeListener extends ChangeListener[Integer] {
 
@@ -97,7 +101,7 @@ abstract class EditorTab extends TabFrame {
     result.getStyleClass.add("error-label")
     editor match {
       case zoomMixin: ZoomMixin =>
-        result.setStyle("-fx-font-size: %g%%;".format(zoomMixin.getZoom * 100))
+        result.setStyle("-fx-font-size: %g;".format(zoomMixin.getScaledFontSize))
       case _ =>
     }
     result
@@ -153,6 +157,18 @@ abstract class EditorTab extends TabFrame {
         editor.caretPositionProperty().addListener(CaretChangeListener)
         editor.textProperty().addListener(TextChangeListener)
       }
+      if (errorPane.isEmpty) {
+        if (line >= 0) {
+          val pos =
+            if (column > 0)
+              "%s.%s".format(line, column)
+            else
+              line.toString
+          errorPane.append("[%s] %s".format(pos, msg))
+        } else
+          errorPane.append(msg)
+      }
+
     })
   }
 
@@ -173,32 +189,18 @@ abstract class EditorTab extends TabFrame {
     editor.getCaretPosition
 
   def getExecutableFile: java.io.File =
-    _execFile
+    if (document != null)
+      document.getExecutableFile
+    else
+      null
 
   def getFile: java.io.File = file
-
-  def getDefaultFileSuffix: String = ".py"
 
   def getSelectedText: String =
     editor.getSelectedText
 
   def getText: String =
     editor.getText
-
-  def hasExecutableFile: Boolean =
-    if (file != null) {
-      _execFile = file
-      saveExecutable()
-      true
-    } else if (!isEmpty) {
-      if (_execFile == null) {
-        _execFile = java.io.File.createTempFile(caption.getValue + " (", ")" + getDefaultFileSuffix)
-        _execFile.deleteOnExit()
-      }
-      saveExecutable()
-      true
-    } else
-      false
 
   def handleError(errorText: String): Unit = {
     infoPane.getSelectionModel.select(1)
@@ -222,12 +224,26 @@ abstract class EditorTab extends TabFrame {
 
   def isRunning: Boolean = _running
 
-  def loadFile(file: java.io.File): Unit = {
-    if (file.canWrite)
-      this.file = file
-    val source = scala.io.Source.fromFile(file)
-    editor.replaceText(source.getLines.mkString("\n"))
-    caption.setValue(file.getName)
+  def loadFile(file: java.io.File): Unit =
+    loadDocument(Documents(file))
+
+  def loadDocument(document: Document): Unit =
+    if (document != null) {
+      this.document = document
+      val text = document.load()
+      Platform.runLater(() => {
+        editor.replaceText(text)
+        editor.moveTo(document.caretPosition.get min text.length)
+      })
+      document.open(this)
+      caption.setValue(document.name.get)
+    }
+
+  override def onClose(): Unit = {
+    if (document != null)
+      document.close()
+    if (isRunning)
+      stop()
   }
 
   def run(): Unit = {
@@ -250,7 +266,8 @@ abstract class EditorTab extends TabFrame {
   }
 
   protected def _run(): Unit =
-    if (hasExecutableFile) {
+    {
+      save()
       // Execute the code
       val executor = PythonExecutor(this)
       if (executor != null)
@@ -260,37 +277,21 @@ abstract class EditorTab extends TabFrame {
     }
 
   def save(): Unit =
-    if (file != null) synchronized {
-      val writer = new FileWriter(file)
-      val printer = new PrintWriter(writer)
-      printer.print(editor.getText())
-      printer.close()
+    if (document != null)
+      document.save(editor.getText, editor.getCaretPosition)
+
+  def setDocument(document: Document): Unit =
+    if (document != null) {
+      if (this.document != null)
+        this.document.close()
+      this.document = document
+      document.open(this)
+      caption.setValue(document.name.get)
+      document.save(editor.getText, editor.getCaretPosition)
     }
 
-  protected def saveExecutable(): Unit = {
-    val editorText = editor.getText()
-    val text =
-      PythonCodeTranslator.translate(editorText) match {
-        case Some(text) =>
-          text
-        case None =>
-          editorText
-      }
-    synchronized {
-      val writer = new FileWriter(_execFile)
-      val printer = new PrintWriter(writer)
-      printer.print(text)
-      printer.close()
-    }
-  }
-
-  def setFile(file: java.io.File): Unit = {
-    this.file = file
-    if (file != null) {
-      caption.setValue(file.getName)
-      save()
-    }
-  }
+  def setFile(file: java.io.File): Unit =
+    setDocument(Documents(file))
 
   def setSelectedText(s: String): Unit =
     editor.replaceSelection(s)

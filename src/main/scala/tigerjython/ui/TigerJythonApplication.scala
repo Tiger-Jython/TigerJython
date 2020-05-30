@@ -14,6 +14,7 @@ import javafx.scene.control._
 import javafx.scene.layout.BorderPane
 import javafx.stage.Stage
 import tigerjython.core.{BuildInfo, Preferences}
+import tigerjython.files.Documents
 import tigerjython.plugins.{MainWindow, PluginsManager}
 
 /**
@@ -25,7 +26,11 @@ object TigerJythonApplication {
 
   private var _mainStage: Stage = _
 
+  private var _mainWindow: MainWindow = _
+
   private var _scene: Scene = _
+
+  private var _tabManager: TabManager = _
 
   private var _zoomingPane: ZoomingPane = _
 
@@ -33,9 +38,9 @@ object TigerJythonApplication {
 
   def mainStage: Stage = _mainStage
 
-  private var _mainWindow: MainWindow = _
-
   def mainWindow: MainWindow = _mainWindow
+
+  def tabManager: TabManager = _tabManager
 
   /**
    * Launches the IDE.
@@ -49,7 +54,7 @@ object TigerJythonApplication {
 
 class TigerJythonApplication extends Application {
 
-  import TigerJythonApplication.{_mainStage, _mainWindow, _scene, _zoomingPane}
+  import TigerJythonApplication.{_mainStage, _mainWindow, _scene, _tabManager, _zoomingPane}
 
   lazy val menuManager: MenuManager = new DefaultMenuManager(this)
 
@@ -74,7 +79,6 @@ class TigerJythonApplication extends Application {
     root.setCenter(centre)
     _zoomingPane = centre
     centre.zoomFactorProperty.bind(Preferences.globalZoom)
-    tabManager.addTab(editor.PythonEditorTab())
 
     val scene = new Scene(root)
     scene.getStylesheets.add("themes/%s.css".format(Preferences.theme.get()))
@@ -93,12 +97,14 @@ class TigerJythonApplication extends Application {
       }
     })
     primaryStage.setScene(scene)
-    primaryStage.setTitle(BuildInfo.Name)
+    primaryStage.setTitle(BuildInfo.Name + " " + BuildInfo.fullVersion)
     primaryStage.setOnCloseRequest(_ => handleCloseRequest())
     primaryStage.show()
     _mainStage = primaryStage
     _scene = scene
     _mainWindow = new MainWindow(menuManager, tabManager)
+    _tabManager = tabManager
+    Documents.initialize()
     Platform.runLater(() => {
       PluginsManager.initialize()
     })
@@ -121,6 +127,7 @@ class TigerJythonApplication extends Application {
   }
 
   def handleCloseRequest(): Unit = {
+    tabManager.saveAll()
     stop()
     Platform.exit()
     sys.exit()

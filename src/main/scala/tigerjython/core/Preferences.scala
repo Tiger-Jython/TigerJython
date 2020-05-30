@@ -7,13 +7,13 @@
  */
 package tigerjython.core
 
-import java.lang
-import java.util.Locale
+import java.util.{Base64, Locale, Random}
 import java.util.prefs.{Preferences => JPreferences}
 
 import javafx.beans.property._
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.scene.text.Text
+import tigerjython.utils._
 
 /**
  * The global preferences keep track of values used to customise the application.  By binding to the respective
@@ -39,45 +39,6 @@ object Preferences {
 
   protected val preferences: JPreferences = JPreferences.userNodeForPackage(getClass)
 
-  // We define our own flavour of preferences, each with the ability to interact with the persistent storage.
-
-  protected class PrefBooleanProperty(val name: String, default: Boolean = false) extends
-    SimpleBooleanProperty(preferences.getBoolean(name, default)) {
-
-    addListener(new ChangeListener[lang.Boolean] {
-      override def changed(observableValue: ObservableValue[_ <: lang.Boolean], oldValue: lang.Boolean,
-                           newValue: lang.Boolean): Unit =
-        preferences.putBoolean(name, newValue)
-    })
-  }
-
-  protected class PrefDoubleProperty(val name: String, default: Double = 0.0) extends
-    SimpleDoubleProperty(preferences.getDouble(name, default)) {
-
-    addListener(new ChangeListener[Number] {
-      override def changed(observableValue: ObservableValue[_ <: Number], oldValue: Number, newValue: Number): Unit =
-        preferences.putDouble(name, newValue.doubleValue())
-    })
-  }
-
-  protected class PrefIntegerProperty(val name: String, default: Int = 0) extends
-    SimpleIntegerProperty(preferences.getInt(name, default)) {
-
-    addListener(new ChangeListener[Number] {
-      override def changed(observableValue: ObservableValue[_ <: Number], oldValue: Number, newValue: Number): Unit =
-        preferences.putInt(name, newValue.intValue())
-    })
-  }
-
-  protected class PrefStringProperty(val name: String, default: String = null) extends
-    SimpleStringProperty(preferences.get(name, default)) {
-
-    addListener(new ChangeListener[String] {
-      override def changed(observableValue: ObservableValue[_ <: String], oldValue: String, newValue: String): Unit =
-        preferences.put(name, newValue)
-    })
-  }
-
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // Private methods used to obtain some system standard values
@@ -99,29 +60,31 @@ object Preferences {
 
   // UI Preferences
 
-  val fontFamily: StringProperty = new PrefStringProperty("editor.font-family", "monospace")
+  val fontFamily: StringProperty = new PrefStringProperty(preferences, "editor.font-family", "monospace")
 
-  val fontSize: DoubleProperty = new PrefDoubleProperty("editor.font-size", getDefaultFontSize)
+  val fontSize: DoubleProperty = new PrefDoubleProperty(preferences, "editor.font-size", getDefaultFontSize)
 
-  val globalZoom: DoubleProperty = new PrefDoubleProperty("global.zoom", 1.0)
+  val globalZoom: DoubleProperty = new PrefDoubleProperty(preferences, "global.zoom", 1.0)
 
-  val language: StringProperty = new PrefStringProperty("language", getDefaultLanguage)
+  val language: StringProperty = new PrefStringProperty(preferences, "language", getDefaultLanguage)
 
   val languageCode: StringProperty = new SimpleStringProperty()
 
-  val tabWidth: IntegerProperty = new PrefIntegerProperty("tabWidth", 4)
+  val tabWidth: IntegerProperty = new PrefIntegerProperty(preferences, "tabWidth", 4)
 
-  val theme: StringProperty = new PrefStringProperty("editor.theme", getDefaultTheme)
+  val theme: StringProperty = new PrefStringProperty(preferences, "editor.theme", getDefaultTheme)
 
-  val windowHeight: DoubleProperty = new PrefDoubleProperty("window.height", 600)
+  val windowHeight: DoubleProperty = new PrefDoubleProperty(preferences, "window.height", 600)
 
-  val windowWidth: DoubleProperty = new PrefDoubleProperty("window.width", 800)
+  val windowWidth: DoubleProperty = new PrefDoubleProperty(preferences, "window.width", 800)
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   {
     val code = Configuration.getLanguageCode(language.get)
     languageCode.setValue(code)
+    if (preferences.get("user-number", null) == null)
+      preferences.put("user-number", generateUserNumber)
   }
 
   language.addListener(new ChangeListener[String] {
@@ -131,23 +94,53 @@ object Preferences {
     }
   })
 
+  /**
+   * Creates a new quasi-unique random string as a pseudo-user-id.  This is only created the first time TigerJython is
+   * run on a specific machine and cannot be modified afterwards.  This user-number is used for purposes of research,
+   * where you might want to collect a user's edits anonymously (without revealing the actual identity).  However, the
+   * user-number here is generated irrespective of whether it is actually used or not.  It might just sit there dormant
+   * in the preferences, making sure that opting in or out of such research programmes does not generate a new number.
+   *
+   * The generated user number is a modified base64 encoded ASCII string, representing (pseudo-)random bytes.  By
+   * replacing `/` by `-`, it can also be used as a file-name.  Furthermore note that each string starts with the
+   * same letter.  This allows to change the scheme of the user numbers to be changed later on, where the initial
+   * letter will be modified accordingly, allowing a server to easily detect the used scheme.
+   *
+   * Finally note that there is, in principle, a chance that more than one user might have the same user numbers, but
+   * since it is used merely to differentiate between users taking part in a study and not for actual identification,
+   * this risk is acceptable.
+   */
+  private def generateUserNumber: String = {
+    val data = new Array[Byte](48)
+    new Random().nextBytes(data)
+    val result = "A" + Base64.getEncoder.encodeToString(data).replace('/', '-')
+    println(result)
+    result
+  }
+
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // General and Python-Related Preferences
 
-  val checkSyntax: BooleanProperty = new PrefBooleanProperty("syntaxcheck", true)
+  val checkSyntax: BooleanProperty = new PrefBooleanProperty(preferences, "syntaxcheck", true)
 
-  val checkUpdates: BooleanProperty = new PrefBooleanProperty("check-updates", true)
+  val checkUpdates: BooleanProperty = new PrefBooleanProperty(preferences, "check-updates", true)
 
-  val pythonInterpreter: StringProperty = new PrefStringProperty("python.interpreter")
+  val pythonInterpreter: StringProperty = new PrefStringProperty(preferences, "python.interpreter")
 
-  val repeatLoop: BooleanProperty = new PrefBooleanProperty("repeat-loop", false)
+  val repeatLoop: BooleanProperty = new PrefBooleanProperty(preferences, "repeat-loop", false)
 
-  val sendStatistics: BooleanProperty = new PrefBooleanProperty("send-statistics")
+  val sendStatistics: BooleanProperty = new PrefBooleanProperty(preferences, "send-statistics")
 
-  val syntaxCheckIsStrict: BooleanProperty = new PrefBooleanProperty("syntaxcheck-strict", true)
+  val syntaxCheckIsStrict: BooleanProperty =
+    new PrefBooleanProperty(preferences, "syntaxcheck-strict", true)
 
-  val syntaxCheckRejectDeadCode: BooleanProperty = new PrefBooleanProperty("syntaxcheck-deadcode", false)
+  val syntaxCheckRejectDeadCode: BooleanProperty =
+    new PrefBooleanProperty(preferences, "syntaxcheck-deadcode", false)
+
+  val userNumber: ReadOnlyStringProperty = new PrefStringProperty(preferences, "user-number")
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 }

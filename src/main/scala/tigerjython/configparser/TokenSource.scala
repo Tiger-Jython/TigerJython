@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package tigerjython.config
+package tigerjython.configparser
 
 /**
  * The `TokenSource` is a `Token`-iterator that takes a text as a char-sequence as input and splits it up into tokens.

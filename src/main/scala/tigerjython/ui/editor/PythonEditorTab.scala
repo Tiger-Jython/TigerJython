@@ -8,6 +8,7 @@
 package tigerjython.ui.editor
 
 import org.fxmisc.richtext._
+import tigerjython.files.Document
 
 /**
  * This is a specialisation of the more general `EditorTab` to use the Python-editor.
@@ -37,4 +38,10 @@ object PythonEditorTab {
   }
 
   def apply(): PythonEditorTab = new PythonEditorTab()
+
+  def apply(document: Document): PythonEditorTab = {
+    val result = new PythonEditorTab()
+    result.loadDocument(document)
+    result
+  }
 }

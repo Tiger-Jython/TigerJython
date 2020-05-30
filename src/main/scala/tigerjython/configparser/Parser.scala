@@ -5,7 +5,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package tigerjython.config
+package tigerjython.configparser
 
 /**
  * The parser takes a text as input and returns a map that maps qualified identifiers to values.
@@ -152,7 +152,7 @@ object Parser {
     val res = getClass.getClassLoader.getResourceAsStream("resources/" + name)
     if (res != null) {
       val source = scala.io.Source.fromInputStream(res)("utf-8")
-      tigerjython.config.Parser(source.getLines())
+      tigerjython.configparser.Parser(source.getLines())
     } else
       null
   }

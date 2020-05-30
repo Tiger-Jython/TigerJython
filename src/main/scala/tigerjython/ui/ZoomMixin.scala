@@ -63,6 +63,8 @@ trait ZoomMixin { self: Node =>
     }
   }
 
+  def getScaledFontSize: Double = Preferences.fontSize.get * zoomFactors(zoomIndex)
+
   def getZoom: Double = zoomProperty.getValue
 
   def setZoom(factor: Double): Unit =

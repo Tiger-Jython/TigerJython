@@ -7,7 +7,7 @@
  */
 package tigerjython.core
 
-import tigerjython.config._
+import tigerjython.configparser._
 
 /**
  * Various small utility and helper functions.

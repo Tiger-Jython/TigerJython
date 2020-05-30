@@ -1,10 +1,15 @@
 # Changelog
 
-### 3.0 Early Access Preview 4 (... 2020)
+### 3.0 Early Access Preview 5 (30 May 2020)
 
 Implemented:
 - Support for `repeat` loops;
 - TigerJython specific libraries (only as part of the release, no sources);
+- New file management that allows reopening previously edited files;
+- "+"/"Add" tab to create a new document or reopen a previous one;
+
+Big fixes:
+- Error messages on JRE 8 are displayed too large;
 
 
 ### 3.0 Early Access Preview 3 (25 May 2020)

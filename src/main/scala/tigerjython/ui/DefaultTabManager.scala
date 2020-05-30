@@ -10,6 +10,9 @@ package tigerjython.ui
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.scene.Node
 import javafx.scene.control.{Tab, TabPane}
+import tigerjython.files.Document
+import tigerjython.ui.editor.{EditorTab, PythonEditorTab}
+import tigerjython.ui.tabs.OpenDocumentTab
 
 import scala.jdk.CollectionConverters._
 
@@ -33,14 +36,29 @@ class DefaultTabManager extends TabPane with TabManager {
         newTab.getContent match {
           case frame: TabFrame =>
             frame.focusChanged(true)
+          case _  =>
         }
     }
   })
 
+  {
+    val frame = OpenDocumentTab()
+    val t = new Tab()
+    t.setContent(frame)
+    t.setClosable(false)
+    t.textProperty().bind(frame.caption)
+    getTabs.add(t)
+  }
+
   def addTab(frame: TabFrame): Option[TabFrame] =
     if (frame != null) {
       val tab = createTab(frame)
-      getTabs.add(tab)
+      val tabList = getTabs
+      val len = tabList.size()
+      if (len > 0)
+        tabList.add(len-1, tab)
+      else
+        getTabs.add(tab)
       if (frame.manager != null) {}
       frame.manager = this
       getSelectionModel.select(tab)
@@ -52,6 +70,7 @@ class DefaultTabManager extends TabPane with TabManager {
     val result = new Tab()
     result.setContent(frame)
     result.textProperty.bind(frame.caption)
+    result.setOnCloseRequest({ _ => frame.onClose() })
     result
   }
 
@@ -99,30 +118,37 @@ class DefaultTabManager extends TabPane with TabManager {
         case None =>
       }
 
+  def openDocument(document: Document): Unit = {
+    if (document.frame == null) {
+      val f = PythonEditorTab(document)
+      showOrAdd(f)
+    } else
+      showOrAdd(document.frame)
+  }
+
+  def saveAll(): Boolean = {
+    for (t <- getTabs.asScala)
+      t match {
+        case tab: Tab =>
+          tab.getContent match {
+            case editorTab: EditorTab =>
+              editorTab.autoSave()
+            case _ =>
+          }
+        case _ =>
+      }
+    true
+  }
+
   def showOrAdd(frame: TabFrame): Unit = {
     for (t <- getTabs.asScala)
       t match {
         case tab: Tab if tab.getContent eq frame =>
           getSelectionModel.select(tab)
           tab.getContent.setVisible(true)
+          return
         case _ =>
       }
     addTab(frame)
   }
-
-  /*def tabChanged(sender: TabFrame): Unit = {
-  } if (sender != null && sender.manager == this) {
-      for (t <- getTabs.asScala)
-        t match {
-          case tab: Tab if tab.getContent == sender =>
-            if (Platform.isFxApplicationThread)
-              tab.setText(sender.caption)
-            else
-              Platform.runLater(() => {
-                tab.setText(sender.caption)
-              })
-          case _ =>
-        }
-    }
-  }*/
 }

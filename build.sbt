@@ -54,7 +54,7 @@ val buildDate = "%d %s %d".format(
 
 val buildTag = "-SNAPSHOT"
 
-val buildVersion = "ea+04"
+val buildVersion = "ea+05"
 
 // This is needed to run/test the project without having to restart SBT afterwards
 fork in run := true

@@ -9,7 +9,7 @@ package tigerjython.ui
 
 import javafx.application.Platform
 import javafx.beans.property.StringProperty
-import tigerjython.config.{ConfigValue, Parser}
+import tigerjython.configparser.{ConfigValue, Parser}
 
 /**
  * A `UIString` holds a string value that depends on the user's locale and language.  It is loaded at runtime from an

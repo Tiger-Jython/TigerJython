@@ -33,4 +33,6 @@ trait TabFrame extends Region {
 
   private[ui] def manager_=(m: TabManager): Unit =
     _manager = m
+
+  def onClose(): Unit = {}
 }

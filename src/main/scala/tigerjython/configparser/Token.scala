@@ -5,17 +5,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package tigerjython.config
+package tigerjython.configparser
 
 /**
  * An individual token in the config's source.
  *
  * @author Tobias Kohn
  */
-private[config]
+private[configparser]
 sealed abstract class Token
 
-private[config]
+private[configparser]
 object Token {
 
   object ASSIGNMENT extends Token
