@@ -12,7 +12,7 @@ import tigerjython.ui.{TigerJythonApplication, editor}
 /**
  * @author Tobias Kohn
  */
-class NewDocumentItem extends DocumentItem {
+class NewDocumentItem(val parentFrame: OpenDocumentTab) extends DocumentItem {
 
   {
     titleLabel.setText("New Document")
@@ -21,4 +21,9 @@ class NewDocumentItem extends DocumentItem {
 
   def onClicked(): Unit =
     TigerJythonApplication.tabManager.addTab(editor.PythonEditorTab())
+
+  override def onMouseEnter(): Unit =
+    parentFrame.setPreviewText("")
+
+  override def onMouseLeave(): Unit = {}
 }

@@ -8,8 +8,10 @@
 package tigerjython.files
 
 import java.io.{FileWriter, PrintWriter}
-import java.nio.file.{Path, Paths}
-import java.text.DateFormat
+import java.nio.file.attribute.BasicFileAttributes
+import java.nio.file.{Files, Path, Paths}
+import java.text.{DateFormat, SimpleDateFormat}
+import java.time.ZoneId
 import java.util.Date
 import java.util.prefs.{Preferences => JPreferences}
 
@@ -26,6 +28,8 @@ import tigerjython.utils._
  */
 class Document(protected val prefNode: JPreferences) {
 
+  private val dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM)
+
   private var _tempFile: java.io.File = _
 
   var frame: TabFrame = _
@@ -33,7 +37,7 @@ class Document(protected val prefNode: JPreferences) {
   // We ensure that the preferences contain some basic fields such as the date of its creation and the date when it
   // has been modified last
   {
-    val now = DateFormat.getDateInstance(DateFormat.MEDIUM).format(new Date())
+    val now = dateFormat.format(new Date())
     if (prefNode.get("created", null) == null)
       prefNode.put("created", now)
     if (prefNode.get("last-modified", null) == null)
@@ -66,6 +70,31 @@ class Document(protected val prefNode: JPreferences) {
         null
     }
 
+  protected def formatDate(date: Date): String =
+    new SimpleDateFormat("d MMM yyyy").format(date)
+
+  def getCreationDate: Date =
+    dateFormat.parse(prefNode.get("created", null))
+
+  /**
+   * Returns the dates of creation and last modification as a string that is as short as possible, i.e. either
+   * `3-5 Mar 2020`, `3 Mar-9 Apr 2020`, or `3 Mar 2020-9 Apr 2021`, respectively.
+   */
+  def getDateString: String = {
+    val d1 = getCreationDate.toInstant.atZone(ZoneId.systemDefault())
+    val d2 = lastModified.toInstant.atZone(ZoneId.systemDefault())
+    if (d1.getYear == d2.getYear) {
+      if (d1.getMonthValue != d2.getMonthValue)
+        "%s–%s".format(
+          new SimpleDateFormat("d MMM").format(getCreationDate),
+          formatDate(lastModified)
+        )
+      else
+        "%d–%s".format(d1.getDayOfMonth, formatDate(lastModified))
+    } else
+      "%s–%s".format(formatDate(getCreationDate), formatDate(lastModified))
+  }
+
   def getDefaultFileSuffix: String = ".py"
 
   /**
@@ -97,6 +126,10 @@ class Document(protected val prefNode: JPreferences) {
     result
   }
 
+  def getSearchScore(filter: SearchFilter): Int =
+    filter.getScore(name.get) + filter.getScore(description.get) +
+      filter.getScore(text.get) + filter.getScore(pathString.get())
+
   val imports: StringProperty = new PrefStringProperty(prefNode, "imports", "")
 
   def index: Int = prefNode.getInt("index", 0)
@@ -115,7 +148,7 @@ class Document(protected val prefNode: JPreferences) {
    * Returns the date the document has last been modified.
    */
   def lastModified: Date =
-    DateFormat.getDateInstance(DateFormat.MEDIUM).parse(prefNode.get("last-modified", null))
+    dateFormat.parse(prefNode.get("last-modified", null))
 
   /**
    * Returns the date the document has last been modified.
@@ -126,14 +159,23 @@ class Document(protected val prefNode: JPreferences) {
     prefNode.get("last-modified", "?")
 
   def load(): String = synchronized {
-    val f = file
-    if (f != null && f.exists()) {
-      val source = scala.io.Source.fromFile(file)
-      val result = source.getLines.mkString("\n")
-      this.text.setValue(result)
-      result
-    } else
-      this.text.get()
+    path match {
+      case Some(p) =>
+        val f = p.toFile
+        if (f.exists()) {
+          val source = scala.io.Source.fromFile(file)
+          val result = source.getLines.mkString("\n")
+          this.text.setValue(result)
+          val attr = Files.readAttributes(p, classOf[BasicFileAttributes])
+          val createDate = Date.from(attr.creationTime().toInstant)
+          if (createDate.before(getCreationDate))
+            prefNode.put("created", dateFormat.format(createDate))
+          result
+        } else
+          this.text.get()
+      case _ =>
+        this.text.get
+    }
   }
 
   /**

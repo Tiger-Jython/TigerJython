@@ -15,11 +15,11 @@ import tigerjython.files.Document
 /**
  * @author Tobias Kohn
  */
-class OpenDocumentItem(val document: Document) extends DocumentItem {
+class OpenDocumentItem(val parentFrame: OpenDocumentTab, val document: Document) extends DocumentItem {
 
   {
-    titleLabel.textProperty().bind(document.name)
-    descriptionLabel.textProperty().bind(document.description)
+    titleLabel.textProperty().set(document.name.get)
+    descriptionLabel.textProperty().set(document.pathString.get + "\n" + document.getDateString)
   }
 
   override protected def createIcon(): Node = {
@@ -42,4 +42,10 @@ class OpenDocumentItem(val document: Document) extends DocumentItem {
 
   def onClicked(): Unit =
     document.show()
+
+  override def onMouseEnter(): Unit =
+    parentFrame.setPreviewText(document.text.get)
+
+  override def onMouseLeave(): Unit =
+    parentFrame.setPreviewText("")
 }

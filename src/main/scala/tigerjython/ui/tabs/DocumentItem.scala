@@ -19,8 +19,10 @@ import javafx.scene.shape.Rectangle
  */
 abstract class DocumentItem extends BorderPane {
 
+  def parentFrame: OpenDocumentTab
+
   protected val icon: Node = createIcon()
-  protected val titleLabel = new Label("Hello World!")
+  protected val titleLabel = new Label()
   protected val descriptionLabel = new Label()
 
   {
@@ -43,6 +45,14 @@ abstract class DocumentItem extends BorderPane {
   addEventFilter(MouseEvent.MOUSE_CLICKED, (event: MouseEvent) => {
     onClicked()
   })
+  addEventFilter(MouseEvent.MOUSE_ENTERED_TARGET, (event: MouseEvent) => {
+    if (event.getTarget eq this)
+     onMouseEnter()
+  })
+  addEventFilter(MouseEvent.MOUSE_EXITED_TARGET, (event: MouseEvent) => {
+    if (event.getTarget eq this)
+      onMouseLeave()
+  })
 
   protected def createIcon(): Node = {
     val result = new Rectangle(42, 59)
@@ -57,4 +67,8 @@ abstract class DocumentItem extends BorderPane {
   }
 
   def onClicked(): Unit
+
+  def onMouseEnter(): Unit
+
+  def onMouseLeave(): Unit
 }
