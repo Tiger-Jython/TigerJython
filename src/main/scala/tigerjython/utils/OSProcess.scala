@@ -145,13 +145,21 @@ class OSProcess(val cmd: String) {
       new Thread(stdOutput).start()
       new Thread(stdError).start()
       _isRunning.set(true)
-      started()
-      true
+      if (process.isAlive) {
+        started()
+        true
+      } else {
+        _execResult.set(process.exitValue())
+        false
+      }
     } catch {
       case _: IOException =>
         _execResult.set(-1)
         false
       case _: SecurityException =>
+        _execResult.set(-1)
+        false
+      case _: IllegalThreadStateException =>
         _execResult.set(-1)
         false
     }

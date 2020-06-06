@@ -104,6 +104,9 @@ class OpenDocumentTab protected () extends TabFrame {
     val open = new NewDocumentItem(this)
     documentItems += open
     items.getChildren.add(open)
+    val notebook = new NewNotebookItem(this)
+    documentItems += notebook
+    items.getChildren.add(notebook)
     for (doc <- Documents.getListOfDocuments) {
       val item = new OpenDocumentItem(this, doc)
       documentItems += item

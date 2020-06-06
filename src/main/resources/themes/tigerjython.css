@@ -48,6 +48,42 @@
     -fx-fill: white;
 }
 
+.notebook .cells {
+    -fx-background-color: ivory;
+    -fx-padding: 10 65 10 65;
+}
+
+.notebook .cell {
+    -fx-border-style: solid;
+    -fx-border-color: yellow;
+    -fx-background-color: ivory;
+    -fx-padding: 3;
+}
+
+.notebook .cell:active {
+    -fx-border-style: solid;
+    -fx-border-color: navy;
+    -fx-background-color: ivory;
+    -fx-padding: 3;
+}
+
+.notebook .styled-text-area {
+    -fx-border-style: solid;
+    -fx-border-color: silver;
+}
+
+.notebook .output {
+    -fx-padding: 10;
+    -fx-font-family: monospace;
+    -fx-text-fill: navy;
+}
+
+.notebook .error {
+    -fx-padding: 10;
+    -fx-font-family: monospace;
+    -fx-text-fill: #CC0000;
+}
+
 .lineno {
     -fx-fill: gold;
     -fx-background-color: -fx-fill;
