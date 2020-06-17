@@ -1,5 +1,11 @@
 # Changelog
 
+### 3.0 Early Access Preview 6 ( June 2020)
+
+Implemented:
+- Simple notebooks to work with Python interactively;
+
+
 ### 3.0 Early Access Preview 5 (30 May 2020)
 
 Implemented:

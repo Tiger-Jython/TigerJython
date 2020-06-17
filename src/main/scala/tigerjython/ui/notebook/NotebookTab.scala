@@ -8,6 +8,7 @@
 package tigerjython.ui.notebook
 
 import javafx.application.Platform
+import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.geometry.{Orientation, Pos}
 import javafx.scene.{Node, shape}
 import javafx.scene.control.{Button, ScrollPane, SplitPane, TextArea, ToolBar}
@@ -15,8 +16,9 @@ import javafx.scene.input.MouseEvent
 import javafx.scene.layout.{BorderPane, StackPane, VBox}
 import javafx.scene.paint.Color
 import javafx.scene.shape.{Polygon, Rectangle}
+import tigerjython.core.Preferences
 import tigerjython.execute.PythonEvaluator
-import tigerjython.ui.TabFrame
+import tigerjython.ui.{TabFrame, ZoomMixin}
 import tigerjython.ui.Utils.onFX
 
 /**
@@ -24,7 +26,7 @@ import tigerjython.ui.Utils.onFX
  */
 class NotebookTab extends TabFrame {
 
-  protected val itemsBox: VBox = new VBox()
+  protected val itemsBox: VBox with ZoomMixin = new VBox with ZoomMixin
   protected val outputPane: TextArea = createOutputPane
   protected val scrollPane: ScrollPane = new ScrollPane()
   protected val splitPane: SplitPane = new SplitPane()
@@ -65,6 +67,14 @@ class NotebookTab extends TabFrame {
       case _ =>
     }
   })
+  itemsBox.zoomProperty.addListener(new ChangeListener[Number] {
+    override def changed(observableValue: ObservableValue[_ <: Number], t: Number, newZoom: Number): Unit =
+      Platform.runLater(() => {
+        val size: Double = Preferences.fontSize.get * newZoom.doubleValue()
+        for (cell <- cells)
+          cell.setTextSize(size)
+      })
+  })
 
   def addCell(): NotebookCell =
     addCell(NotebookCell(this))
@@ -78,6 +88,8 @@ class NotebookTab extends TabFrame {
         r.setStroke(Color.TRANSPARENT)
         itemsBox.getChildren.add(r)
       }
+      val size = Preferences.fontSize.get * itemsBox.zoomProperty.getValue
+      cell.setTextSize(size)
       itemsBox.getChildren.add(cell)
       selectCell(cell)
       cell

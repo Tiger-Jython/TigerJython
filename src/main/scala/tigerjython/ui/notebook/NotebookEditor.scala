@@ -8,35 +8,53 @@
 package tigerjython.ui.notebook
 
 import java.lang
-import java.util.regex.Pattern
 
+import javafx.application.Platform
 import javafx.beans.value.{ChangeListener, ObservableValue}
-import javafx.scene.text.Text
-import org.fxmisc.richtext.CodeArea
+import javafx.scene.text.{Font, Text}
 import tigerjython.core.Preferences
+import tigerjython.ui.editing._
 
 /**
  * @author Tobias Kohn
  */
-class NotebookEditor(val cell: NotebookCell) extends CodeArea {
+class NotebookEditor(val cell: NotebookCell) extends PythonCodeArea {
 
   private var _linesCount: Int = 0
   private var _linesHeight: Double = 17.0
 
   {
-    setStyle("-fx-font-family: \"%s\";".format(Preferences.fontFamily.get))
     setPrefHeight(_linesHeight + 1)
+  }
+
+  def setTextSize(size: Double): Unit = {
+    setStyle("-fx-font-size: %g; -fx-font-family: \"%s\";".format(
+      size,
+      Preferences.fontFamily.get
+    ))
+    val txt = new Text("Xyq")
+    txt.setFont(new Font(Preferences.fontFamily.get, size))
+    _linesHeight = txt.getLayoutBounds.getHeight
+    val lines = _linesCount max 1
+    Platform.runLater(() => {
+      setPrefHeight(lines * _linesHeight + 1)
+    })
+  }
+
+  def recomputeHeight(): Unit = {
+    val lines = _linesCount max 1
+    lookup(".text") match {
+      case txt: Text =>
+        _linesHeight = txt.getBoundsInLocal.getHeight max 8.0
+      case _ =>
+    }
+    setPrefHeight(lines * _linesHeight + 1)
   }
 
   protected def setLinesCount(lines: Int): Unit =
     if (lines != _linesCount) {
-      lookup(".text") match {
-        case txt: Text =>
-          _linesHeight = txt.getBoundsInLocal.getHeight
-        case _ =>
-      }
-      setPrefHeight(lines * _linesHeight + 1)
       _linesCount = lines
+      recomputeHeight()
     }
 
   textProperty().addListener(new ChangeListener[String] {
@@ -51,30 +69,4 @@ class NotebookEditor(val cell: NotebookCell) extends CodeArea {
 
     }
   })
-}
-object NotebookEditor {
-
-  private val KEYWORDS = Array(
-    "and", "as", "assert", "async", "await", "break", "class", "continue", "def", "del", "elif", "else",
-    "except", "finally", "for", "from", "global", "if", "import", "in", "is", "lambda", "nonlocal", "not",
-    "or", "pass", "raise", "return", "try", "while", "with", "yield",
-    "False", "None", "True"
-  )
-
-  private val COMMENT_PATTERN = "#[^\\n]*"
-  private val KEYWORD_PATTERN = "\\b(" + KEYWORDS.mkString("|") + "|repeat)\\b"
-  private val KEYWORD_PATTERN_PLAIN = "\\b(" + KEYWORDS.mkString("|") + ")\\b"
-  private val STRING_PATTERN = "\\\"([^\\\"\\\\\\\\]|\\\\\\\\.)*\\\""
-
-  private lazy val PATTERN = Pattern.compile(
-    "(?<KEYWORD>" + KEYWORD_PATTERN + ")" +
-      "|(?<STRING>" + STRING_PATTERN + ")" +
-      "|(?<COMMENT>" + COMMENT_PATTERN + ")"
-  )
-
-  private lazy val PATTERN_PLAIN = Pattern.compile(
-    "(?<KEYWORD>" + KEYWORD_PATTERN_PLAIN + ")" +
-      "|(?<STRING>" + STRING_PATTERN + ")" +
-      "|(?<COMMENT>" + COMMENT_PATTERN + ")"
-  )
 }

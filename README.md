@@ -66,4 +66,6 @@ Who is behind TigerJython?  The first version of _TigerJython_ was written by To
 
 The team is also collaborating with institutions such as [ETH Zurich](https://www.abz.inf.ethz.ch/) and [PH Graubünden](https://phgr.ch/), leading to new developments, including the [Web Version of TigerJython](https://webtigerjython.ethz.ch/).
 
-As we strongly believe that quality education must be accessible to everyone, we provide all our materials free of charge.  This is made possible not only through the great efforts of our members, but also thanks to our sponsor [Klett Publishers](https://www.klett.ch/).
+As we strongly believe that quality education must be accessible to everyone, we provide all our materials free of 
+charge.  This is made possible not only through the great efforts of our members, but also thanks to our 
+sponsor [Klett and Balmer Publishers](https://www.klett.ch/).

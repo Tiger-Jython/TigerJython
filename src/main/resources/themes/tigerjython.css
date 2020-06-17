@@ -55,7 +55,7 @@
 
 .notebook .cell {
     -fx-border-style: solid;
-    -fx-border-color: yellow;
+    -fx-border-color: gray;
     -fx-background-color: ivory;
     -fx-padding: 3;
 }

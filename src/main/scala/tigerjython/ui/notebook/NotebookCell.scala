@@ -50,6 +50,12 @@ class NotebookCell(val notebook: NotebookTab) extends BorderPane with EvalResult
     })
   }
 
+  def recomputeHeight(): Unit =
+    editor.recomputeHeight()
+
+  def setTextSize(size: Double): Unit =
+    editor.setTextSize(size)
+
   def setActive(active: Boolean): Unit = {
     pseudoClassStateChanged(NotebookCell.activePseudoClass, active)
     if (active)
@@ -76,9 +82,12 @@ class NotebookCell(val notebook: NotebookTab) extends BorderPane with EvalResult
 
   def setResult(text: String): Unit =
     onFX(() => {
-      val result = new Label(text)
-      result.getStyleClass.add("output")
-      resultNode = result
+      if (text != "") {
+        val result = new Label(text)
+        result.getStyleClass.add("output")
+        resultNode = result
+      } else
+        resultNode = null
       notebook.selectNextCell()
     })
 
