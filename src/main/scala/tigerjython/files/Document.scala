@@ -178,6 +178,10 @@ class Document(protected val prefNode: JPreferences) {
     }
   }
 
+  def loadUndo(): (Array[Byte], String) = synchronized {
+    (prefNode.getByteArray("undoIndices", Array()), prefNode.get("undoText", ""))
+  }
+
   /**
    * Call `modified` to mark the document as having been modified today.
    */
@@ -215,6 +219,11 @@ class Document(protected val prefNode: JPreferences) {
     setDescriptionFromText(text)
   }
 
+  def saveUndo(indices: Array[Byte], text: String): Unit = synchronized {
+    prefNode.putByteArray("undoIndices", indices)
+    prefNode.put("undoText", text)
+  }
+
   private def setDescriptionFromText(text: String): Unit =
     description.setValue(text.split('\n').take(3).mkString("\n"))
 
@@ -230,5 +239,5 @@ class Document(protected val prefNode: JPreferences) {
   def show(): Unit =
     TigerJythonApplication.tabManager.openDocument(this)
 
-  val text: StringProperty = new PrefStringProperty(prefNode, "text")
+  val text: StringProperty = new PrefTextProperty(prefNode, "text")
 }

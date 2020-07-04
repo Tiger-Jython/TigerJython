@@ -10,10 +10,11 @@ package tigerjython.ui.editing
 import java.time.Duration
 import java.util.Optional
 
+import javafx.application.Platform
 import javafx.concurrent.Task
 import javafx.scene.input.{KeyCode, KeyEvent}
 import org.fxmisc.richtext._
-import org.fxmisc.richtext.model.StyleSpans
+import org.fxmisc.richtext.model.{PlainTextChange, StyleSpans}
 import tigerjython.core.Preferences
 import tigerjython.plugins.EventManager
 import tigerjython.ui.Utils.onFX
@@ -25,8 +26,11 @@ import tigerjython.ui.Utils.onFX
  */
 class PythonCodeArea extends CodeArea {
 
+  protected val undoQueue = new TigerJythonChangeQueue[PlainTextChange]()
+
   {
     setStyle("-fx-font-family: \"%s\";".format(Preferences.fontFamily.get))
+    setUndoManager(UndoFactory.createUndoManager(this, undoQueue))
 
     this.multiPlainChanges()
       .successionEnds(Duration.ofMillis(50))
@@ -102,4 +106,34 @@ class PythonCodeArea extends CodeArea {
   private def applyHighlighting(highlighting: StyleSpans[java.util.Collection[String]]): Unit =
     this.setStyleSpans(0, highlighting)
 
+  def getUndoBuffer: Array[PlainTextChange] = {
+    val result = new Array[PlainTextChange](undoQueue.getHistoryLength)
+    for (i <- result.indices)
+      result(i) = undoQueue.getHistoryItem(i)
+    result
+  }
+
+  def setInitialText(text: String): Unit =
+    Platform.runLater(() => {
+      if (text != "" && text.last != '\n')
+        appendText(text + "\n")
+      else
+        appendText(text)
+      getUndoManager.forgetHistory()
+      getUndoManager.mark()
+      selectRange(0, 0)
+    })
+
+  def setInitialText(text: String, undoChanges: Array[PlainTextChange]): Unit =
+    Platform.runLater(() => {
+      if (text != "" && text.last != '\n')
+        appendText(text + "\n")
+      else
+        appendText(text)
+      getUndoManager.forgetHistory()
+      undoQueue.push(undoChanges: _*)
+      undoQueue.markPositionAsBase()
+      getUndoManager.mark()
+      selectRange(0, 0)
+    })
 }

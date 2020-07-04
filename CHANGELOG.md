@@ -1,9 +1,13 @@
 # Changelog
 
-### 3.0 Early Access Preview 6 ( June 2020)
+### 3.0 Early Access Preview 6 ( July 2020)
 
 Implemented:
 - Simple notebooks to work with Python interactively;
+- Undo history of documents is saved and restored across sessions;
+
+Bug fixes:
+- Correctly handles text sizes beyond 8 KB;
 
 
 ### 3.0 Early Access Preview 5 (30 May 2020)

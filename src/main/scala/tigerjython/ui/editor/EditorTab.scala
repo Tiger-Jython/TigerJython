@@ -21,6 +21,7 @@ import tigerjython.errorhandling._
 import tigerjython.execute.PythonExecutor
 import tigerjython.files.{Document, Documents}
 import tigerjython.plugins.EventManager
+import tigerjython.ui.editing.{PythonCodeArea, UndoHelper}
 import tigerjython.ui.{TabFrame, TigerJythonApplication, ZoomMixin}
 
 /**
@@ -87,7 +88,9 @@ abstract class EditorTab extends TabFrame {
   def appendToOutput(s: String): Unit =
     outputPane.append(s)
 
-  def autoSave(): Unit = save()
+  def autoSave(): Unit = {
+    save()
+  }
 
   def clearOutput(): Unit = {
     outputPane.clear()
@@ -231,10 +234,19 @@ abstract class EditorTab extends TabFrame {
     if (document != null) {
       this.document = document
       val text = document.load()
-      Platform.runLater(() => {
-        editor.replaceText(text)
-        editor.moveTo(document.caretPosition.get min text.length)
-      })
+      editor match {
+        case pythonEditor: PythonCodeArea =>
+          val (indices, txt) = document.loadUndo()
+          val undoBuffer = UndoHelper.decode(indices, txt).reverse
+          pythonEditor.setInitialText(text, undoBuffer)
+        case _ =>
+          Platform.runLater(() => {
+            editor.appendText(text)
+            editor.getUndoManager.forgetHistory()
+            editor.getUndoManager.mark()
+            editor.selectRange(0, 0)
+          })
+      }
       document.open(this)
       caption.setValue(document.name.get)
     }
@@ -277,8 +289,15 @@ abstract class EditorTab extends TabFrame {
     }
 
   def save(): Unit =
-    if (document != null)
+    if (document != null) {
       document.save(editor.getText, editor.getCaretPosition)
+      editor match {
+        case pythonEditor: PythonCodeArea =>
+          val (indices, text) = UndoHelper.encode(pythonEditor.getUndoBuffer)
+          document.saveUndo(indices, text)
+        case _ =>
+      }
+    }
 
   def setDocument(document: Document): Unit =
     if (document != null) {
