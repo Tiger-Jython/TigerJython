@@ -1,10 +1,16 @@
 # Changelog
 
-### 3.0 Early Access Preview 6 ( July 2020)
+
+### 3.0 Early Access Preview 6 (coming soon)
 
 Implemented:
 - Simple notebooks to work with Python interactively;
 - Undo history of documents is saved and restored across sessions;
+- Added icons to choose the interpreter and language;
+
+Changes:
+- The executing Python interpreter is now chosen on the basis of individual editor tabs rather than
+  globally.  This works better for additional target devices where fast switching is necessary;
 
 Bug fixes:
 - Correctly handles text sizes beyond 8 KB;

@@ -38,24 +38,38 @@ object TigerJython {
    *   a filename indicating the Python-script to execute.
    */
   def main(args: Array[String]): Unit = {
-    if (args.nonEmpty && args.head == "-jython") {
-      val files = args.filter(!_.startsWith("-"))
-      if (files.length == 1)
-        JythonExecutor.run(files.head)
-      else if (files.length < 1) {
-        System.err.println("Error: missing filename to execute")
-      } else {
-        System.err.println("Error: too many filenames to execute:")
-        System.err.println(args.mkString(" "))
+    if (args.nonEmpty)
+      args.head match {
+        case "-jython" =>
+          val files = args.filter(!_.startsWith("-"))
+          if (files.length == 1)
+            JythonExecutor.run(files.head)
+          else if (files.length < 1) {
+            System.err.println("Error: missing filename to execute")
+          } else {
+            System.err.println("Error: too many filenames to execute:")
+            System.err.println(args.mkString(" "))
+          }
+        case "-client" =>
+          val port = args(1).toInt
+          val id = args(2).toInt
+          tigerjython.remote.ExecuteClientConnection.initialize(port, id)
+          JythonExecutor.initialize()
+        case _ =>
+          startEditor(args)
       }
-    } else {
-      println("TigerJython " + BuildInfo.fullVersion)
-      println("  on Java " + Configuration.getJavaVersion.toString)
-      println("  on " + OSPlatform.system.toString)
+    else
+      startEditor(args)
+  }
 
-      tigerjython.execute.PythonInstallations.initialize()
-      tigerjython.core.Configuration.initialize()
-      tigerjython.ui.TigerJythonApplication.launchApplication(args)
-    }
+  private def startEditor(args: Array[String]): Unit = {
+    println("TigerJython " + BuildInfo.fullVersion)
+    println("  on Java " + Configuration.getJavaVersion.toString)
+    println("  on " + OSPlatform.system.toString)
+
+    tigerjython.execute.PythonInstallations.initialize()
+    tigerjython.core.Configuration.initialize()
+    tigerjython.remote.ExecuteServer.initialize()
+    tigerjython.ui.TigerJythonApplication.launchApplication(args)
   }
 }

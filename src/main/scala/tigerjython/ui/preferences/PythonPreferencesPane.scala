@@ -54,7 +54,7 @@ class PythonPreferencesPane extends PreferencePane {
     interpreterSelectionBox.getSelectionModel.select(PythonInstallations.getSelectedIndex)
   }
 
-  protected def createInstallationChooser(): Seq[Node] = {
+  protected def createInstallationChooser(): Seq[Node] = Seq() /*{
     val label = new Label("Choose an installation:")
     val addButton = new Button("+")
     updateInterpreterSelection()
@@ -66,7 +66,7 @@ class PythonPreferencesPane extends PreferencePane {
     label.labelForProperty.setValue(interpreterSelectionBox)
     addButton.setOnAction({ _ => addPythonVersion() })
     Seq(label, interpreterSelectionBox, addButton)
-  }
+  }*/
 
   protected def createErrorCheckOptions(): Seq[Node] = {
     val checkErrors = new CheckBox("Check for syntax errors")

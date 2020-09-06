@@ -25,8 +25,8 @@ object PythonExecutor {
    * @param editorTab   The editor-tab that contains the code to be run.
    * @return            Either a `PythonExecutor`-instance to run the code, or `null`.
    */
-  def apply(editorTab: EditorTab): PythonExecutor =
-    if (PythonInstallations.useInternal) {
+  def apply(editorTab: EditorTab): PythonExecutor = null
+    /*if (PythonInstallations.useInternal) {
       null
     } else {
       val path = PythonInstallations.getSelectedPath
@@ -35,11 +35,15 @@ object PythonExecutor {
           if (path.toString.endsWith(".jar"))
             new PythonJavaProcess(path)
           else
-            new PythonOSProcess(path)
+            new InterpreterProcess(path)
         val result = new PythonOSExecutor(process, editorTab)
         process.parent = result
         result
       } else
         null
-    }
+    }*/
+
+  def request(editorTab: EditorTab, onReady: PythonExecutor=>Unit): Unit = {
+    onReady(apply(editorTab))
+  }
 }

@@ -10,43 +10,49 @@ package tigerjython.execute
 import java.nio.file.Path
 import java.util.{Timer, TimerTask}
 
-import tigerjython.ui.editor.EditorTab
 import tigerjython.utils.OSProcess
 
 /**
- * In addition to other OS processes, the `PythonOSProcess` will also update the editor-tab by routing any output to
+ * In addition to other OS processes, the `InterpreterProcess` will also update the controller by routing any output to
  * its output pane, as well as indicating when the process has run its course.
  *
  * @author Tobias Kohn
  */
-class PythonOSProcess(cmd: String) extends OSProcess(cmd) {
+class InterpreterProcess(cmd: String) extends OSProcess(cmd) {
 
-  var parent: PythonOSExecutor = _
+  var parent: CommandExecutor = _
 
   def this(cmd: Path) =
     this(cmd.toAbsolutePath.toString)
 
-  protected def editorTab: EditorTab = parent.editorTab
+  protected def controller: ExecutionController = parent.controller
+
+  override protected def getBaseArgs: Array[String] =
+    if (isJavaProcess)
+      Array("-S")
+    else
+      Array()
 
   protected object UpdateTask extends TimerTask {
 
     override def run(): Unit =
-      if (editorTab != null) {
+      if (controller != null) {
         if (stdError.nonEmpty) {
           val err = stdError.readBuffer()
-          editorTab.appendToErrorOutput(err)
+          controller.appendToErrorOutput(err)
         }
         val out = stdOutput.readBuffer()
         if (out != null && out != "")
-          editorTab.appendToOutput(out)
+          controller.appendToOutput(out)
       }
   }
 
   protected var timer: Timer = _
 
   override def started(): Unit = {
-    if (editorTab != null) {
-      editorTab.updateRunStatus(parent, running = true)
+    if (controller != null) {
+      controller.notifyExecutionStarted()
+      controller.updateRunStatus(parent, running = true)
       timer = new Timer(true)
       timer.scheduleAtFixedRate(UpdateTask, 100, 100)
     }
@@ -57,10 +63,10 @@ class PythonOSProcess(cmd: String) extends OSProcess(cmd) {
       timer.cancel()
       timer = null
     }
-    if (editorTab != null) {
+    if (controller != null) {
       UpdateTask.run()  // read the last bits of the output and error streams
-      editorTab.updateRunStatus(parent, running = false)
-      editorTab.appendToOutput("--- finished in %d ms ---".format(getExecTime))
+      controller.updateRunStatus(parent, running = false)
+      controller.notifyExecutionFinished(getExecTime)
     }
   }
 }

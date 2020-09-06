@@ -11,14 +11,15 @@ import javafx.application.Platform
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.geometry.{Orientation, Pos}
 import javafx.scene.{Node, shape}
-import javafx.scene.control.{Button, ScrollPane, SplitPane, TextArea, ToolBar}
+import javafx.scene.control.{Button, MenuButton, MenuItem, ScrollPane, SeparatorMenuItem, SplitPane, TextArea, ToolBar}
+import javafx.scene.image.{Image, ImageView}
 import javafx.scene.input.MouseEvent
-import javafx.scene.layout.{BorderPane, StackPane, VBox}
+import javafx.scene.layout.{BorderPane, HBox, Priority, StackPane, VBox}
 import javafx.scene.paint.Color
 import javafx.scene.shape.{Polygon, Rectangle}
 import tigerjython.core.Preferences
-import tigerjython.execute.PythonEvaluator
-import tigerjython.ui.{TabFrame, ZoomMixin}
+import tigerjython.execute.{Evaluator, ExecutorFactory, InterpreterInstallations, TigerJythonExecutorFactory}
+import tigerjython.ui.{ImagePool, TabFrame, ZoomMixin}
 import tigerjython.ui.Utils.onFX
 
 /**
@@ -32,7 +33,16 @@ class NotebookTab extends TabFrame {
   protected val splitPane: SplitPane = new SplitPane()
   protected val topToolBar: Node = createTopToolBar
 
-  protected var evaluator: PythonEvaluator = _
+  protected lazy val targetImage: ImageView = {
+    val result = new ImageView(ImagePool.tigerJython_Logo)
+    result.setFitHeight(16)
+    result.setFitWidth(16)
+    result
+  }
+  protected lazy val targetButton: MenuButton = new MenuButton()
+
+  protected var evalFactory: ExecutorFactory = TigerJythonExecutorFactory
+  protected var evaluator: Evaluator = _
 
   protected val cells: collection.mutable.ArrayBuffer[NotebookCell] = collection.mutable.ArrayBuffer[NotebookCell]()
 
@@ -102,6 +112,17 @@ class NotebookTab extends TabFrame {
     new TextArea()
   }
 
+  protected def createTargetMenuItem(name: String, img: Image, factory: ExecutorFactory): MenuItem = {
+    val result = new MenuItem(name)
+    result.setOnAction(_ => {
+      targetImage.setImage(img)
+      evalFactory = factory
+    })
+    result.setUserData(factory)
+    result.setGraphic(new ImageView(img))
+    result
+  }
+
   protected def createTopToolBar: Node = {
     val result = new ToolBar()
     val runButton = new Button()
@@ -115,7 +136,16 @@ class NotebookTab extends TabFrame {
     stopButton.setGraphic(stopRect)
     runButton.setOnAction(_ => { evaluateCell() })
     //stopButton.setOnAction(_ => { stop() })
-    result.getItems.addAll(runButton)
+    val filler = new HBox()
+    HBox.setHgrow(filler, Priority.ALWAYS)
+    targetButton.setGraphic(targetImage)
+    for (interpreter <- InterpreterInstallations.availableInterpreters) {
+      if (interpreter.title== "-")
+        targetButton.getItems.add(new SeparatorMenuItem())
+      else if (interpreter.factory != null && interpreter.factory.canEvaluate)
+        targetButton.getItems.add(createTargetMenuItem(interpreter.title, interpreter.icon, interpreter.factory))
+    }
+    result.getItems.addAll(runButton, filler, targetButton)
     result
   }
 
@@ -148,7 +178,11 @@ class NotebookTab extends TabFrame {
   def evaluateCell(): Unit = {
     val cell = currentCell
     if (evaluator == null)
-      evaluator = PythonEvaluator(this)
+      evalFactory.createEvaluator(this, evaluator=>{
+        this.evaluator = evaluator
+        if (cell != null)
+          cell.evaluate(evaluator)
+      })
     if (cell != null)
       cell.evaluate(evaluator)
   }

@@ -10,9 +10,10 @@ package tigerjython.core
 import java.util.{Base64, Locale, Random}
 import java.util.prefs.{Preferences => JPreferences}
 
+import javafx.beans.property
 import javafx.beans.property._
 import javafx.beans.value.{ChangeListener, ObservableValue}
-import javafx.scene.text.Text
+import javafx.scene.text.{Font, Text}
 import tigerjython.utils._
 
 /**
@@ -60,6 +61,8 @@ object Preferences {
 
   // UI Preferences
 
+  val defaultFont: SimpleObjectProperty[Font] = new SimpleObjectProperty[Font](new Font(getDefaultFontSize))
+
   val fontFamily: StringProperty = new PrefStringProperty(preferences, "editor.font-family", "monospace")
 
   val fontSize: DoubleProperty = new PrefDoubleProperty(preferences, "editor.font-size", getDefaultFontSize)
@@ -77,6 +80,28 @@ object Preferences {
   val windowHeight: DoubleProperty = new PrefDoubleProperty(preferences, "window.height", 600)
 
   val windowWidth: DoubleProperty = new PrefDoubleProperty(preferences, "window.width", 800)
+
+  {
+    fontSize.addListener(new ChangeListener[Number] {
+      override def changed(observableValue: ObservableValue[_ <: Number], t: Number, t1: Number): Unit = {
+        updateDefaultFont()
+      }
+    })
+    globalZoom.addListener(new ChangeListener[Number] {
+      override def changed(observableValue: ObservableValue[_ <: Number], t: Number, t1: Number): Unit = {
+        updateDefaultFont()
+      }
+    })
+    updateDefaultFont()
+  }
+
+  private def updateDefaultFont(): Unit = {
+    val f = fontSize.get() * globalZoom.get()
+    if (f != defaultFont.get().getSize) {
+      defaultFont.get.getName
+      defaultFont.setValue(new Font(f))
+    }
+  }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -141,6 +166,4 @@ object Preferences {
   val userNumber: ReadOnlyStringProperty = new PrefStringProperty(preferences, "user-number")
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 }

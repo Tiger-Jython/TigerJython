@@ -8,20 +8,17 @@
 package tigerjython.execute
 
 /**
- * The basic interface for anything that can execute a program: it must provide the means to run/start a program,
- * as well as to stop it.
- *
  * @author Tobias Kohn
  */
-trait Executor {
+trait ExecutorFactory {
 
-  def controller: ExecutionController
+  def canEvaluate: Boolean = true
 
-  def run(): Unit
+  def canExecute: Boolean = true
 
-  def stop(): Unit
+  def createEvaluator(controller: Object, onReady: Evaluator=>Unit): Unit
 
-  def writeToInput(ch: Char): Unit
+  def createExecutor(controller: ExecutionController, onReady: Executor=>Unit): Unit
 
-  def writeToInput(s: String): Unit
+  def name: String
 }

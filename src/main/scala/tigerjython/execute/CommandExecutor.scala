@@ -7,17 +7,17 @@
  */
 package tigerjython.execute
 
-import tigerjython.ui.editor.EditorTab
-
 /**
- * An implementation of the executor interface that runs the Python script externally.
+ * This executor uses a simple "OS terminal command" to execute the code.  That is, it does not support any direct
+ * interaction other than through standard input/output.
  *
  * @author Tobias Kohn
  */
-class PythonOSExecutor(val process: PythonOSProcess, editor_tab: EditorTab) extends PythonExecutor(editor_tab) {
+class CommandExecutor(val process: InterpreterProcess,
+                      val controller: ExecutionController) extends Executor {
 
   def run(): Unit =
-    process.exec(editorTab.getExecutableFile.getAbsolutePath)
+    process.exec(controller.getExecutableFile.getAbsolutePath)
 
   def stop(): Unit =
     process.abort()

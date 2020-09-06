@@ -7,12 +7,10 @@
  */
 package tigerjython.execute
 
-import tigerjython.ui.notebook.NotebookTab
-
 /**
  * @author Tobias Kohn
  */
-class PythonOSEvaluator(val process: PythonOSIProcess) extends PythonEvaluator {
+class ProcessEvaluator(val process: InteractiveOSProcess) extends Evaluator {
 
   def eval(expression: String, onResult: EvalResult): Unit =
     process.request(expression, onResult)

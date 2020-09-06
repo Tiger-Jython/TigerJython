@@ -23,6 +23,8 @@ import tigerjython.configparser.Parser
  */
 object Configuration {
 
+  final val appLogoName: String = "TigerJython"
+
   private lazy val _availableLanguages: Seq[(String, String)] = {
     val languageMap = Parser.parseResource("languages.txt")
     val result = languageMap.map(pair => (pair._1, pair._2.value))
@@ -38,6 +40,11 @@ object Configuration {
     val themesMap = Parser.parseResource("themes.txt")
     themesMap.map(pair => (pair._1, pair._2.value)).toSeq.sortBy(_._2)
   }
+
+  /**
+   * Returns the number of available (logical) processors on the system.
+   */
+  def availableProcessors: Int = Runtime.getRuntime.availableProcessors()
 
   /**
    * Returns a list with all available languages as tuples of the form `(abbreviation, human-readable-form)`.

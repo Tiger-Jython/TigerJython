@@ -17,7 +17,7 @@ import tigerjython.core.Configuration
  *
  * @author Tobias Kohn
  */
-class PythonJavaProcess(val pythonCmd: String) extends PythonOSProcess("java") {
+class PythonJavaProcess(val pythonCmd: String) extends InterpreterProcess("java") {
 
   def this(pythonCmd: Path) =
     this(pythonCmd.toAbsolutePath.toString)
@@ -32,7 +32,7 @@ class PythonJavaProcess(val pythonCmd: String) extends PythonOSProcess("java") {
         Configuration.sourcePath.toString == pythonCmd
     }
 
-  override protected def createCommands(args: Seq[String]): Array[String] =
+  override protected def createCommand(args: Seq[String]): Array[String] =
     if (internedPython)
       Array("java", "-jar", pythonCmd, "-jython") :++ args
     else

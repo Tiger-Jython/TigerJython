@@ -11,9 +11,10 @@ import javafx.application.{Application, Platform}
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.scene._
 import javafx.scene.control._
+import javafx.scene.image.Image
 import javafx.scene.layout.BorderPane
 import javafx.stage.Stage
-import tigerjython.core.{BuildInfo, Preferences}
+import tigerjython.core.{BuildInfo, Configuration, Preferences}
 import tigerjython.files.Documents
 import tigerjython.plugins.{MainWindow, PluginsManager}
 
@@ -99,6 +100,11 @@ class TigerJythonApplication extends Application {
     primaryStage.setScene(scene)
     primaryStage.setTitle(BuildInfo.Name + " " + BuildInfo.fullVersion)
     primaryStage.setOnCloseRequest(_ => handleCloseRequest())
+    primaryStage.getIcons.addAll(
+      new Image(getClass.getClassLoader.getResourceAsStream("resources/%s_32.png".format(Configuration.appLogoName))),
+      new Image(getClass.getClassLoader.getResourceAsStream("resources/%s_64.png".format(Configuration.appLogoName))),
+      new Image(getClass.getClassLoader.getResourceAsStream("resources/%s_128.png".format(Configuration.appLogoName))),
+    )
     primaryStage.show()
     _mainStage = primaryStage
     _scene = scene
@@ -129,6 +135,7 @@ class TigerJythonApplication extends Application {
   def handleCloseRequest(): Unit = {
     tabManager.saveAll()
     stop()
+    tigerjython.remote.ExecuteServer.quit()
     Platform.exit()
     sys.exit()
   }

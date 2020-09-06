@@ -7,22 +7,26 @@
  */
 package tigerjython.ui.editor
 
+import java.text.SimpleDateFormat
+import java.util.Calendar
+
 import javafx.application.Platform
 import javafx.beans.value.{ChangeListener, ObservableValue}
-import javafx.geometry.Orientation
+import javafx.geometry.{Orientation, Side}
 import javafx.scene._
-import javafx.scene.control.{Alert, Button, ButtonType, Label, SplitPane, TabPane, ToolBar}
-import javafx.scene.layout.BorderPane
+import javafx.scene.control._
+import javafx.scene.image.{Image, ImageView}
+import javafx.scene.layout.{BorderPane, HBox, Priority}
 import javafx.scene.shape.{Polygon, Rectangle}
 import javafx.stage.Popup
 import org.fxmisc.flowless.VirtualizedScrollPane
 import org.fxmisc.richtext.CodeArea
 import tigerjython.errorhandling._
-import tigerjython.execute.PythonExecutor
+import tigerjython.execute._
 import tigerjython.files.{Document, Documents}
 import tigerjython.plugins.EventManager
 import tigerjython.ui.editing.{PythonCodeArea, UndoHelper}
-import tigerjython.ui.{TabFrame, TigerJythonApplication, ZoomMixin}
+import tigerjython.ui.{ImagePool, TabFrame, TigerJythonApplication, ZoomMixin}
 
 /**
  * The editor is the central frame to be displayed in the main window.  It provides an editor, output-panes and a
@@ -30,7 +34,7 @@ import tigerjython.ui.{TabFrame, TigerJythonApplication, ZoomMixin}
  *
  * @author Tobias Kohn
  */
-abstract class EditorTab extends TabFrame {
+abstract class EditorTab extends TabFrame with ExecutionController {
 
   import tigerjython.ui.Utils._
 
@@ -38,14 +42,24 @@ abstract class EditorTab extends TabFrame {
   protected val errorPane: OutputPane = createErrorPane
   protected var errorPopup: Popup = _
   protected val infoPane: TabPane = new TabPane()
+  protected val logPane: OutputPane = new DefaultOutputPane(this, "log")
   protected val outputPane: OutputPane = createOutputPane
   protected val scrollPane: VirtualizedScrollPane[_] = new VirtualizedScrollPane(editor)
   protected val sideMenuBar: Node = createSideMenuBar
   protected val splitPane: SplitPane = new SplitPane()
   protected val topToolBar: Node = createTopToolBar
 
+  protected lazy val targetImage: ImageView = {
+    val result = new ImageView(ImagePool.tigerJython_Logo)
+    result.setFitHeight(16)
+    result.setFitWidth(16)
+    result
+  }
+  protected lazy val targetButton: MenuButton = new MenuButton()
+
   protected var document: Document = _
-  protected var executor: PythonExecutor = _
+  protected var executor: Executor = _
+  protected var execFactory: ExecutorFactory = TigerJythonExecutorFactory
   private var _running: Boolean = false
 
   protected var errorLabel: Node = _
@@ -71,7 +85,8 @@ abstract class EditorTab extends TabFrame {
   { // Create the scene/graphical contents
     val mainBox = new BorderPane()
     mainBox.setTop(topToolBar)
-    infoPane.getTabs.addAll(outputPane, errorPane)
+    infoPane.getTabs.addAll(outputPane, errorPane, logPane)
+    infoPane.setSide(Side.BOTTOM)
     splitPane.setOrientation(Orientation.VERTICAL)
     splitPane.getItems.addAll(scrollPane, infoPane)
     mainBox.setCenter(splitPane)
@@ -84,6 +99,15 @@ abstract class EditorTab extends TabFrame {
 
   def appendToErrorOutput(s: String): Unit =
     errorPane.append(s)
+
+  def appendToLog(text: String): Unit = {
+    if (text != "-") {
+      val cal = Calendar.getInstance
+      val sdf = new SimpleDateFormat("HH:mm:ss")
+      logPane.append("[%s] %s".format(sdf.format(cal.getTime), text))
+    } else
+      logPane.append("-" * 42)
+  }
 
   def appendToOutput(s: String): Unit =
     outputPane.append(s)
@@ -125,6 +149,19 @@ abstract class EditorTab extends TabFrame {
 
   protected def createSideMenuBar: Node = null
 
+  protected def createTargetMenuItem(name: String, img: Image, factory: ExecutorFactory): MenuItem = {
+    val result = new MenuItem(name)
+    result.setOnAction(_ => {
+      targetImage.setImage(img)
+      if (execFactory != factory) {
+        execFactory = factory
+      }
+    })
+    result.setGraphic(new ImageView(img))
+    result.setUserData(factory)
+    result
+  }
+
   protected def createTopToolBar: Node = {
     val result = new ToolBar()
     val runButton = new Button()
@@ -138,7 +175,16 @@ abstract class EditorTab extends TabFrame {
     stopButton.setGraphic(stopRect)
     runButton.setOnAction(_ => { run() })
     stopButton.setOnAction(_ => { stop() })
-    result.getItems.addAll(runButton, stopButton)
+    val filler = new HBox()
+    HBox.setHgrow(filler, Priority.ALWAYS)
+    targetButton.setGraphic(targetImage)
+    for (interpreter <- InterpreterInstallations.availableInterpreters) {
+      if (interpreter.title== "-")
+        targetButton.getItems.add(new SeparatorMenuItem())
+      else if (interpreter.factory != null && interpreter.factory.canExecute)
+        targetButton.getItems.add(createTargetMenuItem(interpreter.title, interpreter.icon, interpreter.factory))
+    }
+    result.getItems.addAll(runButton, stopButton, filler, targetButton)
     result
   }
 
@@ -272,21 +318,22 @@ abstract class EditorTab extends TabFrame {
         case Some((line, offs, msg)) =>
           displayError(line, offs, msg)
         case None =>
-          Platform.runLater(() => _run())
+          execFactory.createExecutor(this, executor=>{
+            Platform.runLater(() => _run(executor))
+          })
       }
     })
   }
 
-  protected def _run(): Unit =
-    {
-      save()
-      // Execute the code
-      val executor = PythonExecutor(this)
-      if (executor != null)
-        executor.run()
-      else
-        new Alert(Alert.AlertType.ERROR, "Please choose an appropriate interpreter", ButtonType.OK).showAndWait()
-    }
+  protected def _run(executor: Executor): Unit = {
+    save()
+    // Execute the code
+    if (executor != null) {
+      this.executor = executor
+      executor.run()
+    } else
+      new Alert(Alert.AlertType.ERROR, "Please choose an appropriate interpreter", ButtonType.OK).showAndWait()
+  }
 
   def save(): Unit =
     if (document != null) {
@@ -320,7 +367,7 @@ abstract class EditorTab extends TabFrame {
       executor.stop()
   }
 
-  def updateRunStatus(executor: PythonExecutor, running: Boolean): Unit =
+  def updateRunStatus(executor: Executor, running: Boolean): Unit =
     if (running) {
       this.executor = executor
       _running = true

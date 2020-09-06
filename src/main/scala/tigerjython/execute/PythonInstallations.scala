@@ -20,7 +20,7 @@ import tigerjython.utils.OSProcess
  */
 object PythonInstallations {
 
-  private final val JYTHON_NAME = "Jython (%s)".format(org.python.Version.PY_VERSION)
+  private final val JYTHON_NAME = "TigerJython (%s)".format(org.python.Version.PY_VERSION)
   private final val JYTHON_VERSION: Int = org.python.Version.PY_MAJOR_VERSION
 
   private val _availableVersions = collection.mutable.ArrayBuffer[String](
@@ -34,7 +34,7 @@ object PythonInstallations {
   /**
    * Get the path of the internal Jython interpreter for execution.
    */
-  private def getInternalJythonPath: Path = {
+  def getInternalJythonPath: Path = {
     val cls = classOf[org.python.util.PythonInterpreter]
     val path = cls.getProtectionDomain.getCodeSource.getLocation.toURI
     try {
@@ -109,6 +109,15 @@ object PythonInstallations {
           _executablePaths(version) = (extractVersion(version), path)
         }
     }
+
+  def getAvailableSystems: Array[(String, Int, Path)] = {
+    val result = collection.mutable.ArrayBuffer[(String, Int, Path)]()
+    for (version <- _availableVersions) {
+      val (v, p) = _executablePaths(version)
+      result += ((version, v, p))
+    }
+    result.toArray
+  }
 
   def getAvailableVersions: Array[String] = _availableVersions.toArray
 

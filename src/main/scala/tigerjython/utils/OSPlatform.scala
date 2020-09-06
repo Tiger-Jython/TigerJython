@@ -36,4 +36,6 @@ object OSPlatform extends Enumeration {
     else
       UNKNOWN
   }
+
+  def isWindows: Boolean = system == WINDOWS
 }

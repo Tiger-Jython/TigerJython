@@ -20,18 +20,22 @@ object JythonExecutor {
 
   var interpreter: PythonInterpreter = _
 
-  /**
-   * Run the given file using the internally packaged Jython.
-   *
-   * @param filename  The name or full path of the file to execute.
-   */
-  def run(filename: String): Unit = {
+  def initialize(): Unit = {
     Options.importSite = false
     Options.Qnew = true
     val postProperties = new java.util.Properties()
     postProperties.setProperty("python.cachedir.skip", "false")
     PythonInterpreter.initialize(System.getProperties, postProperties, null)
     jython.JythonBuiltins.initialize()
+  }
+
+  /**
+   * Run the given file using the internally packaged Jython.
+   *
+   * @param filename  The name or full path of the file to execute.
+   */
+  def run(filename: String): Unit = {
+    initialize()
     interpreter = new PythonInterpreter()
     interpreter.execfile(filename)
   }

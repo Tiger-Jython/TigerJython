@@ -15,7 +15,7 @@ import tigerjython.utils.OSProcess
  *
  * @author Tobias Kohn
  */
-class PythonOSIProcess(cmd: String) extends OSProcess(cmd) {
+class InteractiveOSProcess(cmd: String) extends OSProcess(cmd) {
 
   def this(cmd: Path) =
     this(cmd.toAbsolutePath.toString)

@@ -10,10 +10,12 @@ package tigerjython.ui.preferences
 import javafx.beans.property.{SimpleStringProperty, StringProperty}
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.scene.Node
-import javafx.scene.control.{CheckBox, ComboBox, Label}
+import javafx.scene.control.{CheckBox, ComboBox, Label, ListCell}
+import javafx.scene.image.ImageView
 import javafx.scene.layout.{StackPane, VBox}
+import javafx.scene.text.Font
 import tigerjython.core.{Configuration, Preferences}
-import tigerjython.ui.UIString
+import tigerjython.ui.{ImagePool, UIString}
 
 /**
  * The pane for general settings such as language or zoom level.  This is the one displayed first when the user opens
@@ -36,6 +38,12 @@ class GeneralPreferencesPane extends PreferencePane {
     val chooser = new ComboBox[String]()
     label.setLabelFor(chooser)
     chooser.getItems.addAll( availableLanguages.map(_._2): _* )
+    chooser.setButtonCell(new ImageListCell())
+    chooser.setCellFactory(_ => {
+      val result = new ImageListCell()
+      result.fontProperty().bind(Preferences.defaultFont)
+      result
+    })
     chooser.getSelectionModel.select(index)
     chooser.valueProperty().addListener(new ChangeListener[String] {
       override def changed(observableValue: ObservableValue[_ <: String], oldValue: String, newValue: String): Unit = {
@@ -83,5 +91,17 @@ class GeneralPreferencesPane extends PreferencePane {
     result.getChildren.addAll(createZoomingElements(): _*)
     result.getChildren.addAll(createServerElements(): _*)
     new StackPane(result)
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  private class ImageListCell extends ListCell[String] {
+    override protected def updateItem(item: String, empty: Boolean): Unit = {
+      super.updateItem(item, empty)
+      val img = ImagePool.flags.get(item).orNull
+      if (img != null)
+        setGraphic(new ImageView(img))
+      setText(item)
+    }
   }
 }

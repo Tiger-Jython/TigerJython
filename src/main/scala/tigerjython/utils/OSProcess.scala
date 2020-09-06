@@ -8,7 +8,7 @@
 package tigerjython.utils
 
 import java.io._
-import java.nio.file.Path
+import java.nio.file.{Path, Paths}
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
 
@@ -18,13 +18,22 @@ import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger}
  *
  * @author Tobias Kohn
  */
-class OSProcess(val cmd: String) {
+class OSProcess(val cmd: String, val isJavaProcess: Boolean) {
+
+  def this(cmd: String) =
+    this(cmd, isJavaProcess = cmd.toLowerCase.endsWith(".jar"))
 
   def this(file: File) =
     this(file.getAbsolutePath)
 
+  def this(file: File, isJavaProcess: Boolean) =
+    this(file.getAbsolutePath, isJavaProcess)
+
   def this(path: Path) =
     this(path.toAbsolutePath.toString)
+
+  def this(path: Path, isJavaProcess: Boolean) =
+    this(path.toAbsolutePath.toString, isJavaProcess)
 
   private val _execResult = new AtomicInteger()
   private var _execTime: Long = 0
@@ -120,8 +129,23 @@ class OSProcess(val cmd: String) {
     if (onCompleted != null)
       onCompleted(result)
 
-  protected def createCommands(args: Seq[String]): Array[String] =
-    Array(cmd) :++ args
+  protected def createCommand(args: Seq[String]): Array[String] =
+    if (isJavaProcess) {
+      val result = collection.mutable.ArrayBuffer[String](
+        OSProcess.javaExecutable
+      )
+      result ++= getJavaArgs
+      result += "-jar"
+      result += cmd
+      result ++= getBaseArgs
+      result ++= args
+      result.toArray
+    } else
+      Array(cmd) :++ getBaseArgs :++ args
+
+  protected def getBaseArgs: Array[String] = Array()
+
+  protected def getJavaArgs: Array[String] = Array()
 
   /**
    * Run the process with the given arguments.
@@ -133,7 +157,7 @@ class OSProcess(val cmd: String) {
     try {
       if (_isRunning.get())
         return false
-      val commands = createCommands(args)
+      val commands = createCommand(args)
       val observer = new Thread(ProcessObserver)
       _execTime = System.currentTimeMillis()
       process = runtime.exec(commands)
@@ -246,4 +270,28 @@ class OSProcess(val cmd: String) {
       } else
         stdInput.write(s, 0, s.length)
     }
+}
+object OSProcess {
+
+  /**
+   * This variable contains the full path and filename of the `java` binary of the currently running JRE.  In case the
+   * correct command cannot be evaluated, it just falls back on returning plain `java`.
+   *
+   * There are two reasons for trying to find the full path of the currently running JRE.
+   *   - The system might not have a Java installation in a search path;
+   *   - We might not want to use the JRE installed in the system, but rather a JRE that was distributed together with
+   *     TigerJython as a package.
+   */
+  lazy val javaExecutable: String = {
+    val p = Paths.get(System.getProperty("java.home")).resolve("bin")
+    val f =
+      if (OSPlatform.isWindows)
+        p.resolve("java.exe").toFile
+      else
+        p.resolve("java").toFile
+    if (f.exists && f.canExecute)
+      f.getAbsolutePath
+    else
+      "java"
+  }
 }
