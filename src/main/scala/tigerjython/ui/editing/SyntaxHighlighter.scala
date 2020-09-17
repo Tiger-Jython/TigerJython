@@ -79,4 +79,7 @@ object SyntaxHighlighter {
 
   def execute(command: Runnable): Unit =
     executor.execute(command: Runnable)
+
+  def shutdown(): Unit =
+    executor.shutdown()
 }

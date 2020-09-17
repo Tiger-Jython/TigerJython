@@ -19,7 +19,36 @@ class OpenDocumentItem(val parentFrame: OpenDocumentTab, val document: Document)
 
   {
     titleLabel.textProperty().set(document.name.get)
-    descriptionLabel.textProperty().set(document.pathString.get + "\n" + document.getDateString)
+    descriptionLabel.textProperty().set("%s\n%d lines, %s".format(
+      document.pathString.get, document.numberOfLines, document.getDateString
+    ))
+  }
+
+  private lazy val lines: Array[(Int, Int)] = {
+    val lns = getLines
+    var i = lns.length
+    while (i > 0 && lns(i-1) == (0, 0))
+      i -= 1
+    lns.take(i)
+  }
+
+  private def getLines: Array[(Int, Int)] = {
+    val result = collection.mutable.ArrayBuffer[(Int, Int)]()
+    for (line <- document.text.get.split('\n')) {
+      var indent = line.segmentLength(_ <= ' ')
+      var len = line.length
+      while (len > indent && line(len-1) <= ' ')
+        len -= 1
+      indent = indent / 2
+      len = (len / 2) min 22
+      if (indent < len)
+        result += ((indent, len))
+      else
+        result += ((0, 0))
+      if (result.length > 20)
+        return result.toArray
+    }
+    result.toArray
   }
 
   override protected def createIcon(): Node = {
@@ -32,11 +61,21 @@ class OpenDocumentItem(val parentFrame: OpenDocumentTab, val document: Document)
     g.getChildren.addAll(
       outline, result
     )
-    for (i <- 0 to 13) {
-      val l = new Line(10, 10 + 3 * i, 32, 10 + 3 * i)
-      l.setStroke(Color.GRAY)
-      g.getChildren.add(l)
-    }
+    if (lines.nonEmpty)
+      for (i <- lines.indices) {
+        val (start, end) = lines(i)
+        if (start < end) {
+          val l = new Line(10 + start, 10 + 2 * i, 10 + end, 10 + 2 * i)
+          l.setStroke(Color.GRAY)
+          g.getChildren.add(l)
+        }
+      }
+    else
+      for (i <- 0 to 13) {
+        val l = new Line(10, 10 + 3 * i, 32, 10 + 3 * i)
+        l.setStroke(Color.GRAY)
+        g.getChildren.add(l)
+      }
     g
   }
 

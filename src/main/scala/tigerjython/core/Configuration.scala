@@ -57,6 +57,12 @@ object Configuration {
   def availableThemes: Seq[(String, String)] = _availableThemes
 
   /**
+   * Returns the default port to be used for communication with execute instances of TigerJython.  A value of `0`
+   * indicates that the JVM should provide the next free port.
+   */
+  def getDefaultPort: Int = 0
+
+  /**
    * Returns the version of the JRE the program is running on.  This only returns the major version.
    */
   lazy val getJavaVersion: Int = {

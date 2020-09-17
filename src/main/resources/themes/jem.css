@@ -2,6 +2,10 @@
     -fx-fill: black;
 }
 
+.run-btn:hover .run-triangle {
+    -fx-fill: limegreen;
+}
+
 .stop-square {
     -fx-fill: black;
 }
@@ -84,6 +88,17 @@
     -fx-padding: 10;
     -fx-font-family: monospace;
     -fx-text-fill: #CC0000;
+}
+
+.navigator-text {
+    -fx-background-color: #CCC, #F7F7F7;
+    -fx-text-fill: #777;
+}
+
+.navigator-text:focused {
+    -fx-background-color: #039ED3, white;
+    -fx-text-fill: black;
+    -fx-faint-focus-color: #039ED322;
 }
 
 .lineno {

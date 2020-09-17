@@ -145,6 +145,9 @@ class OSProcess(val cmd: String, val isJavaProcess: Boolean) {
 
   protected def getBaseArgs: Array[String] = Array()
 
+  def getCommandText: String =
+    createCommand(Seq()).mkString(" ")
+
   protected def getJavaArgs: Array[String] = Array()
 
   /**

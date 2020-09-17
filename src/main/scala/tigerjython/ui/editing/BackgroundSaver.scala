@@ -32,4 +32,8 @@ object BackgroundSaver {
       task
     } else
       null
+
+  def shutdown(): Unit = {
+    executor.shutdown()
+  }
 }

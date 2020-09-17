@@ -190,6 +190,14 @@ class Document(protected val prefNode: JPreferences) {
 
   val name: StringProperty = new PrefStringProperty(prefNode, "name")
 
+  def numberOfLines: Int = {
+    val txt = text.get()
+    if (txt != null && txt != "")
+      txt.count(_ == '\n') + 1
+    else
+      0
+  }
+
   def open(f: TabFrame): Unit = {
     prefNode.putBoolean("open", true)
     frame = f

@@ -17,7 +17,7 @@ object TigerJythonExecutorFactory extends ExecutorFactory {
 
   val name: String = "TigerJython"
 
-  private var ids: Int = 1
+  private var ids: Int = 0
 
   protected def newInstance(controller: ExecutionController): TigerJythonExecutor = {
     ids += 1
@@ -29,6 +29,6 @@ object TigerJythonExecutorFactory extends ExecutorFactory {
   }
 
   def createExecutor(controller: ExecutionController, onReady: Executor=>Unit): Unit = {
-
+    onReady(newInstance(controller))
   }
 }

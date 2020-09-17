@@ -59,6 +59,13 @@ object Documents {
     documents.toArray
   }
 
+  def getListOfDocumentNames: Set[String] = {
+    val result = collection.mutable.Set[String]()
+    for (doc <- documents)
+      result.add(doc.name.get)
+    result.toSet
+  }
+
   /**
    * Reads all the documents from the preferences.
    */

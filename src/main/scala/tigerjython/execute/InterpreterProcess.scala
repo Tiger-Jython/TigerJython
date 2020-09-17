@@ -20,7 +20,7 @@ import tigerjython.utils.OSProcess
  */
 class InterpreterProcess(cmd: String) extends OSProcess(cmd) {
 
-  var parent: CommandExecutor = _
+  var parent: Executor = _
 
   def this(cmd: Path) =
     this(cmd.toAbsolutePath.toString)

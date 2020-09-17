@@ -43,6 +43,7 @@ abstract class EditorTab extends TabFrame with ExecutionController {
   protected var errorPopup: Popup = _
   protected val infoPane: TabPane = new TabPane()
   protected val logPane: OutputPane = new DefaultOutputPane(this, "log")
+  protected val nameBox: Node = createNameBox
   protected val outputPane: OutputPane = createOutputPane
   protected val scrollPane: VirtualizedScrollPane[_] = new VirtualizedScrollPane(editor)
   protected val sideMenuBar: Node = createSideMenuBar
@@ -97,16 +98,18 @@ abstract class EditorTab extends TabFrame with ExecutionController {
     getChildren.add(mainBox)
   }
 
-  def appendToErrorOutput(s: String): Unit =
+  def appendToErrorOutput(s: String): Unit = {
     errorPane.append(s)
+    appendToLog(s)
+  }
 
   def appendToLog(text: String): Unit = {
     if (text != "-") {
       val cal = Calendar.getInstance
       val sdf = new SimpleDateFormat("HH:mm:ss")
-      logPane.append("[%s] %s".format(sdf.format(cal.getTime), text))
+      logPane.append("[%s] %s\n".format(sdf.format(cal.getTime), text))
     } else
-      logPane.append("-" * 42)
+      logPane.append("-" * 42 + "\n")
   }
 
   def appendToOutput(s: String): Unit =
@@ -162,21 +165,32 @@ abstract class EditorTab extends TabFrame with ExecutionController {
     result
   }
 
+  protected def createNameBox: Node = {
+    val result = new NavigatorTextField()
+    result.captionProperty().bindBidirectional(caption)
+    result
+  }
+
   protected def createTopToolBar: Node = {
     val result = new ToolBar()
     val runButton = new Button()
     val runTriangle = new Polygon()
+    runButton.getStyleClass.add("run-btn")
     runTriangle.getPoints.addAll( -5.0, 8.0, -5.0, -8.0, 6.0, 0.0 )
     runTriangle.getStyleClass.add("run-triangle")
     runButton.setGraphic(runTriangle)
     val stopButton = new Button()
-    val stopRect = new Rectangle(13, 13)
+    val stopRect = new Rectangle(12, 12)
+    stopButton.getStyleClass.add("stop-btn")
     stopRect.getStyleClass.add("stop-square")
     stopButton.setGraphic(stopRect)
     runButton.setOnAction(_ => { run() })
     stopButton.setOnAction(_ => { stop() })
-    val filler = new HBox()
-    HBox.setHgrow(filler, Priority.ALWAYS)
+    val filler1 = new HBox()
+    val filler2 = new HBox()
+    filler1.setMinWidth(32.0)
+    filler1.setPrefWidth(32.0)
+    HBox.setHgrow(filler2, Priority.ALWAYS)
     targetButton.setGraphic(targetImage)
     for (interpreter <- InterpreterInstallations.availableInterpreters) {
       if (interpreter.title== "-")
@@ -184,7 +198,7 @@ abstract class EditorTab extends TabFrame with ExecutionController {
       else if (interpreter.factory != null && interpreter.factory.canExecute)
         targetButton.getItems.add(createTargetMenuItem(interpreter.title, interpreter.icon, interpreter.factory))
     }
-    result.getItems.addAll(runButton, stopButton, filler, targetButton)
+    result.getItems.addAll(runButton, stopButton, filler1, nameBox, filler2, targetButton)
     result
   }
 
@@ -193,6 +207,11 @@ abstract class EditorTab extends TabFrame with ExecutionController {
 
   def displayError(line: Int, column: Int, msg: String): Unit = {
     onFX(() => {
+      if (column > 0)
+        appendToLog("ERROR in line %d, column %d".format(line+1, column))
+      else
+        appendToLog("ERROR in line %d".format(line+1))
+      appendToLog(msg)
       editor.requestFocus()
       editor.moveTo(line, column)
       val caretBounds = editor.caretBoundsProperty().getValue
@@ -295,6 +314,7 @@ abstract class EditorTab extends TabFrame with ExecutionController {
       }
       document.open(this)
       caption.setValue(document.name.get)
+      caption.bindBidirectional(document.name)
     }
 
   override def onClose(): Unit = {
@@ -311,6 +331,7 @@ abstract class EditorTab extends TabFrame with ExecutionController {
     errorPane.clear()
     infoPane.getSelectionModel.select(0)
     EventManager.fireOnRun()
+    appendToLog("Executing...")
 
     // Check syntax
     onFX(() => {
@@ -318,6 +339,7 @@ abstract class EditorTab extends TabFrame with ExecutionController {
         case Some((line, offs, msg)) =>
           displayError(line, offs, msg)
         case None =>
+          appendToLog("Passed static syntax check")
           execFactory.createExecutor(this, executor=>{
             Platform.runLater(() => _run(executor))
           })
@@ -353,6 +375,7 @@ abstract class EditorTab extends TabFrame with ExecutionController {
       this.document = document
       document.open(this)
       caption.setValue(document.name.get)
+      caption.bindBidirectional(document.name)
       document.save(editor.getText, editor.getCaretPosition)
     }
 

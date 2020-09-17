@@ -16,8 +16,14 @@ package tigerjython.execute
 class CommandExecutor(val process: InterpreterProcess,
                       val controller: ExecutionController) extends Executor {
 
-  def run(): Unit =
-    process.exec(controller.getExecutableFile.getAbsolutePath)
+  process.parent = this
+
+  def run(): Unit = {
+    val filename = controller.getExecutableFile.getAbsolutePath
+    controller.appendToLog("Executing '%s'".format(filename))
+    controller.appendToLog(process.getCommandText)
+    process.exec(filename)
+  }
 
   def stop(): Unit =
     process.abort()

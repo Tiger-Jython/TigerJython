@@ -9,6 +9,8 @@ package tigerjython.remote
 
 import java.net.{ServerSocket, SocketException}
 
+import tigerjython.core.Configuration
+
 /**
  * The server lives in the editor itself and listens for executing instances connecting to the editor.
  *
@@ -26,7 +28,9 @@ object ExecuteServer {
   private val _clients = collection.mutable.Map[Int, ExecuteClientProxy]()
 
   private var _serverSocket: ServerSocket = _
-  private var _port: Int = 0
+  private var _port: Int = Configuration.getDefaultPort
+
+  private val waitingRoom = collection.mutable.Map[Int, ExecuteClientProxy=>Unit]()
 
   def serverSocket: ServerSocket = _serverSocket
   def port: Int = _port
@@ -38,6 +42,7 @@ object ExecuteServer {
       while (!serverSocket.isClosed) {
         val socket = serverSocket.accept()
         val client = new ExecuteClientProxy(socket)
+        handleWaitingRoom(client)
         if (onNewClient != null)
           onNewClient(client)
       }
@@ -78,4 +83,23 @@ object ExecuteServer {
   protected[remote]
   def removeClient(client: ExecuteClientProxy): Unit =
     _clients.remove(client.id)
+
+  protected def handleWaitingRoom(proxy: ExecuteClientProxy): Unit =
+    synchronized {
+      waitingRoom.remove(proxy.id) match {
+        case Some(onReady) =>
+          onReady(proxy)
+        case _ =>
+      }
+    }
+
+  def waitForProxy(id: Int, onReady: ExecuteClientProxy=>Unit): Unit =
+    synchronized {
+      _clients.get(id) match {
+        case Some(proxy) =>
+          onReady(proxy)
+        case None =>
+          waitingRoom(id) = onReady
+      }
+    }
 }

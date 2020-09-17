@@ -96,6 +96,17 @@
     -fx-text-fill: #CC0000;
 }
 
+.navigator-text {
+    -fx-background-color: #CCC, #F7F7F7;
+    -fx-text-fill: #777;
+}
+
+.navigator-text:focused {
+    -fx-background-color: #039ED3, white;
+    -fx-text-fill: black;
+    -fx-faint-focus-color: #039ED322;
+}
+
 .lineno {
     -fx-fill: #f0f0f0;
     -fx-background-color: -fx-fill;
