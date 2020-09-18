@@ -25,6 +25,8 @@ import tigerjython.plugins.{MainWindow, PluginsManager}
  */
 object TigerJythonApplication {
 
+  private var _application: TigerJythonApplication = _
+
   private var _mainStage: Stage = _
 
   private var _mainWindow: MainWindow = _
@@ -34,6 +36,8 @@ object TigerJythonApplication {
   private var _tabManager: TabManager = _
 
   private var _zoomingPane: ZoomingPane = _
+
+  def currentApplication: TigerJythonApplication = _application
 
   def mainScene: Scene = _scene
 
@@ -55,7 +59,9 @@ object TigerJythonApplication {
 
 class TigerJythonApplication extends Application {
 
-  import TigerJythonApplication.{_mainStage, _mainWindow, _scene, _tabManager, _zoomingPane}
+  import TigerJythonApplication.{_application, _mainStage, _mainWindow, _scene, _tabManager, _zoomingPane}
+
+  _application = this
 
   lazy val menuManager: MenuManager = new DefaultMenuManager(this)
 
@@ -73,7 +79,7 @@ class TigerJythonApplication extends Application {
 
     //root.setTop(menuManager.mainMenu)
     val contents = new BorderPane()
-    contents.setTop(menuManager.mainMenu)
+    //contents.setTop(menuManager.mainMenu)
     contents.setCenter(tabManager)
     val centre = new ZoomingPane()
     centre.getChildren.add(contents)

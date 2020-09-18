@@ -107,6 +107,22 @@
     -fx-faint-focus-color: #039ED322;
 }
 
+.download-text-btn {
+    -fx-background-color: rgba(150, 150, 150, 0.05);
+}
+
+.download-text-btn * {
+    -fx-stroke: gray;
+}
+
+.download-text-btn:hover {
+    -fx-background-color: #CCC, rgba(150, 150, 150, 0.25);
+}
+
+.download-text-btn:hover * {
+    -fx-stroke: black;
+}
+
 .lineno {
     -fx-fill: #FFDDAA;
     -fx-background-color: -fx-fill;

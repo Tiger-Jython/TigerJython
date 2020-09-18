@@ -7,10 +7,14 @@ Implemented:
 - Simple notebooks to work with Python interactively;
 - Undo history of documents is saved and restored across sessions;
 - Added icons to choose the interpreter and language;
+- Can change the name/caption of a document;
+- Can 'download' programs to external files;
 
 Changes:
 - The executing Python interpreter is now chosen on the basis of individual editor tabs rather than
   globally.  This works better for additional target devices where fast switching is necessary;
+- The traditional menu is no longer necessary and superseded by options that directly embedded into
+  the UI;
 
 Bug fixes:
 - Correctly handles text sizes beyond 8 KB;

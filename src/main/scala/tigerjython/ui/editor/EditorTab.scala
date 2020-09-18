@@ -13,14 +13,16 @@ import java.util.Calendar
 import javafx.application.Platform
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.geometry.{Orientation, Side}
-import javafx.scene._
+import javafx.scene.{layout, _}
 import javafx.scene.control._
 import javafx.scene.image.{Image, ImageView}
 import javafx.scene.layout.{BorderPane, HBox, Priority}
-import javafx.scene.shape.{Polygon, Rectangle}
-import javafx.stage.Popup
+import javafx.scene.shape.{Line, Polygon, Rectangle}
+import javafx.stage.FileChooser.ExtensionFilter
+import javafx.stage.{FileChooser, Popup}
 import org.fxmisc.flowless.VirtualizedScrollPane
 import org.fxmisc.richtext.CodeArea
+import tigerjython.core.Configuration
 import tigerjython.errorhandling._
 import tigerjython.execute._
 import tigerjython.files.{Document, Documents}
@@ -166,8 +168,26 @@ abstract class EditorTab extends TabFrame with ExecutionController {
   }
 
   protected def createNameBox: Node = {
-    val result = new NavigatorTextField()
-    result.captionProperty().bindBidirectional(caption)
+    val navEdit = new NavigatorTextField()
+    navEdit.captionProperty().bindBidirectional(caption)
+    val downloadButton = new Button()
+    downloadButton.setGraphic(createDownloadImage)
+    downloadButton.getStyleClass.add("download-text-btn")
+    downloadButton.setOnAction(_ => downloadToFile())
+    val result = new HBox()
+    result.getChildren.addAll(navEdit, downloadButton)
+    result
+  }
+
+  protected def createDownloadImage: Node = {
+    val result = new Group()
+    val lines = Array(
+      new Line(-4, 5, 4, 5),
+      new Line(0, 5, 0, -4),
+      new Line(0, 5, 3, 1),
+      new Line(0, 5, -3, 1)
+    )
+    result.getChildren.addAll(lines: _*)
     result
   }
 
@@ -239,6 +259,28 @@ abstract class EditorTab extends TabFrame with ExecutionController {
 
     })
   }
+
+  protected lazy val fileChooser: FileChooser = {
+    val result = new FileChooser()
+    result.setInitialDirectory(Configuration.userHome.toFile)
+    result.getExtensionFilters.addAll(
+      new ExtensionFilter("Python Files", "*.py"),
+      new ExtensionFilter("All Files", "*.*")
+    )
+    result
+  }
+
+  def downloadToFile(): Unit =
+    if (document != null) {
+      val cpt = caption.get()
+      if (cpt.endsWith(".py"))
+        fileChooser.setInitialFileName(cpt)
+      else
+        fileChooser.setInitialFileName(cpt + ".py")
+      val selectedFile = fileChooser.showSaveDialog(TigerJythonApplication.mainStage)
+      if (selectedFile != null)
+        document.saveCopyToFile(selectedFile)
+    }
 
   override def focusChanged(receivingFocus: Boolean): Unit = {
     if (receivingFocus)

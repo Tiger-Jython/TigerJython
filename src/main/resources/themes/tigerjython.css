@@ -95,14 +95,35 @@
 }
 
 .navigator-text {
-    -fx-background-color: #CCC, #F7F7F7;
+    -fx-background-color: #DDD, #EEE;
     -fx-text-fill: #777;
+}
+
+.navigator-text:hover {
+    -fx-background-color: #CCC, white;
+    -fx-text-fill: black;
 }
 
 .navigator-text:focused {
     -fx-background-color: #039ED3, white;
     -fx-text-fill: black;
     -fx-faint-focus-color: #039ED322;
+}
+
+.download-text-btn {
+    -fx-background-color: rgba(150, 150, 150, 0.05);
+}
+
+.download-text-btn * {
+    -fx-stroke: gray;
+}
+
+.download-text-btn:hover {
+    -fx-background-color: #CCC, rgba(150, 150, 150, 0.25);
+}
+
+.download-text-btn:hover * {
+    -fx-stroke: black;
 }
 
 .lineno {

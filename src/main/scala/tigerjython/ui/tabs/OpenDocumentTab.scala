@@ -10,11 +10,13 @@ package tigerjython.ui.tabs
 import javafx.beans.property.{SimpleStringProperty, StringProperty}
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.geometry.Orientation
-import javafx.scene.Parent
-import javafx.scene.control.{SplitPane, TextField, ToolBar}
-import javafx.scene.layout.{BorderPane, Region, VBox}
+import javafx.scene.{Group, Node, Parent}
+import javafx.scene.control.{Button, SplitPane, TextField, ToolBar}
+import javafx.scene.layout.{BorderPane, HBox, Priority, Region, VBox}
+import javafx.scene.paint.{Color, Paint}
+import javafx.scene.shape.{Circle, Line}
 import tigerjython.files.Documents
-import tigerjython.ui.TabFrame
+import tigerjython.ui.{TabFrame, TigerJythonApplication}
 import tigerjython.utils.SearchFilter
 
 /**
@@ -69,7 +71,32 @@ class OpenDocumentTab protected () extends TabFrame {
     val findTextField = new TextField()
     findTextField.prefWidthProperty().bind(result.widthProperty().divide(1.5))
     findTextField.textProperty().bindBidirectional(filterText)
-    result.getItems.add(findTextField)
+    val filler = new HBox()
+    HBox.setHgrow(filler, Priority.ALWAYS)
+    val prefButton = new Button()
+    prefButton.setGraphic(createPrefGraphic())
+    prefButton.setOnAction(_ => TigerJythonApplication.currentApplication.showPreferences())
+    result.getItems.addAll(findTextField, filler, prefButton)
+    result
+  }
+
+  protected def createPrefGraphic(): Node = {
+    val result = new Group()
+    val a = 7
+    val b = a / math.sqrt(2)
+    for ((x, y) <- Array[(Double, Double)]((a, 0), (0, a), (b, b), (b, -b))) {
+      val l1 = new Line(x, y, x / math.sqrt(2), y / math.sqrt(2))
+      l1.setStrokeWidth(2)
+      result.getChildren.add(l1)
+      val l2 = new Line(-x, -y, -x / math.sqrt(2), -y / math.sqrt(2))
+      l2.setStrokeWidth(2)
+      result.getChildren.add(l2)
+    }
+    val circle = new Circle(0, 0, b-0.5)
+    circle.setFill(Color.TRANSPARENT)
+    circle.setStroke(Color.BLACK)
+    circle.setStrokeWidth(2)
+    result.getChildren.add(circle)
     result
   }
 

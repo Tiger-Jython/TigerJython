@@ -227,6 +227,13 @@ class Document(protected val prefNode: JPreferences) {
     setDescriptionFromText(text)
   }
 
+  def saveCopyToFile(file: java.io.File): Unit = synchronized {
+    val writer = new FileWriter(file)
+    val printer = new PrintWriter(writer)
+    printer.print(text)
+    printer.close()
+  }
+
   def saveUndo(indices: Array[Byte], text: String): Unit = synchronized {
     prefNode.putByteArray("undoIndices", indices)
     prefNode.put("undoText", text)
