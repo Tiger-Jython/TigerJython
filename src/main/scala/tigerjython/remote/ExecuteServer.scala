@@ -16,7 +16,7 @@ import tigerjython.core.Configuration
  *
  * This class is highly automated and you will probably only need the following fields and methods:
  * - `port`  Returns the port at which the server is listening.  Send that number to clients so they know how to
- *   connext to the server.
+ *   connect to the server.
  * - `clients(id)`  Returns the client associated with a given ID, if the client is up and running and has been
  *   registered with the server (clients register with the server automatically as soon as they have been started).
  * - `onNewClient`  Lets you set a function to be called whenever a new client registers with the server.
@@ -42,7 +42,6 @@ object ExecuteServer {
       while (!serverSocket.isClosed) {
         val socket = serverSocket.accept()
         val client = new ExecuteClientProxy(socket)
-        handleWaitingRoom(client)
         if (onNewClient != null)
           onNewClient(client)
       }
@@ -72,12 +71,15 @@ object ExecuteServer {
 
   def quit(): Unit = {
     _serverSocket.close()
+    for ((_, c) <- _clients)
+      c.close()
   }
 
   protected[remote]
   def addClient(client: ExecuteClientProxy): Unit =
     if (client != null && client.id > 0) {
       _clients(client.id) = client
+      handleWaitingRoom(client)
     }
 
   protected[remote]

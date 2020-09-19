@@ -13,11 +13,11 @@ import java.util.Calendar
 import javafx.application.Platform
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.geometry.{Orientation, Side}
-import javafx.scene.{layout, _}
+import javafx.scene._
 import javafx.scene.control._
 import javafx.scene.image.{Image, ImageView}
 import javafx.scene.layout.{BorderPane, HBox, Priority}
-import javafx.scene.shape.{Line, Polygon, Rectangle}
+import javafx.scene.shape.{Line, Polygon, Rectangle, StrokeLineCap}
 import javafx.stage.FileChooser.ExtensionFilter
 import javafx.stage.{FileChooser, Popup}
 import org.fxmisc.flowless.VirtualizedScrollPane
@@ -183,10 +183,12 @@ abstract class EditorTab extends TabFrame with ExecutionController {
     val result = new Group()
     val lines = Array(
       new Line(-4, 5, 4, 5),
-      new Line(0, 5, 0, -4),
-      new Line(0, 5, 3, 1),
-      new Line(0, 5, -3, 1)
+      new Line(0, 3, 0, -4),
+      new Line(0, 3, 3, 0),
+      new Line(0, 3, -3, 0)
     )
+    for (line <- lines)
+      line.setStrokeLineCap(StrokeLineCap.ROUND)
     result.getChildren.addAll(lines: _*)
     result
   }
@@ -374,6 +376,7 @@ abstract class EditorTab extends TabFrame with ExecutionController {
     infoPane.getSelectionModel.select(0)
     EventManager.fireOnRun()
     appendToLog("Executing...")
+    appendToOutput("Starting execution..")
 
     // Check syntax
     onFX(() => {
@@ -382,6 +385,7 @@ abstract class EditorTab extends TabFrame with ExecutionController {
           displayError(line, offs, msg)
         case None =>
           appendToLog("Passed static syntax check")
+          appendToOutput(".")
           execFactory.createExecutor(this, executor=>{
             Platform.runLater(() => _run(executor))
           })
@@ -390,6 +394,7 @@ abstract class EditorTab extends TabFrame with ExecutionController {
   }
 
   protected def _run(executor: Executor): Unit = {
+    appendToOutput(".")
     save()
     // Execute the code
     if (executor != null) {

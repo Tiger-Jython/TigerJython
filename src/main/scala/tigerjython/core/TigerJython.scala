@@ -38,27 +38,34 @@ object TigerJython {
    *   a filename indicating the Python-script to execute.
    */
   def main(args: Array[String]): Unit = {
-    if (args.nonEmpty)
-      args.head match {
-        case "-jython" =>
-          val files = args.filter(!_.startsWith("-"))
-          if (files.length == 1)
-            JythonExecutor.run(files.head)
-          else if (files.length < 1) {
-            System.err.println("Error: missing filename to execute")
-          } else {
-            System.err.println("Error: too many filenames to execute:")
-            System.err.println(args.mkString(" "))
-          }
-        case "-client" =>
-          val port = args(1).toInt
-          val id = args(2).toInt
-          tigerjython.remote.ExecuteClientConnection.initialize(port, id)
-          JythonExecutor.initialize()
-        case _ =>
-          startEditor(args)
-      }
-    else
+    if (args.nonEmpty) {
+      var runFile: Option[String] = None
+      var server: Option[(Int, Int)] = None
+      var i = 0
+      while (i < args.length)
+        args(i) match {
+          case "-client" =>
+            val port = args(i+1).toInt
+            val id = args(i+2).toInt
+            server = Some((port, id))
+            i += 3
+          case "-jython" =>
+            runFile = Some(args(i+1))
+            i += 2
+          case _ =>
+            i += 1
+        }
+      if (server.isDefined) {
+        val (port, id) = server.get
+        tigerjython.remote.ExecuteClientConnection.initialize(port, id)
+        JythonExecutor.initialize()
+        JythonExecutor.runRemote()
+      } else
+      if (runFile.isDefined)
+        JythonExecutor.run(runFile.get)
+      else
+        startEditor(args)
+    } else
       startEditor(args)
   }
 

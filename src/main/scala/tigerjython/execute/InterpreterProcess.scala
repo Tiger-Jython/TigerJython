@@ -22,6 +22,8 @@ class InterpreterProcess(cmd: String) extends OSProcess(cmd) {
 
   var parent: Executor = _
 
+  var isClientProcess: Boolean = false
+
   def this(cmd: Path) =
     this(cmd.toAbsolutePath.toString)
 
@@ -51,8 +53,10 @@ class InterpreterProcess(cmd: String) extends OSProcess(cmd) {
 
   override def started(): Unit = {
     if (controller != null) {
-      controller.notifyExecutionStarted()
-      controller.updateRunStatus(parent, running = true)
+      if (!isClientProcess) {
+        controller.notifyExecutionStarted()
+        controller.updateRunStatus(parent, running = true)
+      }
       timer = new Timer(true)
       timer.scheduleAtFixedRate(UpdateTask, 100, 100)
     }
@@ -66,7 +70,7 @@ class InterpreterProcess(cmd: String) extends OSProcess(cmd) {
     if (controller != null) {
       UpdateTask.run()  // read the last bits of the output and error streams
       controller.updateRunStatus(parent, running = false)
-      controller.notifyExecutionFinished(getExecTime)
+      controller.notifyExecutionFinished(getExecTime, terminated=isClientProcess)
     }
   }
 }

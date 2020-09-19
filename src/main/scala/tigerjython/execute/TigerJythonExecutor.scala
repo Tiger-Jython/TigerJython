@@ -7,7 +7,7 @@
  */
 package tigerjython.execute
 
-import tigerjython.remote.{ExecFileMessage, ExecuteServer}
+import tigerjython.remote.{ExecFileMessage, ExecuteServer, QuitMessage}
 
 /**
  * This executor uses a simple "OS terminal command" to execute the code.  That is, it does not support any direct
@@ -21,6 +21,7 @@ class TigerJythonExecutor(val id: Int, override val controller: ExecutionControl
 
   {
     process.parent = this
+    process.isClientProcess = true
     controller.appendToLog("Starting process:")
     controller.appendToLog(process.getCommandText)
     process.exec("-client", ExecuteServer.getPort.toString, id.toString)
@@ -28,10 +29,19 @@ class TigerJythonExecutor(val id: Int, override val controller: ExecutionControl
 
   def run(): Unit =
     ExecuteServer.waitForProxy(id, proxy => {
-      controller.appendToLog("Connexted to client %d".format(id))
+      controller.appendToLog("Connected to client %d".format(id))
       val filename = controller.getExecutableFile.getAbsolutePath
       controller.appendToLog("Running file: %s".format(filename))
-      proxy.sendMessage(ExecFileMessage(filename, 0))
+      controller.clearOutput()
+      controller.notifyExecutionStarted()
+      controller.updateRunStatus(this, running = true)
+      val startTime = System.currentTimeMillis()
+      proxy.executeFile(filename, _ => {
+        val runTime = System.currentTimeMillis() - startTime
+        proxy.sendMessage(QuitMessage())
+        Thread.sleep(250)    // Leave some time for the output to appear in the editor window
+        controller.notifyExecutionFinished(runTime)
+      })
     })
 
   def stop(): Unit =

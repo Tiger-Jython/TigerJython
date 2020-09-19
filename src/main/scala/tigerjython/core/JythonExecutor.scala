@@ -10,6 +10,7 @@ package tigerjython.core
 import org.python.core.Options
 import org.python.util.PythonInterpreter
 import tigerjython.jython
+import tigerjython.remote.ExecuteClientConnection
 
 /**
  * The Jython executor is responsible for invoking Jython and executing the Python file as specified by the filename.
@@ -38,5 +39,13 @@ object JythonExecutor {
     initialize()
     interpreter = new PythonInterpreter()
     interpreter.execfile(filename)
+  }
+
+  def runRemote(): Unit = {
+    interpreter = new PythonInterpreter()
+    while (true) {
+      ExecuteClientConnection.processMessage(interpreter)
+      Thread.sleep(100)
+    }
   }
 }

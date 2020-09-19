@@ -7,7 +7,7 @@
  */
 package tigerjython.remote
 
-import java.io.{InputStream, ObjectInputStream, ObjectOutputStream, OutputStream}
+import java.io.{InputStream, InvalidClassException, ObjectInputStream, ObjectOutputStream, OutputStream}
 import java.net.Socket
 
 /**
@@ -23,7 +23,12 @@ abstract class Communicator {
     val ois = new ObjectInputStream(inputStream)
     try {
       while (!socket.isClosed)
-        handleMessage(ois.readObject().asInstanceOf[Message])
+        try {
+          handleMessage(ois.readObject().asInstanceOf[Message])
+        } catch {
+          case _: InvalidClassException =>
+            println("[ERROR] received broken object; ignoring it")
+        }
     } catch {
       case _: java.io.EOFException =>
     }
@@ -42,4 +47,9 @@ abstract class Communicator {
   def sendMessage(message: Message): Unit =
     if (socket != null && !socket.isClosed && message != null)
       objectStream.writeObject(message)
+
+  def close(): Unit = synchronized {
+    if (!socket.isClosed)
+      socket.close()
+  }
 }

@@ -104,6 +104,7 @@ object ExecuteClientConnection extends Communicator {
           } finally {
             timer.cancel()
           }
+        case _ =>
       }
 
   def quit(): Unit = {

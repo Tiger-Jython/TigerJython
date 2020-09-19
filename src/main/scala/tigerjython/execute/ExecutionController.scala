@@ -20,12 +20,17 @@ trait ExecutionController {
 
   def appendToOutput(text: String): Unit
 
+  def clearOutput(): Unit
+
   def getExecutableFile: File
 
-  def notifyExecutionFinished(executionTime: Long): Unit = {
-    appendToLog("finished after %d ms".format(executionTime))
-    appendToOutput("--- finished in %d ms ---".format(executionTime))
-  }
+  def notifyExecutionFinished(executionTime: Long, terminated: Boolean = false): Unit =
+    if (terminated) {
+      appendToLog("process terminated after %d ms".format(executionTime))
+    } else {
+      appendToLog("finished after %d ms".format(executionTime))
+      appendToOutput("--- finished in %d ms ---".format(executionTime))
+    }
 
   def notifyExecutionStarted(): Unit = {}
 

@@ -60,6 +60,16 @@ as published at the SIGCSE Technical Symposium 2020.  If you use TigerJython for
 ```
 
 
+## Build
+
+TigerJython uses [`sbt`](https://www.scala-sbt.org/) to build the code.  Start `sbt` first and then use
+`compile` to compile the code and `assembly` to generate a JAR file containing all the necessary 
+libraries (such as Scala, Jython, etc).
+
+By placing additional JARs into the `lib` subfolder, you can have additional files integrated into the
+project. 
+
+
 ## About
 
 Who is behind TigerJython?  The first version of _TigerJython_ was written by Tobias Kohn, Aegidius Pluss and Jarka Arnold, together with extensive tutorials for learning and using Python, such as the one available on [TigerJython.ch](http://www.tigerjython.com/engl/index.php).  As it was quickly adopted throughout Europe, the team founded an non-profit association ("Verein" under Swiss law) [TigerJython-Group](http://tjgroup.ch/), which now officially maintains the IDE, the Python libraries and tutorials, and regularly develops and publishes new materials.
