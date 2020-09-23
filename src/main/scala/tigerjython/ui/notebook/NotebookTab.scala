@@ -7,6 +7,8 @@
  */
 package tigerjython.ui.notebook
 
+import java.io.File
+
 import javafx.application.Platform
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.geometry.{Orientation, Pos}
@@ -18,14 +20,14 @@ import javafx.scene.layout.{BorderPane, HBox, Priority, StackPane, VBox}
 import javafx.scene.paint.Color
 import javafx.scene.shape.{Polygon, Rectangle}
 import tigerjython.core.Preferences
-import tigerjython.execute.{Evaluator, ExecutorFactory, InterpreterInstallations, TigerJythonExecutorFactory}
+import tigerjython.execute.{Evaluator, ExecutionController, Executor, ExecutorFactory, InterpreterInstallations, TigerJythonExecutorFactory}
 import tigerjython.ui.{ImagePool, TabFrame, ZoomMixin}
 import tigerjython.ui.Utils.onFX
 
 /**
  * @author Tobias Kohn
  */
-class NotebookTab extends TabFrame {
+class NotebookTab extends TabFrame with ExecutionController {
 
   protected val itemsBox: VBox with ZoomMixin = new VBox with ZoomMixin
   protected val outputPane: TextArea = createOutputPane
@@ -183,7 +185,7 @@ class NotebookTab extends TabFrame {
         if (cell != null)
           cell.evaluate(evaluator)
       })
-    if (cell != null)
+    else if (cell != null)
       cell.evaluate(evaluator)
   }
 
@@ -210,6 +212,19 @@ class NotebookTab extends TabFrame {
     else
       addCell()
   }
+
+  def appendToLog(text: String): Unit = {
+    println(text)
+  }
+
+  def appendToOutput(text: String): Unit =
+    outputPane.appendText(text)
+
+  def clearOutput(): Unit = {}
+
+  def getExecutableFile: File = null
+
+  def updateRunStatus(executor: Executor, running: Boolean): Unit = {}
 }
 object NotebookTab {
 

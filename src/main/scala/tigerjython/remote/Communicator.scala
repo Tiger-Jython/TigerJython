@@ -8,7 +8,7 @@
 package tigerjython.remote
 
 import java.io.{InputStream, InvalidClassException, ObjectInputStream, ObjectOutputStream, OutputStream}
-import java.net.Socket
+import java.net.{Socket, SocketException}
 
 /**
  * @author Tobias Kohn
@@ -31,6 +31,7 @@ abstract class Communicator {
         }
     } catch {
       case _: java.io.EOFException =>
+      case _: SocketException =>
     }
   })
 

@@ -24,8 +24,8 @@ object TigerJythonExecutorFactory extends ExecutorFactory {
     new TigerJythonExecutor(ids, controller)
   }
 
-  def createEvaluator(controller: Object, onReady: Evaluator=>Unit): Unit = {
-
+  def createEvaluator(controller: ExecutionController, onReady: Evaluator=>Unit): Unit = {
+    onReady(newInstance(controller))
   }
 
   def createExecutor(controller: ExecutionController, onReady: Executor=>Unit): Unit = {

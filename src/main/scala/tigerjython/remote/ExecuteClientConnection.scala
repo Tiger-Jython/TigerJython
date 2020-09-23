@@ -13,6 +13,7 @@ import java.net.Socket
 import java.util.{Timer, TimerTask}
 import java.util.concurrent.ArrayBlockingQueue
 
+import org.python.core.{CodeFlag, CompileMode, CompilerFlags, Py, PyObject}
 import org.python.util.PythonInterpreter
 import tigerjython.core.Configuration
 
@@ -35,8 +36,8 @@ object ExecuteClientConnection extends Communicator {
 
   private val messageQueue = new ArrayBlockingQueue[Message](16)
 
-  private val timer = new Timer()
-  private object SystemInfoReporter extends TimerTask {
+  private var timer: Timer = new Timer()
+  private class SystemInfoReporter extends TimerTask {
     override def run(): Unit =
       sendSystemStatus()
   }
@@ -68,41 +69,60 @@ object ExecuteClientConnection extends Communicator {
     sendMessage(SystemInfoMessage(Configuration.getJavaVersion, Configuration.availableProcessors))
   }
 
+  private def evalScript(script: String, interpreter: PythonInterpreter): PyObject = {
+    val cflags: CompilerFlags = new CompilerFlags()
+    cflags.source_is_utf8 = true
+    cflags.setFlag(CodeFlag.CO_FUTURE_DIVISION)
+    val code =
+      try {
+        Py.compile_flags(script, "<script>", CompileMode.eval, cflags)
+      } catch {
+        case _: Throwable =>
+          Py.compile_flags(script, "<script>", CompileMode.exec, cflags)
+      }
+    val result: PyObject = Py.runCode(code, null, interpreter.getLocals)
+    Py.flushLine()
+    result
+  }
+
   def processMessage(interpreter: PythonInterpreter): Unit =
     if (!messageQueue.isEmpty)
       messageQueue.poll() match {
         case EvalMessage(script, tag) =>
+          val task = new SystemInfoReporter()
           try {
-            timer.schedule(SystemInfoReporter, 0, 100)
-            val result = interpreter.eval(script)
+            timer.schedule(task, 0, 100)
+            val result = evalScript(script, interpreter)
             sendMessage(ResultMessage(result.toString, tag))
           } catch {
             case e: Exception =>
               sendMessage(ErrorResultMessage(e.toString, tag))
           } finally {
-            timer.cancel()
+            task.cancel()
           }
         case ExecFileMessage(filename, tag) =>
+          val task = new SystemInfoReporter()
           try {
-            timer.schedule(SystemInfoReporter, 0, 100)
+            timer.schedule(task, 0, 100)
             interpreter.execfile(filename)
             sendMessage(ResultMessage(null, tag))
           } catch {
             case e: Exception =>
               sendMessage(ErrorResultMessage(e.toString, tag))
           } finally {
-            timer.cancel()
+            task.cancel()
           }
         case ExecMessage(script, tag) =>
+          val task = new SystemInfoReporter()
           try {
-            timer.schedule(SystemInfoReporter, 0, 100)
+            timer.schedule(task, 0, 100)
             interpreter.exec(script)
             sendMessage(ResultMessage(null, tag))
           } catch {
             case e: Exception =>
               sendMessage(ErrorResultMessage(e.toString, tag))
           } finally {
-            timer.cancel()
+            task.cancel()
           }
         case _ =>
       }

@@ -73,6 +73,9 @@ class NotebookCell(val notebook: NotebookTab) extends BorderPane with EvalResult
       setBottom(null)
   }
 
+  def addOutput(s: String): Unit =
+    notebook.appendToOutput(s)
+
   def setError(errorMsg: String): Unit =
     onFX(() => {
       val result = new Label(errorMsg)

@@ -7,7 +7,7 @@
  */
 package tigerjython.execute
 
-import tigerjython.remote.{ExecFileMessage, ExecuteServer, QuitMessage}
+import tigerjython.remote.{ExecuteServer, QuitMessage}
 
 /**
  * This executor uses a simple "OS terminal command" to execute the code.  That is, it does not support any direct
@@ -15,7 +15,7 @@ import tigerjython.remote.{ExecFileMessage, ExecuteServer, QuitMessage}
  *
  * @author Tobias Kohn
  */
-class TigerJythonExecutor(val id: Int, override val controller: ExecutionController) extends Executor {
+class TigerJythonExecutor(val id: Int, override val controller: ExecutionController) extends Executor with Evaluator {
 
   protected val process: InterpreterProcess = new InterpreterProcess(PythonInstallations.getInternalJythonPath)
 
@@ -36,7 +36,7 @@ class TigerJythonExecutor(val id: Int, override val controller: ExecutionControl
       controller.notifyExecutionStarted()
       controller.updateRunStatus(this, running = true)
       val startTime = System.currentTimeMillis()
-      proxy.executeFile(filename, _ => {
+      proxy.executeFile(filename, (_, _) => {
         val runTime = System.currentTimeMillis() - startTime
         proxy.sendMessage(QuitMessage())
         Thread.sleep(250)    // Leave some time for the output to appear in the editor window
@@ -51,6 +51,16 @@ class TigerJythonExecutor(val id: Int, override val controller: ExecutionControl
       case None =>
         process.abort()
     }
+
+  def eval(expression: String, onResult: EvalResult): Unit =
+    ExecuteServer.waitForProxy(id, proxy => {
+      proxy.evaluate(expression, (result, isError) => {
+        if (isError)
+          onResult.setError(result)
+        else
+          onResult.setResult(result)
+      })
+    })
 
   def writeToInput(ch: Char): Unit =
     process.writeToInput(ch)

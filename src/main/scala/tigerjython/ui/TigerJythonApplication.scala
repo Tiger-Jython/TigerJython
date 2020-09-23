@@ -145,6 +145,7 @@ class TigerJythonApplication extends Application {
     editing.SyntaxHighlighter.shutdown()
     editing.BackgroundSaver.shutdown()
     Platform.exit()
+    sys.exit()
   }
 
   def showPreferences(): Unit = {

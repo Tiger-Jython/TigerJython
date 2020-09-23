@@ -16,7 +16,7 @@ trait ExecutorFactory {
 
   def canExecute: Boolean = true
 
-  def createEvaluator(controller: Object, onReady: Evaluator=>Unit): Unit
+  def createEvaluator(controller: ExecutionController, onReady: Evaluator=>Unit): Unit
 
   def createExecutor(controller: ExecutionController, onReady: Executor=>Unit): Unit
 

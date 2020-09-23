@@ -15,7 +15,7 @@ import java.nio.file.Path
 class CommandExecutorFactory(val name: String,
                              val cmd: Path) extends ExecutorFactory {
 
-  def createEvaluator(controller: Object, onReady: Evaluator=>Unit): Unit = {
+  def createEvaluator(controller: ExecutionController, onReady: Evaluator=>Unit): Unit = {
     val evaluator = new ProcessEvaluator(new InteractiveOSProcess(getCommand))
     onReady(evaluator)
   }

@@ -12,6 +12,8 @@ package tigerjython.execute
  */
 trait EvalResult {
 
+  def addOutput(s: String): Unit
+
   def setError(errorMsg: String): Unit
 
   def setResult(result: String): Unit

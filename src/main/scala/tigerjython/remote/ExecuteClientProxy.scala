@@ -30,7 +30,7 @@ class ExecuteClientProxy(val socket: Socket) extends Communicator {
   private var _memoryUsed: Long = 0
   private var _memoryMax: Long = 0
 
-  private val queryBuffer = collection.mutable.Map[Int, String=>Unit]()
+  private val queryBuffer = collection.mutable.Map[Int, (String, Boolean)=>Unit]()
   private var _tag: Int = 0
 
   val inputStream: InputStream = socket.getInputStream
@@ -51,10 +51,16 @@ class ExecuteClientProxy(val socket: Socket) extends Communicator {
         ExecuteServer.addClient(this)
       case QuitMessage() =>
         ExecuteServer.removeClient(this)
+      case ErrorResultMessage(errorMsg, tag) =>
+        queryBuffer.remove(tag) match {
+          case Some(onResult) =>
+            onResult(errorMsg, true)
+          case None =>
+        }
       case ResultMessage(result, tag) =>
         queryBuffer.remove(tag) match {
           case Some(onResult) =>
-            onResult(result)
+            onResult(result, false)
           case None =>
         }
       case SystemInfoMessage(javaVersion, cpuCount) =>
@@ -74,13 +80,13 @@ class ExecuteClientProxy(val socket: Socket) extends Communicator {
     _tag
   }
 
-  def evaluate(script: String, onResult: String=>Unit): Unit = {
+  def evaluate(script: String, onResult: (String, Boolean)=>Unit): Unit = {
     val tag = nextTag
     queryBuffer(tag) = onResult
     sendMessage(EvalMessage(script, tag))
   }
 
-  def executeFile(fileName: String, onResult: String=>Unit): Unit = {
+  def executeFile(fileName: String, onResult: (String, Boolean)=>Unit): Unit = {
     val tag = nextTag
     queryBuffer(tag) = onResult
     sendMessage(ExecFileMessage(fileName, tag))
