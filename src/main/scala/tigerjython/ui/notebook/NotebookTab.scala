@@ -111,7 +111,9 @@ class NotebookTab extends TabFrame with ExecutionController {
   def appendToErrorOutput(s: String): Unit = {}
 
   protected def createOutputPane: TextArea = {
-    new TextArea()
+    val result = new TextArea()
+    result.getStyleClass.add("output-pane")
+    result
   }
 
   protected def createTargetMenuItem(name: String, img: Image, factory: ExecutorFactory): MenuItem = {

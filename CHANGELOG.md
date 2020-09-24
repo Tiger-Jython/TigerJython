@@ -1,7 +1,7 @@
 # Changelog
 
 
-### 3.0 Early Access Preview 6 (coming soon)
+### 3.0 Early Access Preview 6 (24 September 2020)
 
 Implemented:
 - Simple notebooks to work with Python interactively;
@@ -18,6 +18,13 @@ Changes:
 
 Bug fixes:
 - Correctly handles text sizes beyond 8 KB;
+
+Known issues:
+- Starting a TigerJython instance for execution is slow and should be done ahead of time to make it 
+  more responsive;
+- Documents should not be synchronised with files on the disc automatically;
+- TigerJython's special functions are not yet fully supported;
+- Missing support for executing programs on external devices; 
 
 
 ### 3.0 Early Access Preview 5 (30 May 2020)
