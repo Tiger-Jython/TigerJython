@@ -58,9 +58,10 @@ object InterpreterInstallations {
       if (!interpreters(i+1).title.startsWith(intp.title))
         result += intp
     }
-    result += interpreters.last
-    if (interpreters.nonEmpty)
+    if (interpreters.nonEmpty) {
+      result += interpreters.last
       result += Separator
+    }
     // Add other devices that are not directly detectable
     result += InterpreterInfo("Micro:bit", ImagePool.microBit_Logo, null)
     result.toArray

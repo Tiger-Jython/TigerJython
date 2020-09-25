@@ -10,13 +10,16 @@ package tigerjython.ui.tabs
 import javafx.beans.property.{SimpleStringProperty, StringProperty}
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.geometry.Orientation
-import javafx.scene.{Group, Node, Parent}
+import javafx.scene.{Group, Node, Parent, control}
 import javafx.scene.control.{Button, SplitPane, TextField, ToolBar}
 import javafx.scene.layout.{BorderPane, HBox, Priority, Region, VBox}
-import javafx.scene.paint.{Color, Paint}
+import javafx.scene.paint.Color
 import javafx.scene.shape.{Circle, Line}
+import javafx.stage.FileChooser
+import javafx.stage.FileChooser.ExtensionFilter
+import tigerjython.core.Configuration
 import tigerjython.files.Documents
-import tigerjython.ui.{TabFrame, TigerJythonApplication}
+import tigerjython.ui.{TabFrame, TigerJythonApplication, editor}
 import tigerjython.utils.SearchFilter
 
 /**
@@ -31,6 +34,7 @@ class OpenDocumentTab protected () extends TabFrame {
 
   val filterText: StringProperty = new SimpleStringProperty()
   protected val contents: BorderPane = new BorderPane()
+  protected val importBtn: Node = createImportBtn()
   protected val items: VBox = createItems()
   protected val preview: SimplePythonEditor = createPreview()
   protected val searchBar: Region = createSearchBar()
@@ -76,7 +80,7 @@ class OpenDocumentTab protected () extends TabFrame {
     val prefButton = new Button()
     prefButton.setGraphic(createPrefGraphic())
     prefButton.setOnAction(_ => TigerJythonApplication.currentApplication.showPreferences())
-    result.getItems.addAll(findTextField, filler, prefButton)
+    result.getItems.addAll(findTextField, importBtn, filler, prefButton)
     result
   }
 
@@ -97,6 +101,30 @@ class OpenDocumentTab protected () extends TabFrame {
     circle.setStroke(Color.BLACK)
     circle.setStrokeWidth(2)
     result.getChildren.add(circle)
+    result
+  }
+
+  protected lazy val fileChooser: FileChooser = {
+    val result = new FileChooser()
+    result.setInitialDirectory(Configuration.userHome.toFile)
+    result.getExtensionFilters.addAll(
+      new ExtensionFilter("Python Files", "*.py"),
+      new ExtensionFilter("All Files", "*.*")
+    )
+    result
+  }
+
+  protected def createImportBtn(): Node = {
+    val result = new control.Button("...")
+    result.setOnAction(_ => {
+      val selectedFile = fileChooser.showOpenDialog(TigerJythonApplication.mainStage)
+      if (selectedFile != null) {
+        val tab = editor.PythonEditorTab()
+        tab.loadDocument(Documents.importDocument(selectedFile))
+        TigerJythonApplication.tabManager.addTab(tab)
+      }
+    })
+    result.getStyleClass.add("import-file-btn")
     result
   }
 

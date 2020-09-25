@@ -1,7 +1,8 @@
 package tigerjython.files
 
-import java.nio.file.Path
+import java.nio.file.{Path, Paths}
 import java.util.prefs.{Preferences => JPreferences}
+
 import tigerjython.ui.{TigerJythonApplication, editor}
 
 /**
@@ -22,7 +23,7 @@ object Documents {
     Documents.getDocumentForPath(path)
 
   def apply(path: java.io.File): Document =
-    Documents.getDocumentForPath(path.toPath)
+    Documents.getDocumentForFile(path)
 
   def createDocument(): Document = {
     val node = preferences.node(createDocumentName)
@@ -44,6 +45,12 @@ object Documents {
     "file_x%s%s".format("0" * prefix, name)
   }
 
+  def getDocumentForFile(file: java.io.File): Document =
+    if (file != null)
+      getDocumentForPath(file.toPath)
+    else
+      createDocument()
+
   def getDocumentForPath(path: Path): Document =
     if (path != null) {
       for (doc <- documents)
@@ -64,6 +71,12 @@ object Documents {
     for (doc <- documents)
       result.add(doc.name.get)
     result.toSet
+  }
+
+  def importDocument(file: java.io.File): Document = {
+    val result = createDocument()
+    result.importFromFile(file)
+    result
   }
 
   /**

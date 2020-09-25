@@ -132,6 +132,19 @@ class Document(protected val prefNode: JPreferences) {
 
   val imports: StringProperty = new PrefStringProperty(prefNode, "imports", "")
 
+  def importFromFile(file: java.io.File): Unit = synchronized {
+    if (file != null && file.exists()) {
+      val source = scala.io.Source.fromFile(file)
+      val txt = source.getLines().mkString("\n")
+      this.text.setValue(txt)
+      prefNode.put("source", file.getAbsolutePath)
+      val attr = Files.readAttributes(file.toPath, classOf[BasicFileAttributes])
+      val createDate = Date.from(attr.creationTime().toInstant)
+      if (createDate.before(getCreationDate))
+        prefNode.put("created", dateFormat.format(createDate))
+    }
+  }
+
   def index: Int = prefNode.getInt("index", 0)
 
   def isOpen: Boolean = prefNode.getBoolean("open", false)

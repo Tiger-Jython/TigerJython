@@ -30,7 +30,8 @@ class TigerJythonExecutor(val id: Int, override val controller: ExecutionControl
   def run(): Unit =
     ExecuteServer.waitForProxy(id, proxy => {
       controller.appendToLog("Connected to client %d".format(id))
-      val filename = controller.getExecutableFile.getAbsolutePath
+      val _file = controller.getExecutableFile
+      val filename = _file.getAbsolutePath
       controller.appendToLog("Running file: %s".format(filename))
       controller.clearOutput()
       controller.notifyExecutionStarted()

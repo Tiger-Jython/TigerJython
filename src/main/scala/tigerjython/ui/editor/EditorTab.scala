@@ -413,6 +413,11 @@ abstract class EditorTab extends TabFrame with ExecutionController {
           document.saveUndo(indices, text)
         case _ =>
       }
+    } else
+    if (editor.getLength > 0) {
+      val doc = Documents.createDocument()
+      doc.name.set(caption.get())
+      setDocument(doc)
     }
 
   def setDocument(document: Document): Unit =
