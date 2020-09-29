@@ -1,7 +1,16 @@
 # Changelog
 
 
-### 3.0 Early Access Preview 6 (24 September 2020)
+### 3.0 Early Access Preview 7 ()
+
+Implemented:
+- Can delete files from the '+' tab;
+
+Bug fixes:
+- Loads previously created files;
+
+
+### 3.0 Early Access Preview 6 (25 September 2020)
 
 Implemented:
 - Simple notebooks to work with Python interactively;

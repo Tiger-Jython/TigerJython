@@ -133,6 +133,22 @@
     -fx-stroke: black;
 }
 
+.delete-btn {
+    -fx-background-color: rgba(150, 150, 150, 0.625);
+}
+
+.delete-btn * {
+    -fx-stroke: white;
+}
+
+.delete-btn:hover {
+    -fx-background-color: black, black;
+}
+
+.delete-btn:hover * {
+    -fx-stroke: white;
+}
+
 .lineno {
     -fx-fill: #232323;
     -fx-background-color: -fx-fill;

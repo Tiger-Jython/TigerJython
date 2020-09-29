@@ -11,7 +11,7 @@ import javafx.beans.property.{SimpleStringProperty, StringProperty}
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.geometry.Orientation
 import javafx.scene.{Group, Node, Parent, control}
-import javafx.scene.control.{Button, SplitPane, TextField, ToolBar}
+import javafx.scene.control.{Button, ScrollPane, SplitPane, TextField, ToolBar}
 import javafx.scene.layout.{BorderPane, HBox, Priority, Region, VBox}
 import javafx.scene.paint.Color
 import javafx.scene.shape.{Circle, Line}
@@ -41,8 +41,11 @@ class OpenDocumentTab protected () extends TabFrame {
   protected val splitPane: SplitPane = new SplitPane()
 
   {
+    val scrollBar = new ScrollPane()
+    scrollBar.setContent(items)
+    scrollBar.setFitToWidth(true)
     splitPane.setOrientation(Orientation.HORIZONTAL)
-    splitPane.getItems.addAll(items, preview)
+    splitPane.getItems.addAll(scrollBar, preview)
     contents.setTop(searchBar)
     contents.setCenter(splitPane)
     getChildren.add(contents)
@@ -63,8 +66,10 @@ class OpenDocumentTab protected () extends TabFrame {
     })
   }
 
-  protected def createItems(): VBox =
-    new VBox()
+  protected def createItems(): VBox = {
+    val result = new VBox()
+    result
+  }
 
   protected def createPreview(): SimplePythonEditor = {
     new SimplePythonEditor()

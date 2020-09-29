@@ -1,6 +1,6 @@
 package tigerjython.files
 
-import java.nio.file.{Path, Paths}
+import java.nio.file.Path
 import java.util.prefs.{Preferences => JPreferences}
 
 import tigerjython.ui.{TigerJythonApplication, editor}
@@ -79,6 +79,13 @@ object Documents {
     result
   }
 
+  private[files]
+  def removeDocument(document: Document): Unit = {
+    val idx = documents.indexOf(document)
+    if (document != null && idx >= 0)
+      documents.remove(idx)
+  }
+
   /**
    * Reads all the documents from the preferences.
    */
@@ -87,11 +94,9 @@ object Documents {
     val openDocuments = collection.mutable.ArrayBuffer[Document]()
     for (childName <- preferences.childrenNames()) {
       val doc = new Document(preferences.node(childName))
-      if (doc.exists) {
-        documents += doc
-        if (doc.isOpen)
-          openDocuments += doc
-      }
+      documents += doc
+      if (doc.isOpen)
+        openDocuments += doc
     }
     for (doc <- openDocuments) {
       val tab = editor.PythonEditorTab(doc)

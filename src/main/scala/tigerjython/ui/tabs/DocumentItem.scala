@@ -7,12 +7,16 @@
  */
 package tigerjython.ui.tabs
 
+import javafx.event.EventTarget
 import javafx.scene.{Group, Node}
-import javafx.scene.control.Label
+import javafx.scene.control.{Button, Label}
 import javafx.scene.input.MouseEvent
 import javafx.scene.layout.{BorderPane, VBox}
 import javafx.scene.paint.Color
 import javafx.scene.shape.Rectangle
+import javafx.scene.text.Text
+
+import scala.annotation.tailrec
 
 /**
  * @author Tobias Kohn
@@ -42,8 +46,20 @@ abstract class DocumentItem extends BorderPane {
     setMinHeight(60)
   }
 
+  @tailrec
+  private def handleMouseEvent(target: EventTarget): Unit =
+    target match {
+      case x if x == this =>
+        onClicked()
+      case _: Button =>
+      case node: Node if node.getParent != null =>
+        handleMouseEvent(node.getParent)
+      case _ =>
+        onClicked()
+    }
+
   addEventFilter(MouseEvent.MOUSE_CLICKED, (event: MouseEvent) => {
-    onClicked()
+    handleMouseEvent(event.getTarget)
   })
   addEventFilter(MouseEvent.MOUSE_ENTERED_TARGET, (event: MouseEvent) => {
     if (event.getTarget eq this)

@@ -7,6 +7,9 @@
  */
 package tigerjython.ui.tabs
 
+import javafx.scene.control.Alert.AlertType
+import javafx.scene.control.{Alert, Button, ButtonType}
+import javafx.scene.layout.{HBox, Priority, VBox}
 import javafx.scene.{Group, Node}
 import javafx.scene.paint.Color
 import javafx.scene.shape.{Line, Rectangle}
@@ -17,11 +20,14 @@ import tigerjython.files.Document
  */
 class OpenDocumentItem(val parentFrame: OpenDocumentTab, val document: Document) extends DocumentItem {
 
+  protected val deleteBtn: Node = createDeleteBtn()
+
   {
     titleLabel.textProperty().set(document.name.get)
     descriptionLabel.textProperty().set("%s\n%d lines, %s".format(
       document.pathString.get, document.numberOfLines, document.getDateString
     ))
+    setRight(deleteBtn)
   }
 
   private lazy val lines: Array[(Int, Int)] = {
@@ -49,6 +55,45 @@ class OpenDocumentItem(val parentFrame: OpenDocumentTab, val document: Document)
         return result.toArray
     }
     result.toArray
+  }
+
+  protected def createDeleteBtn(): Node = {
+    val result = new Button()
+    result.setGraphic(createDeleteIcon())
+    result.setOnAction(_ => {
+      val alert = new Alert(AlertType.CONFIRMATION, "Do you really want to delete '%s'?".format(document.name.get()),
+        ButtonType.YES, ButtonType.NO, ButtonType.CANCEL)
+      alert.showAndWait()
+      if (alert.getResult == ButtonType.YES) {
+        if (document.isOpen && document.frame != null)
+          document.frame.close()
+        document.delete()
+        parentFrame.update()
+      }
+    })
+    result.getStyleClass.add("delete-btn")
+
+    val filler = new VBox()
+    VBox.setVgrow(filler, Priority.ALWAYS)
+
+    val bar = new VBox()
+    bar.getChildren.addAll(
+      filler,
+      result
+    )
+    bar
+  }
+
+  protected def createDeleteIcon(): Node = {
+    val result = new Group()
+    result.getChildren.addAll(
+      new Line(0, 1, 12, 1),
+      new Line(3, 0, 9, 0),
+      new Line(2, 4, 2, 12),
+      new Line(2, 12, 10, 12),
+      new Line(10, 12, 10, 4),
+    )
+    result
   }
 
   override protected def createIcon(): Node = {

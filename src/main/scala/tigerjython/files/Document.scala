@@ -52,6 +52,12 @@ class Document(protected val prefNode: JPreferences) {
     frame = null
   }
 
+  def delete(): Unit = {
+    prefNode.clear()
+    prefNode.removeNode()
+    Documents.removeDocument(this)
+  }
+
   val description: StringProperty = new PrefStringProperty(prefNode, "description", "")
 
   def exists: Boolean =
