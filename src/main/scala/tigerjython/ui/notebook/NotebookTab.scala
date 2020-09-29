@@ -191,6 +191,11 @@ class NotebookTab extends TabFrame with ExecutionController {
       cell.evaluate(evaluator)
   }
 
+  override def onClose(): Unit = {
+    if (evaluator != null)
+      evaluator.shutdown()
+  }
+
   def selectCell(index: Int): Unit =
     if (0 <= index && index < cells.length && cellIndex != index) {
       if (0 <= cellIndex && cellIndex < cells.length)
@@ -216,7 +221,7 @@ class NotebookTab extends TabFrame with ExecutionController {
   }
 
   def appendToLog(text: String): Unit = {
-    println(text)
+    // println(text)
   }
 
   def appendToOutput(text: String): Unit =

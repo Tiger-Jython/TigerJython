@@ -7,6 +7,8 @@
  */
 package tigerjython.execute
 
+import tigerjython.core.Preferences
+
 /**
  * This executor uses a simple "OS terminal command" to execute the code.  That is, it does not support any direct
  * interaction other than through standard input/output.

@@ -22,4 +22,6 @@ trait Evaluator {
    * object to which the results can then be sent.
    */
   def eval(expression: String, onResult: EvalResult): Unit
+
+  def shutdown(): Unit
 }

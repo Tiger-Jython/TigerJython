@@ -12,6 +12,24 @@ package tigerjython.execute
  */
 trait ExecutorFactory {
 
+  private val evaluators = collection.mutable.Set[Evaluator]()
+
+  private val executors = collection.mutable.Set[Executor]()
+
+  private[execute] def addEvaluator(evaluator: Evaluator): Unit =
+    if (evaluator != null)
+      evaluators += evaluator
+
+  private[execute] def addExecutor(executor: Executor): Unit =
+    if (executor != null)
+      executors += executor
+
+  private[execute] def removeEvaluator(evaluator: Evaluator): Unit =
+    evaluators -= evaluator
+
+  private[execute] def removeExecutor(executor: Executor): Unit =
+    executors -= executor
+
   def canEvaluate: Boolean = true
 
   def canExecute: Boolean = true
@@ -21,4 +39,13 @@ trait ExecutorFactory {
   def createExecutor(controller: ExecutionController, onReady: Executor=>Unit): Unit
 
   def name: String
+
+  def shutdown(): Unit = {
+    if (evaluators.nonEmpty)
+      for (evaluator <- evaluators.clone())
+        evaluator.shutdown()
+    if (executors.nonEmpty)
+      for (executor <- executors.clone())
+        executor.shutdown()
+  }
 }

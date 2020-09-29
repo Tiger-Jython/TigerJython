@@ -77,6 +77,7 @@ object TigerJython {
     tigerjython.execute.PythonInstallations.initialize()
     tigerjython.core.Configuration.initialize()
     tigerjython.remote.ExecuteServer.initialize()
+    tigerjython.execute.TigerJythonProcess.initialize()
     tigerjython.ui.TigerJythonApplication.launchApplication(args)
   }
 }

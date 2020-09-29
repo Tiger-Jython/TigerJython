@@ -1,13 +1,15 @@
 # Changelog
 
 
-### 3.0 Early Access Preview 7 ()
+### 3.0 Early Access Preview 7 (.. September 2020)
 
 Implemented:
 - Can delete files from the '+' tab;
+- TigerJython executor instances are started ahead of time for faster response;
 
 Bug fixes:
 - Loads previously created files;
+- All threads and running executor instances are shutdown when closing the app;
 
 
 ### 3.0 Early Access Preview 6 (25 September 2020)

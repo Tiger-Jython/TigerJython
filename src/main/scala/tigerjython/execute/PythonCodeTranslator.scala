@@ -28,15 +28,14 @@ object PythonCodeTranslator {
    * @return      Either `None` or a new `String` representing the transformed code.
    */
   def translate(code: String): Option[String] = {
-    val version = PythonInstallations.getSelectedVersionNumber
     if (Preferences.repeatLoop.get)
-      _translate(code, version)
+      _translate(code)
     else
       None
   }
 
-  protected def _translate(code: String, pythonVersion: Int): Option[String] = {
-    val parserState = ParserState(code, pythonVersion, ErrorHandler.SilentErrorHandler)
+  protected def _translate(code: String): Option[String] = {
+    val parserState = ParserState(code, 3, ErrorHandler.SilentErrorHandler)
     parserState.repeatStatement = Preferences.repeatLoop.get
     val lexer = new Lexer(code, parserState, 0)
     val result = new StringBuilder()
@@ -64,7 +63,7 @@ object PythonCodeTranslator {
               val hd = lexer.head
               if (hd != null) {
                 val argument = code.substring(position, hd.pos)
-                result ++= REPEAT_STRING(pythonVersion).format(argument)
+                result ++= REPEAT_STRING(3).format(argument)
                 position = hd.pos
               }
             } else

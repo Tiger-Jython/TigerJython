@@ -19,6 +19,8 @@ trait Executor {
 
   def run(): Unit
 
+  def shutdown(): Unit
+
   def stop(): Unit
 
   def writeToInput(ch: Char): Unit

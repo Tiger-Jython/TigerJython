@@ -455,6 +455,7 @@ abstract class EditorTab extends TabFrame with ExecutionController {
         if (errorText != "")
           handleError(errorText)
       })
+      TigerJythonProcess.preStart()
       EventManager.fireOnStopped()
       save()
     }

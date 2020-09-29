@@ -141,11 +141,13 @@ class TigerJythonApplication extends Application {
   def handleCloseRequest(): Unit = {
     tabManager.saveAll()
     stop()
+    tigerjython.execute.TigerJythonProcess.shutdown()
+    tigerjython.execute.TigerJythonExecutorFactory.shutdown()
     tigerjython.remote.ExecuteServer.quit()
     editing.SyntaxHighlighter.shutdown()
     editing.BackgroundSaver.shutdown()
     Platform.exit()
-    sys.exit()
+    //sys.exit()
   }
 
   def showPreferences(): Unit = {

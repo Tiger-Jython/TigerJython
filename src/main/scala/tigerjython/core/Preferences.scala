@@ -139,7 +139,6 @@ object Preferences {
     val data = new Array[Byte](48)
     new Random().nextBytes(data)
     val result = "A" + Base64.getEncoder.encodeToString(data).replace('/', '-')
-    println(result)
     result
   }
 
@@ -150,6 +149,8 @@ object Preferences {
   val checkSyntax: BooleanProperty = new PrefBooleanProperty(preferences, "syntaxcheck", true)
 
   val checkUpdates: BooleanProperty = new PrefBooleanProperty(preferences, "check-updates", true)
+
+  val preStartExecutor: BooleanProperty = new PrefBooleanProperty(preferences, "prestart-executor", true)
 
   val pythonInterpreter: StringProperty = new PrefStringProperty(preferences, "python.interpreter")
 

@@ -83,6 +83,19 @@ object ExecuteServer {
     }
 
   protected[remote]
+  def updateClientId(oldId: Int, client: ExecuteClientProxy): Unit = {
+    _clients.remove(oldId)
+    addClient(client)
+  }
+
+  def updateClientId(oldId: Int, newId: Int): Unit =
+    _clients.get(oldId) match {
+      case Some(proxy) =>
+        proxy.changeId(newId)
+      case _ =>
+    }
+
+  protected[remote]
   def removeClient(client: ExecuteClientProxy): Unit =
     _clients.remove(client.id)
 

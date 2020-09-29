@@ -17,14 +17,19 @@ import tigerjython.remote.{ExecuteServer, QuitMessage}
  */
 class TigerJythonExecutor(val id: Int, override val controller: ExecutionController) extends Executor with Evaluator {
 
-  protected val process: InterpreterProcess = new InterpreterProcess(PythonInstallations.getInternalJythonPath)
+  protected val process: InterpreterProcess = TigerJythonProcess(id)
 
   {
     process.parent = this
     process.isClientProcess = true
     controller.appendToLog("Starting process:")
     controller.appendToLog(process.getCommandText)
-    process.exec("-client", ExecuteServer.getPort.toString, id.toString)
+    process.onCompleted = _ => {
+      TigerJythonExecutorFactory.removeExecutor(this)
+    }
+    TigerJythonExecutorFactory.addExecutor(this)
+    if (!process.isRunning)
+      process.exec("-client", ExecuteServer.getPort.toString, id.toString)
   }
 
   def run(): Unit =
@@ -44,6 +49,16 @@ class TigerJythonExecutor(val id: Int, override val controller: ExecutionControl
         controller.notifyExecutionFinished(runTime)
       })
     })
+
+  def shutdown(): Unit = {
+    ExecuteServer(id) match {
+      case Some(proxy) =>
+        proxy.quit()
+        Thread.sleep(100)   // Let's give the process a chance to end 'normally'
+      case _ =>
+    }
+    process.abort()
+  }
 
   def stop(): Unit =
     ExecuteServer(id) match {

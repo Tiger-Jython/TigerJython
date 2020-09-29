@@ -80,6 +80,13 @@ class ExecuteClientProxy(val socket: Socket) extends Communicator {
     _tag
   }
 
+  def changeId(newId: Int): Unit =
+    if (newId > 0 && newId != _id) {
+      val oldId = _id
+      _id = newId
+      ExecuteServer.updateClientId(oldId, this)
+    }
+
   def evaluate(script: String, onResult: (String, Boolean)=>Unit): Unit = {
     val tag = nextTag
     queryBuffer(tag) = onResult
@@ -90,6 +97,11 @@ class ExecuteClientProxy(val socket: Socket) extends Communicator {
     val tag = nextTag
     queryBuffer(tag) = onResult
     sendMessage(ExecFileMessage(fileName, tag))
+  }
+
+  def quit(): Unit = {
+    sendMessage(QuitMessage())
+    close()
   }
 
   thread.start()

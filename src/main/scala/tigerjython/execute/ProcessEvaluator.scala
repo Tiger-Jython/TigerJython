@@ -14,4 +14,7 @@ class ProcessEvaluator(val process: InteractiveOSProcess) extends Evaluator {
 
   def eval(expression: String, onResult: EvalResult): Unit =
     process.request(expression, onResult)
+
+  override def shutdown(): Unit =
+    process.abort()
 }

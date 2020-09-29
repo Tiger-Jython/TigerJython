@@ -27,7 +27,11 @@ class InterpreterProcess(cmd: String) extends OSProcess(cmd) {
   def this(cmd: Path) =
     this(cmd.toAbsolutePath.toString)
 
-  protected def controller: ExecutionController = parent.controller
+  protected def controller: ExecutionController =
+    if (parent != null)
+      parent.controller
+    else
+      null
 
   override protected def getBaseArgs: Array[String] =
     if (isJavaProcess)

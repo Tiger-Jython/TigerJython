@@ -22,8 +22,12 @@ class CommandExecutor(val process: InterpreterProcess,
     val filename = controller.getExecutableFile.getAbsolutePath
     controller.appendToLog("Executing '%s'".format(filename))
     controller.appendToLog(process.getCommandText)
+    controller.clearOutput()
     process.exec(filename)
   }
+
+  override def shutdown(): Unit =
+    process.abort()
 
   def stop(): Unit =
     process.abort()
