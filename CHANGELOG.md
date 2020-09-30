@@ -1,15 +1,23 @@
 # Changelog
 
 
-### 3.0 Early Access Preview 7 (.. September 2020)
+### 3.0 Early Access Preview 7 (30 September 2020)
 
 Implemented:
 - Can delete files from the '+' tab;
 - TigerJython executor instances are started ahead of time for faster response;
+- Saves all documents so that they can be mutually imported;
+
+Changes:
+- Import of files from disk is more prominent and visible;
 
 Bug fixes:
 - Loads previously created files;
 - All threads and running executor instances are shutdown when closing the app;
+- Runtime errors are actually displayed;
+
+Known issues:
+- Errors in modules are not displayed at the correct position;
 
 
 ### 3.0 Early Access Preview 6 (25 September 2020)

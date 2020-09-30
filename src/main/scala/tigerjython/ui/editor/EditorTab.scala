@@ -235,7 +235,11 @@ abstract class EditorTab extends TabFrame with ExecutionController {
         appendToLog("ERROR in line %d".format(line+1))
       appendToLog(msg)
       editor.requestFocus()
-      editor.moveTo(line, column)
+      try {
+        editor.moveTo(line, column)
+      } catch {
+        case _: IndexOutOfBoundsException =>
+      }
       val caretBounds = editor.caretBoundsProperty().getValue
       if (caretBounds.isPresent) {
         val popup = new Popup()
@@ -293,17 +297,21 @@ abstract class EditorTab extends TabFrame with ExecutionController {
           editor.requestFocus()
         })
       })
-    else
+    else {
       hideError()
+      autoSave()
+    }
   }
 
   def getCaretPosition: Int =
     editor.getCaretPosition
 
   def getExecutableFile: java.io.File =
-    if (document != null)
-      document.getExecutableFile
-    else
+    if (document != null && execFactory != null) {
+      val execLanguage = execFactory.getExecLanguage
+      Documents.saveAllExecutables(execLanguage)
+      document.getExecutableFile(execLanguage)
+    } else
       null
 
   def getFile: java.io.File = file
@@ -314,7 +322,7 @@ abstract class EditorTab extends TabFrame with ExecutionController {
   def getText: String =
     editor.getText
 
-  def handleError(errorText: String): Unit = {
+  override def handleError(errorText: String): Unit = {
     infoPane.getSelectionModel.select(1)
     val (line, filename, msg) = PythonRuntimeErrors.generateMessage(errorText)
     if (line >= 0 && msg != null)

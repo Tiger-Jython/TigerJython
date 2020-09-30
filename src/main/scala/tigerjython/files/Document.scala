@@ -7,7 +7,7 @@
  */
 package tigerjython.files
 
-import java.io.{FileWriter, PrintWriter}
+import java.io.{File, FileWriter, PrintWriter}
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.{Files, Path, Paths}
 import java.text.{DateFormat, SimpleDateFormat}
@@ -16,7 +16,7 @@ import java.util.Date
 import java.util.prefs.{Preferences => JPreferences}
 
 import javafx.beans.property._
-import tigerjython.execute.PythonCodeTranslator
+import tigerjython.execute.{ExecLanguage, PythonCodeTranslator}
 import tigerjython.ui.{TabFrame, TigerJythonApplication}
 import tigerjython.utils._
 
@@ -95,29 +95,41 @@ class Document(protected val prefNode: JPreferences) {
           new SimpleDateFormat("d MMM").format(getCreationDate),
           formatDate(lastModified)
         )
-      else
+      else if (d1.getDayOfMonth != d2.getDayOfMonth)
         "%d–%s".format(d1.getDayOfMonth, formatDate(lastModified))
+      else
+        formatDate(lastModified)
     } else
       "%s–%s".format(formatDate(getCreationDate), formatDate(lastModified))
   }
 
   def getDefaultFileSuffix: String = ".py"
 
+  private def createTempFile(): java.io.File =
+    new File(Documents.tempDir, name.getValue
+      .replace('?', '_').replace('*', '_').replace('&', '_')
+      .replace('/', '_').replace('\\', '_').replace('\"', '_') +
+      getDefaultFileSuffix)
+  /*java.io.File.createTempFile(name.getValue
+    .replace('?', '_').replace('*', '_').replace('&', '_')
+    .replace('/', '_').replace('\\', '_').replace('\"', '_') +
+    " (", ")" + getDefaultFileSuffix)*/
+
   /**
    * Creates a temporary file for execution, even if the document does otherwise not have an actual file backing it
    * up.
    */
-  def getExecutableFile: java.io.File = {
+  def getExecutableFile(execLanguage: ExecLanguage.Value): java.io.File = {
     var result = file
     if (result == null) {
       if (_tempFile == null) {
-        _tempFile = java.io.File.createTempFile(name.getValue + " (", ")" + getDefaultFileSuffix)
+        _tempFile = createTempFile()
         _tempFile.deleteOnExit()
       }
       result = _tempFile
     }
     val text =
-      PythonCodeTranslator.translate(this.text.get) match {
+      PythonCodeTranslator.translate(this.text.get, execLanguage) match {
         case Some(text) =>
           text
         case None =>
@@ -130,6 +142,10 @@ class Document(protected val prefNode: JPreferences) {
       printer.close()
     }
     result
+  }
+
+  def saveExecutableFile(execLanguage: ExecLanguage.Value): Unit = {
+    getExecutableFile(execLanguage)
   }
 
   def getSearchScore(filter: SearchFilter): Int =

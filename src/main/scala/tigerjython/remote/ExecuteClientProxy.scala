@@ -52,10 +52,11 @@ class ExecuteClientProxy(val socket: Socket) extends Communicator {
       case QuitMessage() =>
         ExecuteServer.removeClient(this)
       case ErrorResultMessage(errorMsg, tag) =>
-        queryBuffer.remove(tag) match {
+        queryBuffer.get(tag) match {
           case Some(onResult) =>
             onResult(errorMsg, true)
           case None =>
+            println(errorMsg)
         }
       case ResultMessage(result, tag) =>
         queryBuffer.remove(tag) match {

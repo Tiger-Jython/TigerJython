@@ -1,8 +1,11 @@
 package tigerjython.files
 
+import java.io.File
 import java.nio.file.Path
 import java.util.prefs.{Preferences => JPreferences}
 
+import sun.security.action.GetPropertyAction
+import tigerjython.execute.ExecLanguage
 import tigerjython.ui.{TigerJythonApplication, editor}
 
 /**
@@ -79,6 +82,9 @@ object Documents {
     result
   }
 
+  lazy val tempDir: File =
+    new File(GetPropertyAction.privilegedGetProperty("java.io.tmpdir"))
+
   private[files]
   def removeDocument(document: Document): Unit = {
     val idx = documents.indexOf(document)
@@ -98,6 +104,11 @@ object Documents {
         return makeNameUnique(name, index+1)
       }
     n
+  }
+
+  def saveAllExecutables(execLanguage: ExecLanguage.Value): Unit = {
+    for (document <- documents)
+      document.saveExecutableFile(execLanguage)
   }
 
   /**

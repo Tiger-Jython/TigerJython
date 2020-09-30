@@ -38,6 +38,8 @@ trait ExecutorFactory {
 
   def createExecutor(controller: ExecutionController, onReady: Executor=>Unit): Unit
 
+  def getExecLanguage: ExecLanguage.Value
+
   def name: String
 
   def shutdown(): Unit = {

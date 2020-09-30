@@ -27,15 +27,22 @@ object PythonCodeTranslator {
    * @param code  The source code as a `String` value.
    * @return      Either `None` or a new `String` representing the transformed code.
    */
-  def translate(code: String): Option[String] = {
+  def translate(code: String, execLanguage: ExecLanguage.Value): Option[String] = {
     if (Preferences.repeatLoop.get)
-      _translate(code)
+      execLanguage match {
+        case ExecLanguage.PYTHON_2 =>
+          _translate(code, 2)
+        case ExecLanguage.PYTHON_3 =>
+          _translate(code, 3)
+        case _ =>
+          None
+      }
     else
       None
   }
 
-  protected def _translate(code: String): Option[String] = {
-    val parserState = ParserState(code, 3, ErrorHandler.SilentErrorHandler)
+  protected def _translate(code: String, pythonVersion: Int): Option[String] = {
+    val parserState = ParserState(code, pythonVersion, ErrorHandler.SilentErrorHandler)
     parserState.repeatStatement = Preferences.repeatLoop.get
     val lexer = new Lexer(code, parserState, 0)
     val result = new StringBuilder()
@@ -63,7 +70,7 @@ object PythonCodeTranslator {
               val hd = lexer.head
               if (hd != null) {
                 val argument = code.substring(position, hd.pos)
-                result ++= REPEAT_STRING(3).format(argument)
+                result ++= REPEAT_STRING(pythonVersion).format(argument)
                 position = hd.pos
               }
             } else

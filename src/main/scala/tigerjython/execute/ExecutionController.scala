@@ -24,6 +24,9 @@ trait ExecutionController {
 
   def getExecutableFile: File
 
+  def handleError(errorText: String): Unit =
+    appendToErrorOutput(errorText)
+
   def notifyExecutionFinished(executionTime: Long, terminated: Boolean = false): Unit =
     if (terminated) {
       appendToLog("process terminated after %d ms".format(executionTime))

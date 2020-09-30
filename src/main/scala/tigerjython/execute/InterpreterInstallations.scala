@@ -37,17 +37,18 @@ object InterpreterInstallations {
         case "tigerjython" =>
           result += InterpreterInfo(name, ImagePool.tigerJython_Logo, TigerJythonExecutorFactory)
         case "jython" =>
-          val factory = new CommandExecutorFactory(name, path)
+          val factory = new CommandExecutorFactory(name, path, ExecLanguage.python(version))
           interpreters += InterpreterInfo(name, ImagePool.jython_Logo, factory)
         case "pypy" =>
-          val factory = new CommandExecutorFactory(name, path)
+          val factory = new CommandExecutorFactory(name, path, ExecLanguage.python(version))
           interpreters += InterpreterInfo(name, ImagePool.pypy_Logo, factory)
         case "python" =>
-          val factory = new CommandExecutorFactory(name, path)
           if (version < 3)
-            interpreters += InterpreterInfo(name, ImagePool.python2_Logo, factory)
+            interpreters += InterpreterInfo(name, ImagePool.python2_Logo,
+              new CommandExecutorFactory(name, path, ExecLanguage.PYTHON_2))
           else
-            interpreters += InterpreterInfo(name, ImagePool.python_Logo, factory)
+            interpreters += InterpreterInfo(name, ImagePool.python_Logo,
+              new CommandExecutorFactory(name, path, ExecLanguage.PYTHON_3))
         case _ =>
       }
     if (result.nonEmpty)

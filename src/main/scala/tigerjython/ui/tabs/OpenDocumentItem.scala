@@ -9,7 +9,7 @@ package tigerjython.ui.tabs
 
 import javafx.scene.control.Alert.AlertType
 import javafx.scene.control.{Alert, Button, ButtonType}
-import javafx.scene.layout.{HBox, Priority, VBox}
+import javafx.scene.layout.{Priority, VBox}
 import javafx.scene.{Group, Node}
 import javafx.scene.paint.Color
 import javafx.scene.shape.{Line, Rectangle}
@@ -24,8 +24,9 @@ class OpenDocumentItem(val parentFrame: OpenDocumentTab, val document: Document)
 
   {
     titleLabel.textProperty().set(document.name.get)
+    val s = document.pathString.get
     descriptionLabel.textProperty().set("%s\n%d lines, %s".format(
-      document.pathString.get, document.numberOfLines, document.getDateString
+      if (s != null) s else "", document.numberOfLines, document.getDateString
     ))
     setRight(deleteBtn)
   }

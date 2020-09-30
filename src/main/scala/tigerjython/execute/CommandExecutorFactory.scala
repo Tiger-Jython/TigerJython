@@ -13,7 +13,8 @@ import java.nio.file.Path
  * @author Tobias Kohn
  */
 class CommandExecutorFactory(val name: String,
-                             val cmd: Path) extends ExecutorFactory {
+                             val cmd: Path,
+                             val execLanguage: ExecLanguage.Value) extends ExecutorFactory {
 
   def createEvaluator(controller: ExecutionController, onReady: Evaluator=>Unit): Unit = {
     val evaluator = new ProcessEvaluator(new InteractiveOSProcess(getCommand))
@@ -26,4 +27,6 @@ class CommandExecutorFactory(val name: String,
   }
 
   protected def getCommand: String = cmd.toAbsolutePath.toString
+
+  def getExecLanguage: ExecLanguage.Value = execLanguage
 }

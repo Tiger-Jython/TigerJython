@@ -13,7 +13,7 @@ import java.net.Socket
 import java.util.{Timer, TimerTask}
 import java.util.concurrent.ArrayBlockingQueue
 
-import org.python.core.{CodeFlag, CompileMode, CompilerFlags, Py, PyObject}
+import org.python.core.{CodeFlag, CompileMode, CompilerFlags, Py, PyList, PyObject}
 import org.python.util.PythonInterpreter
 import tigerjython.core.Configuration
 
@@ -104,6 +104,13 @@ object ExecuteClientConnection extends Communicator {
           val task = new SystemInfoReporter()
           try {
             timer.schedule(task, 0, 100)
+            interpreter.getSystemState.path match {
+              case lst: PyList =>
+                val s = Py.newString(new java.io.File(filename).getParent)
+                if (!lst.__contains__(s))
+                  lst.append(s)
+              case _ =>
+            }
             interpreter.execfile(filename)
             sendMessage(ResultMessage(null, tag))
           } catch {

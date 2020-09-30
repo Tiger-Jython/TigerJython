@@ -23,7 +23,7 @@ class ImportDocumentItem(val parentFrame: OpenDocumentTab) extends DocumentItem 
 
   {
     titleLabel.setText("Import/Open Document")
-    descriptionLabel.setText("Load a document from a file on disc")
+    descriptionLabel.setText("Load a document from a file on disk")
   }
 
   protected lazy val fileChooser: FileChooser = {
