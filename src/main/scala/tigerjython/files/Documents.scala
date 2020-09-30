@@ -86,6 +86,20 @@ object Documents {
       documents.remove(idx)
   }
 
+  protected[files]
+  def makeNameUnique(name: String, index: Int = 0): String = {
+    val n =
+      if (index > 0)
+        "%s (%d)".format(name, index)
+      else
+        name
+    for (document <- documents)
+      if (document.name.get == n) {
+        return makeNameUnique(name, index+1)
+      }
+    n
+  }
+
   /**
    * Reads all the documents from the preferences.
    */

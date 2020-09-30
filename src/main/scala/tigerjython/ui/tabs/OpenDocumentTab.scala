@@ -85,7 +85,7 @@ class OpenDocumentTab protected () extends TabFrame {
     val prefButton = new Button()
     prefButton.setGraphic(createPrefGraphic())
     prefButton.setOnAction(_ => TigerJythonApplication.currentApplication.showPreferences())
-    result.getItems.addAll(findTextField, importBtn, filler, prefButton)
+    result.getItems.addAll(findTextField, filler, prefButton)
     result
   }
 
@@ -167,6 +167,8 @@ class OpenDocumentTab protected () extends TabFrame {
     val notebook = new NewNotebookItem(this)
     documentItems += notebook
     items.getChildren.add(notebook)
+    val importItem = new ImportDocumentItem(this)
+    items.getChildren.add(importItem)
     for (doc <- Documents.getListOfDocuments) {
       val item = new OpenDocumentItem(this, doc)
       documentItems += item

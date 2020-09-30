@@ -148,6 +148,11 @@ class Document(protected val prefNode: JPreferences) {
       val createDate = Date.from(attr.creationTime().toInstant)
       if (createDate.before(getCreationDate))
         prefNode.put("created", dateFormat.format(createDate))
+      var n = file.getName
+      if (n.toLowerCase.endsWith(".py"))
+        n = n.dropRight(3)
+      n = Documents.makeNameUnique(n)
+      name.setValue(n)
     }
   }
 

@@ -10,7 +10,7 @@ package tigerjython.ui.tabs
 import javafx.scene.{Group, Node}
 import javafx.scene.paint.Color
 import javafx.scene.shape.{Circle, Line, Rectangle}
-import tigerjython.ui.{TigerJythonApplication, editor}
+import tigerjython.ui.TigerJythonApplication
 import tigerjython.ui.notebook.NotebookTab
 
 /**
@@ -51,8 +51,10 @@ class NewNotebookItem(val parentFrame: OpenDocumentTab) extends DocumentItem {
     g
   }
 
-  def onClicked(): Unit =
+  def onClicked(): Unit = {
+    tigerjython.execute.TigerJythonProcess.preStart()
     TigerJythonApplication.tabManager.addTab(NotebookTab())
+  }
 
   override def onMouseEnter(): Unit =
     parentFrame.setPreviewText("")
