@@ -139,6 +139,13 @@
     -fx-stroke: white;
 }
 
+.search-field {
+    -fx-background-image: url('../resources/search.png');
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: left center;
+    -fx-padding: 0.33333em 0.33333em 0.33333em 2.0em;
+}
+
 .lineno {
     -fx-fill: #f0f0f0;
     -fx-background-color: -fx-fill;

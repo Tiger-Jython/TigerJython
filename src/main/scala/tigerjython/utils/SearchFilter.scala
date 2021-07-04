@@ -30,6 +30,8 @@ class SearchFilter(val searchText: String) {
   def getScore(text: String): Int =
     if (searchText == "")
       100
+    else if (text == null || text == "")
+      0
     else if (!text.contains(searchText)) {
       var result: Int = 0
       for (word <- words)

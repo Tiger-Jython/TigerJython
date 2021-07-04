@@ -12,7 +12,8 @@ import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.geometry.Orientation
 import javafx.scene.{Group, Node, Parent, control}
 import javafx.scene.control.{Button, ScrollPane, SplitPane, TextField, ToolBar}
-import javafx.scene.layout.{BorderPane, HBox, Priority, Region, VBox}
+import javafx.scene.image.Image
+import javafx.scene.layout.{BackgroundImage, BorderPane, HBox, Priority, Region, VBox}
 import javafx.scene.paint.Color
 import javafx.scene.shape.{Circle, Line}
 import javafx.stage.FileChooser
@@ -80,6 +81,7 @@ class OpenDocumentTab protected () extends TabFrame {
     val findTextField = new TextField()
     findTextField.prefWidthProperty().bind(result.widthProperty().divide(1.5))
     findTextField.textProperty().bindBidirectional(filterText)
+    findTextField.getStyleClass.add("search-field")
     val filler = new HBox()
     HBox.setHgrow(filler, Priority.ALWAYS)
     val prefButton = new Button()

@@ -7,13 +7,13 @@
  */
 package tigerjython.remote
 
-import java.io.{InputStream, ObjectInputStream, ObjectOutputStream, OutputStream}
+import java.io.{InputStream, OutputStream}
 import java.lang.management.ManagementFactory
 import java.net.Socket
 import java.util.{Timer, TimerTask}
 import java.util.concurrent.ArrayBlockingQueue
 
-import org.python.core.{CodeFlag, CompileMode, CompilerFlags, Py, PyList, PyObject}
+import org.python.core.{CodeFlag, CompileMode, CompilerFlags, Py, PyList, PyObject, __builtin__}
 import org.python.util.PythonInterpreter
 import tigerjython.core.Configuration
 
@@ -36,7 +36,7 @@ object ExecuteClientConnection extends Communicator {
 
   private val messageQueue = new ArrayBlockingQueue[Message](16)
 
-  private var timer: Timer = new Timer()
+  private val timer: Timer = new Timer()
   private class SystemInfoReporter extends TimerTask {
     override def run(): Unit =
       sendSystemStatus()
@@ -111,7 +111,14 @@ object ExecuteClientConnection extends Communicator {
                   lst.append(s)
               case _ =>
             }
-            interpreter.execfile(filename)
+            // interpreter.execfile(filename)
+            val locals = interpreter.getLocals
+            val flags = new CompilerFlags()
+            Py.setSystemState(interpreter.getSystemState)
+            flags.setPrintFunction(true)
+            flags.setUnicodeLiterals(true)
+            __builtin__.execfile_flags(filename, locals, locals, flags)
+            Py.flushLine()
             sendMessage(ResultMessage(null, tag))
           } catch {
             case e: Exception =>

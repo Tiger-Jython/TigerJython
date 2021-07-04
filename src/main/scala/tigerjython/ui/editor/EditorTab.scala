@@ -17,7 +17,8 @@ import javafx.scene._
 import javafx.scene.control._
 import javafx.scene.image.{Image, ImageView}
 import javafx.scene.layout.{BorderPane, HBox, Priority}
-import javafx.scene.shape.{Line, Polygon, Rectangle, StrokeLineCap}
+import javafx.scene.paint.Color
+import javafx.scene.shape.{Circle, Line, Polygon, Rectangle, StrokeLineCap}
 import javafx.stage.FileChooser.ExtensionFilter
 import javafx.stage.{FileChooser, Popup}
 import org.fxmisc.flowless.VirtualizedScrollPane
@@ -193,6 +194,26 @@ abstract class EditorTab extends TabFrame with ExecutionController {
     result
   }
 
+  protected def createPrefGraphic(): Node = {
+    val result = new Group()
+    val a = 7
+    val b = a / math.sqrt(2)
+    for ((x, y) <- Array[(Double, Double)]((a, 0), (0, a), (b, b), (b, -b))) {
+      val l1 = new Line(x, y, x / math.sqrt(2), y / math.sqrt(2))
+      l1.setStrokeWidth(2)
+      result.getChildren.add(l1)
+      val l2 = new Line(-x, -y, -x / math.sqrt(2), -y / math.sqrt(2))
+      l2.setStrokeWidth(2)
+      result.getChildren.add(l2)
+    }
+    val circle = new Circle(0, 0, b-0.5)
+    circle.setFill(Color.TRANSPARENT)
+    circle.setStroke(Color.BLACK)
+    circle.setStrokeWidth(2)
+    result.getChildren.add(circle)
+    result
+  }
+
   protected def createTopToolBar: Node = {
     val result = new ToolBar()
     val runButton = new Button()
@@ -220,7 +241,10 @@ abstract class EditorTab extends TabFrame with ExecutionController {
       else if (interpreter.factory != null && interpreter.factory.canExecute)
         targetButton.getItems.add(createTargetMenuItem(interpreter.title, interpreter.icon, interpreter.factory))
     }
-    result.getItems.addAll(runButton, stopButton, filler1, nameBox, filler2, targetButton)
+    val prefButton = new Button()
+    prefButton.setGraphic(createPrefGraphic())
+    prefButton.setOnAction(_ => TigerJythonApplication.currentApplication.showPreferences())
+    result.getItems.addAll(runButton, stopButton, filler1, nameBox, filler2, targetButton, prefButton)
     result
   }
 
