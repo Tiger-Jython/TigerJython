@@ -19,6 +19,8 @@ import tigerjython.core.Preferences
 import tigerjython.plugins.EventManager
 import tigerjython.ui.Utils.onFX
 
+import tigerjython.syntaxsupport.SyntaxDocument
+
 /**
  * The Python CodeArea inherits from _RichTextFX_'s `CodeArea` and customises it for highlighting Python code.
  *
@@ -27,6 +29,8 @@ import tigerjython.ui.Utils.onFX
 class PythonCodeArea extends CodeArea {
 
   protected val undoQueue = new TigerJythonChangeQueue[PlainTextChange]()
+
+  protected val syntaxDocument: SyntaxDocument = new SyntaxDocument()
 
   {
     setStyle("-fx-font-family: \"%s\";".format(Preferences.fontFamily.get))
@@ -51,8 +55,11 @@ class PythonCodeArea extends CodeArea {
 
   addEventFilter(KeyEvent.KEY_TYPED, (key: KeyEvent) => {
     val char = key.getCharacter
-    if (char != null && char != KeyEvent.CHAR_UNDEFINED)
-      EventManager.fireOnKeyPressed(getCaretPosition, char)
+    if (char != null && char != KeyEvent.CHAR_UNDEFINED) {
+      val pos = getCaretPosition
+      syntaxDocument.insert(pos, char)
+      EventManager.fireOnKeyPressed(pos, char)
+    }
   })
   addEventFilter(KeyEvent.KEY_PRESSED, (key: KeyEvent) =>
     key.getCode match {
@@ -64,14 +71,18 @@ class PythonCodeArea extends CodeArea {
           indentation += " " * Preferences.tabWidth.get
         if (indentation != "") {
           val text = "\n" + indentation
-          onFX(() => { insertText(getCaretPosition, text) })
+          val pos = getCaretPosition
+          onFX(() => { insertText(pos, text) })
+          syntaxDocument.insert(pos, text)
           key.consume()
         }
         EventManager.fireOnKeyPressed(getCaretPosition, KeyCode.ENTER.toString)
       case KeyCode.TAB =>
         val tabWidth = Preferences.tabWidth.get
         val x = tabWidth - (getCaretColumn % tabWidth)
-        onFX(() => { insertText(getCaretPosition, " " * x) })
+        val pos = getCaretPosition
+        onFX(() => { insertText(pos, " " * x) })
+        syntaxDocument.insert(pos, " " * x)
         key.consume()
         EventManager.fireOnKeyPressed(getCaretPosition, KeyCode.TAB.toString)
       case KeyCode.BACK_SPACE =>
@@ -88,6 +99,7 @@ class PythonCodeArea extends CodeArea {
         if (back_width > 1 && getCaretColumn == indentation) {
           val pos = getCaretPosition
           onFX(() => { replaceText(pos - back_width, pos, "") })
+          syntaxDocument.delete(pos - back_width, back_width)
           key.consume()
         }
         EventManager.fireOnKeyPressed(getCaretPosition, KeyCode.BACK_SPACE.toString)
@@ -101,7 +113,9 @@ class PythonCodeArea extends CodeArea {
   )
 
   private def computeHighlightingAsync(): Task[StyleSpans[java.util.Collection[String]]] =
-    SyntaxHighlighter.computeHighlightingAsync(this.getText())
+    SyntaxHighlighter.computeHighlightingAsync(this.getText(), this.syntaxDocument)
+
+  //    SyntaxHighlighter.computeHighlightingAsync(this.getText())
 
   private def applyHighlighting(highlighting: StyleSpans[java.util.Collection[String]]): Unit =
     this.setStyleSpans(0, highlighting)
@@ -115,10 +129,13 @@ class PythonCodeArea extends CodeArea {
 
   def setInitialText(text: String): Unit =
     Platform.runLater(() => {
-      if (text != "" && text.last != '\n')
-        appendText(text + "\n")
-      else
-        appendText(text)
+      val txt: String =
+        if (text != "" && text.last != '\n')
+          text + "\n"
+        else
+          text
+      appendText(txt)
+      syntaxDocument.setText(txt)
       getUndoManager.forgetHistory()
       getUndoManager.mark()
       selectRange(0, 0)
@@ -126,10 +143,13 @@ class PythonCodeArea extends CodeArea {
 
   def setInitialText(text: String, undoChanges: Array[PlainTextChange]): Unit =
     Platform.runLater(() => {
-      if (text != "" && text.last != '\n')
-        appendText(text + "\n")
-      else
-        appendText(text)
+      val txt: String =
+        if (text != "" && text.last != '\n')
+          text + "\n"
+        else
+          text
+      appendText(txt)
+      syntaxDocument.setText(txt)
       getUndoManager.forgetHistory()
       undoQueue.push(undoChanges: _*)
       undoQueue.markPositionAsBase()

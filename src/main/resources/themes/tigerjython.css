@@ -185,6 +185,19 @@
     -fx-font-weight: bold;
 }
 
+.styled-text-area .def-keyword {
+    -fx-fill: #0033BB;
+    -fx-font-weight: bold;
+}
+
+.styled-text-area .def-name {
+    -fx-fill: #0033BB;
+}
+
+.styled-text-area .module-name {
+    -fx-font-style: italic;
+}
+
 .styled-text-area .semicolon {
     -fx-font-weight: bold;
 }
@@ -204,8 +217,16 @@
     -fx-font-weight: bold;
 }
 
+.styled-text-area .builtin {
+    -fx-fill: purple;
+}
+
 .styled-text-area .string {
     -fx-fill: #884400;
+}
+
+.styled-text-area .string-escape {
+    -fx-fill: #AA0000;
 }
 
 .styled-text-area .comment {
