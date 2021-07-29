@@ -53,7 +53,7 @@ class SyntaxDocument {
     text.clear()
     tokens.clear()
     for (message <- tokens.createMessages())
-      struct.handleMessage(0, message)
+      struct.handleMessage(message.index, message)
   }
 
   def delete(position: Int, delLength: Int): Unit = synchronized {

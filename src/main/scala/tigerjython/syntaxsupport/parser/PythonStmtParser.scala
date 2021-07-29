@@ -474,7 +474,7 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
 
   private def readExtName(): Option[NameToken] =
     source.next() match {
-      case name: NameToken if name.tokenType == TokenType.NAME || name.tokenType == TokenType.BUILTIN_NAME =>
+      case name: NameToken if name.isName =>
         source.head match {
           case LeftBracketToken('(') =>
             name.nameTokenType = NameTokenType.CALL

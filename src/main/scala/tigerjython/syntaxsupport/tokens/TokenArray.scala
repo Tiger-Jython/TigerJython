@@ -40,6 +40,21 @@ class TokenArray(val document: SyntaxDocument) extends Iterable[Token] {
           changes(changes.length - 1) = altChange
           return
         case None =>
+          if (changes.length >= 2)
+            change match {
+              case TokenArrayDeletion(index, items) =>
+                val secToLast = changes(changes.length - 2)
+                val last = changes.last
+                (secToLast, last) match {
+                  case (TokenArrayDeletion(delIndex, delItems), TokenArrayInsertion(insIndex, insCount)) =>
+                    if (delIndex == insIndex && insIndex + insCount == index) {
+                      changes(changes.length - 2) = TokenArrayDeletion(delIndex, delItems ++ items)
+                      return
+                    }
+                  case _ =>
+                }
+              case _ =>
+            }
       }
     changes.append(change)
   }

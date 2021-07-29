@@ -155,10 +155,9 @@ class TokenSource(val source: TokenArray, val structElement: StructElement) exte
       skip()
   }
 
-  def ignoreAllUntil(tokenTypes: TokenType.Value*): Unit = {
-    while (!tokenTypes.contains(headTokenType))
+  def ignoreAllUntil(tokenTypes: TokenType.Value*): Unit =
+    while (_index < tokens.length && !tokenTypes.contains(headTokenType))
       skip()
-  }
 
   def index: Int = _index
 

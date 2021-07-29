@@ -8,7 +8,7 @@
 package tigerjython.syntaxsupport.struct
 
 import tigerjython.syntaxsupport.SyntaxDocument
-import tigerjython.syntaxsupport.parser.{PythonStmtParser, StmtParser, TokenSource}
+import tigerjython.syntaxsupport.parser.{PythonStmtParser, StmtParser}
 import tigerjython.syntaxsupport.tokens._
 
 /**
@@ -35,7 +35,8 @@ class StructProgram(val document: SyntaxDocument) extends StructContainer {
         while (i < children.length) {
           val child = children.remove(i)
           if (endIndex < offs) {
-            _gapEnd = offs
+            val gapLen = document.tokens.length - childrenSpan
+            _gapEnd = _gapStart + gapLen
             return
           } else
             offs += child.length
@@ -88,7 +89,7 @@ class StructProgram(val document: SyntaxDocument) extends StructContainer {
     handleMessage(message.index, message)
 
   override def handleMessage(relIndex: Int, message: TokenChangeMessage): Unit = {
-    passMessageToChildren(relIndex, message)
+    passMessageToChildren(message.index, message)
     if (!message.isHandled) {
       if (children.isEmpty) {
         _gapIndex = 0
@@ -98,10 +99,10 @@ class StructProgram(val document: SyntaxDocument) extends StructContainer {
         message match {
           case TokenChangeMessage.TokenChanged(_, index) =>
             setGap(index, index)
-          case TokenChangeMessage.TokensDeleted(_, index, _) =>
-            setGap(index, index)
+          case TokenChangeMessage.TokensDeleted(_, index, delCount) =>
+            setGap(index, index + delCount)
           case TokenChangeMessage.TokensInserted(_, index, insCount) =>
-            setGap(index, index + insCount)
+            setGap(index, index)
         }
       if (_gapStart < _gapEnd)
         parse(message.tokens, _gapStart)

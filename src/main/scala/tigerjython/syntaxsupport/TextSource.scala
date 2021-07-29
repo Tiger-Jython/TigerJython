@@ -234,6 +234,8 @@ class TextSource(val source: StringBuilder) extends BufferedIterator[Char] {
       false
   }
 
+  override def knownSize: Int = source.length()
+
   def next(): Char =
     if (index < source.length()) {
       val result = source.charAt(index)
@@ -282,4 +284,6 @@ class TextSource(val source: StringBuilder) extends BufferedIterator[Char] {
     } else
       null
   }
+
+  def textLength: Int = source.length()
 }
