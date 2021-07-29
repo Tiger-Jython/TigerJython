@@ -40,6 +40,8 @@ class PythonTokenizer(val document: SyntaxDocument) extends Tokenizer {
     "raise", "return", "try", "while", "with"
   )
 
+  var repeatIsKeyword: Boolean = true
+
   def extendParseRange(length: Int): Unit =
     if (length > 0) {
       if (endPosition != -1)
@@ -177,6 +179,8 @@ class PythonTokenizer(val document: SyntaxDocument) extends Tokenizer {
       Token(TokenType.CLASS_KEYWORD, len)
     else if (s == "lambda")
       Token(TokenType.LAMBDA, len)
+    else if (s == "repeat" && repeatIsKeyword)
+      Token(TokenType.KEYWORD, s, source.isAtStartOfLine(-len))
     else if (isStmtOnlyKeyword(s))
       Token(TokenType.KEYWORD, s, source.isAtStartOfLine(-len))
     else if (isKeyword(s))

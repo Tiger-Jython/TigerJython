@@ -34,8 +34,16 @@ class NameToken(tt: TokenType.Value, private var _text: String) extends Token(tt
             visitor.visitSyntaxNode("module-name", length)
           case NameTokenType.DEF_NAME =>
             visitor.visitSyntaxNode("def-name", length)
+          case NameTokenType.CALL =>
+            visitor.visitSyntaxNode("name-call", length)
+          case NameTokenType.FORMAL_ARG =>
+            visitor.visitSyntaxNode("name-arg", length)
+          case NameTokenType.ARG_KEYWORD =>
+            visitor.visitSyntaxNode("name-arg-keyword", length)
+          case NameTokenType.STORE | NameTokenType.ASSIGN_TARGET | NameTokenType.DEL_TARGET =>
+            visitor.visitSyntaxNode("name-store", length)
           case _ =>
-            visitor.visitSyntaxNode("normal", length)
+            visitor.visitSyntaxNode("name", length)
         }
     }
 

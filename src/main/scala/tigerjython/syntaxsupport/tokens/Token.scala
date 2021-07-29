@@ -31,6 +31,8 @@ class Token (var tokenType: TokenType.Value, len: Int) {
         visitor.visitSyntaxNode("keyword", length)
       case TokenType.STRING_LITERAL =>
         visitor.visitSyntaxNode("string", length)
+      case TokenType.NUMBER =>
+        visitor.visitSyntaxNode("number", length)
       case _ =>
         visitor.visitSyntaxNode(tokenType.toString, length)
     }

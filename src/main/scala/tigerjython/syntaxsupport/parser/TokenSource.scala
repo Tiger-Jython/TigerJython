@@ -21,7 +21,7 @@ class TokenSource(val source: TokenArray, val structElement: StructElement) exte
     if (structElement != null && structElement.length > 0) {
       val idx = structElement.index
       val result = collection.mutable.ArrayBuffer[Token]()
-      for (i <- idx until idx + structElement.length) {
+      for (i <- idx until ((idx + structElement.length) min source.length)) {
         val tkn = source(i)
         if (tkn != null && tkn.tokenType != TokenType.WHITESPACE && tkn.tokenType != TokenType.COMMENT &&
           tkn.tokenType != TokenType.NEWLINE)
@@ -57,11 +57,30 @@ class TokenSource(val source: TokenArray, val structElement: StructElement) exte
     }
 
   def expectColon(): Boolean =
-    if (headTokenType == TokenType.COLON) {
+    head match {
+      case c: ColonToken =>
+        c.setIsCompoundColon(false)
+        skip()
+        true
+      case _ =>
+        false
+    }
+/*    if (headTokenType == TokenType.COLON) {
+
       skip()
       true
     } else
-      false
+      false*/
+
+  def expectCompoundColon(): Boolean =
+    head match {
+      case c: ColonToken =>
+        c.setIsCompoundColon(true)
+        skip()
+        true
+      case _ =>
+        false
+    }
 
   def expectComma(): Boolean =
     if (headTokenType == TokenType.COMMA) {

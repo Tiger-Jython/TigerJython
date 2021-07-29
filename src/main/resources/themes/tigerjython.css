@@ -186,12 +186,28 @@
 }
 
 .styled-text-area .def-keyword {
-    -fx-fill: #0033BB;
+    -fx-fill: #0066BB;
     -fx-font-weight: bold;
 }
 
 .styled-text-area .def-name {
-    -fx-fill: #0033BB;
+    -fx-fill: #006699;
+}
+
+.styled-text-area .name-call {
+    -fx-fill: #006699;
+}
+
+.styled-text-area .name-arg {
+    -fx-fill: #007733;
+}
+
+.styled-text-area .name-arg-keyword {
+    -fx-fill: #007733;
+}
+
+.styled-text-area .name-store {
+    -fx-fill: #330066;
 }
 
 .styled-text-area .module-name {
@@ -199,6 +215,10 @@
 }
 
 .styled-text-area .semicolon {
+    -fx-font-weight: bold;
+}
+
+.styled-text-area .colon {
     -fx-font-weight: bold;
 }
 
@@ -227,6 +247,10 @@
 
 .styled-text-area .string-escape {
     -fx-fill: #AA0000;
+}
+
+.styled-text-area .number {
+    -fx-fill: #663300;
 }
 
 .styled-text-area .comment {

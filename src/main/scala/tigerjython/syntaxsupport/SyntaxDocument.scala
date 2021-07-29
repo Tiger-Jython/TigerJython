@@ -156,7 +156,13 @@ class SyntaxDocument {
   }
 
   protected def invalidate(index: Int, startPos: Int, endPos: Int): Unit =
-    if (0 <= startPos && startPos < endPos && endPos <= text.length) {
+    if (index > 0 && tokens(index - 1).tokenType == TokenType.NUMBER) {
+      // A special case: if the preceding token is a number, it might be possible to connect to it
+      // Example: 123e.45 -> '123', 'e', '.', '45';; remove the dot and it becomes one token '123e45'
+      val len = tokens.remove(index - 1).length
+      invalidate(index - 1, startPos - len, endPos)
+    }
+    else if (0 <= startPos && startPos < endPos && endPos <= text.length) {
       tokenizer.setParseRange(startPos, endPos)
       var len = endPos - startPos
       var i = index
@@ -172,7 +178,21 @@ class SyntaxDocument {
         }
       }
       for (message <- tokens.createMessages())
-        struct.handleMessage(0, message)
+        struct.handleMessage(message.index, message)
+    }
+
+  def repeatIsKeyword: Boolean =
+    tokenizer match {
+      case p: PythonTokenizer =>
+        p.repeatIsKeyword
+      case _ =>
+        false
+    }
+  def repeatIsKeyword_=(r: Boolean): Unit =
+    tokenizer match {
+      case p: PythonTokenizer =>
+        p.repeatIsKeyword = r
+      case _ =>
     }
 
   def replace(position: Int, delLength: Int, insText: String): Unit = synchronized {

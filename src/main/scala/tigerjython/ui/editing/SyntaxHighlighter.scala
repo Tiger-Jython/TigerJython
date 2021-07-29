@@ -36,7 +36,10 @@ object SyntaxHighlighter {
     def create(): StyleSpans[java.util.Collection[String]] = spansBuilder.create()
 
     def visitSyntaxNode(style: String, length: Int): Unit =
-      spansBuilder.add(java.util.Collections.singleton(style), length)
+      if (style != null)
+        spansBuilder.add(java.util.Collections.singleton(style), length)
+      else
+        spansBuilder.add(java.util.Collections.emptyList(), length)
 
     def visitWhitespaceSyntaxNode(length: Int): Unit =
       spansBuilder.add(java.util.Collections.emptyList(), length)
@@ -44,6 +47,7 @@ object SyntaxHighlighter {
 
   def computeHighlighting(text: String, syntaxDocument: SyntaxDocument): StyleSpans[java.util.Collection[String]] = {
     val visitor = new SpanTokenVisitor()
+    syntaxDocument.repeatIsKeyword = Preferences.repeatLoop.get()
     syntaxDocument.setText(text)
     syntaxDocument.visit(visitor)
     visitor.create()

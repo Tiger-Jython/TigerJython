@@ -7,12 +7,20 @@
  */
 package tigerjython.syntaxsupport.tokens
 
+import tigerjython.syntaxsupport.{SyntaxDocument, TokenVisitor}
+
 /**
  * @author Tobias Kohn
  */
 class ColonToken extends Token(TokenType.COLON, 1) {
 
   private var _isCompoundColon: Boolean = false
+
+  override def accept(document: SyntaxDocument, visitor: TokenVisitor): Unit =
+    if (isCompoundColon)
+      visitor.visitSyntaxNode("colon", length)
+    else
+      visitor.visitSyntaxNode(null, length)
 
   override def equals(obj: Any): Boolean =
     obj match {
@@ -27,6 +35,9 @@ class ColonToken extends Token(TokenType.COLON, 1) {
     }
 
   def isCompoundColon: Boolean = _isCompoundColon
+
+  def setIsCompoundColon(c: Boolean): Unit =
+    _isCompoundColon = c
 
   def text: String = ":"
 

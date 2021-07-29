@@ -101,7 +101,7 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
     if (source.expect(TokenType.LEFT_BRACKET)) {
       parseCallArguments()
       source.expectRightBracket()
-      if (source.expectColon())
+      if (source.expectCompoundColon())
         parseSimpleStmt()
     }
     StatementType.CLASS_DEF(name)
@@ -114,7 +114,7 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
       source.expectRightBracket()
       if (source.expectSymbol("->"))
         parseTypeAnnotation()
-      source.expectColon()
+      source.expectCompoundColon()
       StatementType.FUNC_DEF(name)
     } else
       StatementType.FUNC_DEF(name)
@@ -131,13 +131,13 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
 
   protected def parseElif(): StatementType = {
     parseExpr()
-    if (source.expectColon())
+    if (source.expectCompoundColon())
       parseSimpleStmt()
     StatementType.ELIF
   }
 
   protected def parseElse(): StatementType = {
-    if (source.expectColon())
+    if (source.expectCompoundColon())
       parseSimpleStmt()
     StatementType.ELSE
   }
@@ -151,13 +151,13 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
           name.nameTokenType = NameTokenType.STORE
         case _ =>
       }
-    if (source.expectColon())
+    if (source.expectCompoundColon())
       parseSimpleStmt()
     StatementType.EXCEPT
   }
 
   protected def parseFinally(): StatementType = {
-    if (source.expectColon())
+    if (source.expectCompoundColon())
       parseSimpleStmt()
     StatementType.FINALLY
   }
@@ -168,7 +168,7 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
     source.expectKeyword("in")
     _nameType = NameTokenType.LOAD
     parseExpr()
-    if (source.expectColon())
+    if (source.expectCompoundColon())
       parseSimpleStmt()
     StatementType.FOR
   }
@@ -180,7 +180,7 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
   protected def parseIf(): StatementType = {
     _nameType = NameTokenType.LOAD
     parseExpr()
-    if (source.expectColon())
+    if (source.expectCompoundColon())
       parseSimpleStmt()
     StatementType.IF
   }
@@ -238,7 +238,7 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
   }
 
   protected def parseTry(): StatementType = {
-    if (source.expectColon())
+    if (source.expectCompoundColon())
       parseSimpleStmt()
     StatementType.TRY
   }
@@ -246,14 +246,14 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
   protected def parseWhile(): StatementType = {
     _nameType = NameTokenType.LOAD
     parseExpr()
-    if (source.expectColon())
+    if (source.expectCompoundColon())
       parseSimpleStmt()
     StatementType.WHILE
   }
 
   protected def parseWith(): StatementType = {
     parseWithItemList()
-    if (source.expectColon())
+    if (source.expectCompoundColon())
       parseSimpleStmt()
     StatementType.WITH
   }
@@ -330,7 +330,7 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
                   parseDictList()
                 source.expectRightBracket(left)
             }
-          case TokenType.RIGHT_BRACKET | TokenType.DELIMITER | TokenType.COLON |
+          case TokenType.RIGHT_BRACKET | TokenType.DELIMITER | TokenType.COLON | TokenType.COMMA |
                TokenType.DEF_KEYWORD | TokenType.CLASS_KEYWORD | TokenType.ASSIGNMENT =>
             return
           case TokenType.KEYWORD =>
