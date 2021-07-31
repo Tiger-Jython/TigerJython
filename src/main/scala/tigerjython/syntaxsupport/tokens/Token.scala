@@ -17,25 +17,32 @@ class Token (var tokenType: TokenType.Value, len: Int) {
 
   private var _length: Int = len
 
+  var annotation: Boolean = false
   var nested: Boolean = false
   var structElement: StructElement = _
 
   def length: Int = _length
   def length_=(len: Int): Unit = setLength(len)
 
-  def accept(document: SyntaxDocument, visitor: TokenVisitor): Unit =
+  protected def getStyleName: String =
     tokenType match {
       case TokenType.COMMENT =>
-        visitor.visitSyntaxNode("comment", length)
+        "comment"
       case TokenType.KEYWORD | TokenType.DEF_KEYWORD | TokenType.CLASS_KEYWORD =>
-        visitor.visitSyntaxNode("keyword", length)
+        "keyword"
       case TokenType.STRING_LITERAL =>
-        visitor.visitSyntaxNode("string", length)
+        "string"
       case TokenType.NUMBER =>
-        visitor.visitSyntaxNode("number", length)
+        "number"
       case _ =>
-        visitor.visitSyntaxNode(tokenType.toString, length)
+        "text"
     }
+
+  def accept(document: SyntaxDocument, visitor: TokenVisitor): Unit =
+    if (annotation)
+      visitor.visitSyntaxNode("annotation", length)
+    else
+      visitor.visitSyntaxNode(getStyleName, length)
 
   override def equals(obj: Any): Boolean =
     obj match {

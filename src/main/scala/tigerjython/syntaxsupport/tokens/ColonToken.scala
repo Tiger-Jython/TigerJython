@@ -16,11 +16,11 @@ class ColonToken extends Token(TokenType.COLON, 1) {
 
   private var _isCompoundColon: Boolean = false
 
-  override def accept(document: SyntaxDocument, visitor: TokenVisitor): Unit =
+  override protected def getStyleName: String =
     if (isCompoundColon)
-      visitor.visitSyntaxNode("colon", length)
+      "colon"
     else
-      visitor.visitSyntaxNode(null, length)
+      null
 
   override def equals(obj: Any): Boolean =
     obj match {

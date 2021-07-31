@@ -1,5 +1,13 @@
 # Changelog
 
+### 3.0 Early Access Preview 8 (31 July 2021)
+
+Implemented:
+- Syntax highlighting for Python;
+- Initial support for Micro:bit and Calliope Mini;
+
+Bug fixes:
+- Running external processes could deadlock when the output was too long;
 
 ### 3.0 Early Access Preview 7 (30 September 2020)
 

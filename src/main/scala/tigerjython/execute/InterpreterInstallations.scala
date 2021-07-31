@@ -64,7 +64,10 @@ object InterpreterInstallations {
       result += Separator
     }
     // Add other devices that are not directly detectable
-    result += InterpreterInfo("Micro:bit", ImagePool.microBit_Logo, null)
+    result += InterpreterInfo("Micro:bit", ImagePool.microBit_Logo,
+      new MicroDeviceExecutorFactory("Micro:bit", ExecLanguage.PYTHON_3))
+    result += InterpreterInfo("Calliope Mini", ImagePool.calliope_Logo,
+      new MicroDeviceExecutorFactory("Calliope Mini", ExecLanguage.PYTHON_3))
     result.toArray
   }
 }

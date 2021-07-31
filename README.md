@@ -65,7 +65,42 @@ TigerJython uses [`sbt`](https://www.scala-sbt.org/) to build the code.  Start `
 libraries (such as Scala, Jython, etc).
 
 By placing additional JARs into the `lib` subfolder, you can have additional files integrated into the
-project. 
+project.
+
+If you want to use standard Jython, you might want to add the following line to `build.sbt`:
+``libraryDependencies += "org.python" % "jython-standalone" % "2.7.2"``
+
+
+
+## Structure
+
+- **`/configparser:`**  a parser to read and process configuration files as used in TigerJython 2.  This is mostly for
+  backward compatibility and to allow for manual configuration.  These configuration files are no longer used by
+  TigerJython itself to save preferences.
+- **`/core:`**  contains the object/method that is invoked when starting the application as well as handling of
+  preferences and providing utilities to access system information.
+- **`/errorhandling:`**  as the name says: specialised error handling for Python.
+- **`/execute:`**  programs are no longer executed directly in the IDE process, but rather a new process is created
+  in which the program is then run.  This allows to also target various interpreters installed on the system or even
+  remote devices.
+- **`/files:`**  the core of the storage system that replaces traditional file management.
+- **`/jython:`**  TigerJython-specific extensions to Jython.  This will eventually be folded directly into a custom
+  version of Jython.
+- **`/microbit:`**  support for the BBC Micro:bit and the Calliope Mini.  The code for flashing the Microbit was
+  heavily inspired by [Nicholas Tollervey's `uFlash`](https://github.com/ntoll/uflash), although with various 
+  adaptations.
+- **`/plugins:`**  the plugin support allowing to write and install plugins into the IDE.  The plugins themselves are
+  written in Python (they may call into other Java-code, of course).
+- **`/remote:`**  the engine to communicate with another instance of TigerJython.
+- **`/syntaxsupport:`**  the syntax highlighter for Python code.  It works on several levels: first, the entire program
+  is tokenised (split into tokens).  Second, the tokens are then grouped to form logical lines, allowing to determine
+  scope, for instance.  Third, based on these logical lines, the input is parsed enough to extract relevant information 
+  for syntax highlighting.  The parsing, however, is incomplete: its purpose is _not_ to find possible errors in the
+  program code, but rather to determine the correct highlighting of names/identifiers in particular.  It also provides
+  enough information about the program to extract imported modules or support auto inserting of closing parentheses and
+  string delimiters.
+- **`/ui:`**  the user interface and thus one of the core parts of TigerJython.
+- **`/utils:`**  various helper tools.
 
 
 ## About

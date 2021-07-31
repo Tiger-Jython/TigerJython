@@ -20,30 +20,30 @@ class NameToken(tt: TokenType.Value, private var _text: String) extends Token(tt
   var nameInfo: NameInfo = _
   var nameTokenType: NameTokenType.Value = NameTokenType.UNKNOWN
 
-  override def accept(document: SyntaxDocument, visitor: TokenVisitor): Unit =
+  override protected def getStyleName: String =
     tokenType match {
       case TokenType.KEYWORD | TokenType.LAMBDA =>
-        visitor.visitSyntaxNode("keyword", length)
+        "keyword"
       case TokenType.DEF_KEYWORD | TokenType.CLASS_KEYWORD =>
-        visitor.visitSyntaxNode("def-keyword", length)
+        "def-keyword"
       case TokenType.BUILTIN_NAME =>
-        visitor.visitSyntaxNode("builtin", length)
+        "builtin"
       case _ =>
         nameTokenType match {
           case NameTokenType.MODULE =>
-            visitor.visitSyntaxNode("module-name", length)
+            "module-name"
           case NameTokenType.DEF_NAME =>
-            visitor.visitSyntaxNode("def-name", length)
+            "def-name"
           case NameTokenType.CALL =>
-            visitor.visitSyntaxNode("name-call", length)
+            "name-call"
           case NameTokenType.FORMAL_ARG =>
-            visitor.visitSyntaxNode("name-arg", length)
+            "name-arg"
           case NameTokenType.ARG_KEYWORD =>
-            visitor.visitSyntaxNode("name-arg-keyword", length)
+            "name-arg-keyword"
           case NameTokenType.STORE | NameTokenType.ASSIGN_TARGET | NameTokenType.DEL_TARGET =>
-            visitor.visitSyntaxNode("name-store", length)
+            "name-store"
           case _ =>
-            visitor.visitSyntaxNode("name", length)
+            "name"
         }
     }
 

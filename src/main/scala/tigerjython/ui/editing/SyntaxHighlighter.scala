@@ -33,7 +33,13 @@ object SyntaxHighlighter {
 
     private val spansBuilder = new StyleSpansBuilder[java.util.Collection[String]]()
 
-    def create(): StyleSpans[java.util.Collection[String]] = spansBuilder.create()
+    def create(): StyleSpans[java.util.Collection[String]] =
+      try {
+        spansBuilder.create()
+      } catch {
+        case _: IllegalStateException =>
+          null
+      }
 
     def visitSyntaxNode(style: String, length: Int): Unit =
       if (style != null)

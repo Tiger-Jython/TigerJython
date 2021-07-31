@@ -49,11 +49,14 @@ class OSProcess(val cmd: String, val isJavaProcess: Boolean) {
   protected class ThreadReader(val inputStream: InputStream) extends Runnable {
 
     private val buffer = new ArrayBlockingQueue[Char](1024)
+    private var _done: Boolean = false
 
     def addToBuffer(ch: Char): Unit =
       buffer.put(ch)
 
     def isEmpty: Boolean = buffer.isEmpty
+
+    def hasCompleted: Boolean = _done
 
     def nonEmpty: Boolean = !isEmpty
 
@@ -75,7 +78,9 @@ class OSProcess(val cmd: String, val isJavaProcess: Boolean) {
         addToBuffer(char.toChar)
         char = reader.read()
       }
+      Thread.sleep(10)
       reader.close()
+      _done = true
     }
   }
 
@@ -241,12 +246,13 @@ class OSProcess(val cmd: String, val isJavaProcess: Boolean) {
    */
   def waitForOutput(): String =
     try {
-      while (_isRunning.get())
-        Thread.sleep(50)
-      if (stdOutput != null)
-        stdOutput.readBuffer()
-      else
-        null
+      process.waitFor()
+      val result = new StringBuilder()
+      while (_isRunning.get() || !stdOutput.hasCompleted) {
+        result.append(stdOutput.readBuffer())
+        Thread.sleep(10)
+      }
+      result.toString()
     } catch {
       case _: InterruptedException =>
         null

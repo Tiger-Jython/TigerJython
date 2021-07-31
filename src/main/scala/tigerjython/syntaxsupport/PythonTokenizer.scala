@@ -24,7 +24,8 @@ class PythonTokenizer(val document: SyntaxDocument) extends Tokenizer {
     "input", "int", "isinstance", "issubclass", "iter", "len", "list", "locals", "map", "max", "memoryview",
     "min", "next", "object", "oct", "open", "ord", "pow", "print", "property", "range", "repr", "reversed",
     "round", "set", "setattr", "slice", "sorted", "staticmethod", "str", "sum", "super", "tuple", "type",
-    "vars", "zip"
+    "vars", "zip",
+    "self"
   )
 
   private val keywords = Set[String](
@@ -244,8 +245,6 @@ class PythonTokenizer(val document: SyntaxDocument) extends Tokenizer {
           return
         case '\\' =>
           source.consume()
-        case '\n' | '\r' =>
-          return
         case _ =>
       }
 

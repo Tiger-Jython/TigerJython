@@ -14,9 +14,6 @@ import tigerjython.syntaxsupport.{SyntaxDocument, TokenVisitor}
  */
 class SymbolToken(tt: TokenType.Value, private var _text: String) extends Token(tt, _text.length) {
 
-  override def accept(document: SyntaxDocument, visitor: TokenVisitor): Unit =
-    visitor.visitSyntaxNode(tokenType.toString, length)
-
   override def equals(obj: Any): Boolean =
     obj match {
       case symbolToken: SymbolToken =>

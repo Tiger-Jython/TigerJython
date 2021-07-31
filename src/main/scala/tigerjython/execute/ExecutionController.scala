@@ -24,6 +24,8 @@ trait ExecutionController {
 
   def getExecutableFile: File
 
+  def getText: String
+
   def handleError(errorText: String): Unit =
     appendToErrorOutput(errorText)
 

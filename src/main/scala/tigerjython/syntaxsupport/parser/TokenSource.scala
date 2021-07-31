@@ -27,6 +27,8 @@ class TokenSource(val source: TokenArray, val structElement: StructElement) exte
           tkn.tokenType != TokenType.NEWLINE)
           result += tkn
       }
+      for (tkn <- result)
+        tkn.annotation = false
       result.toArray
     } else
       Array()
@@ -179,6 +181,10 @@ class TokenSource(val source: TokenArray, val structElement: StructElement) exte
       skip()
 
   def index: Int = _index
+
+  def markAsAnnotation(startIndex: Int, endIndex: Int): Unit =
+    for (i <- startIndex until endIndex)
+      tokens(i).annotation = true
 
   def markUnknownNames(nameTokenType: NameTokenType.Value): Unit =
     for (tkn <- tokens)

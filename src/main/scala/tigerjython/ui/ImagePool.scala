@@ -30,6 +30,8 @@ object ImagePool {
 
   lazy val app_Logo: Image = loadImage(Configuration.appLogoName)
 
+  lazy val calliope_Logo: Image = loadImage("Calliope")
+
   lazy val microBit_Logo: Image = loadImage("MicroBit")
 
   lazy val jupyter_Logo: Image = loadImage("Jupyter")

@@ -435,7 +435,11 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
     parseExprList()
   }
 
-  protected def parseTypeAnnotation(): Unit = parseExpr()
+  protected def parseTypeAnnotation(): Unit = {
+    val startIndex = source.index
+    parseExpr()
+    source.markAsAnnotation(startIndex, source.index)
+  }
 
   protected def parseWithItemList(): Unit = {
     parseExpr()

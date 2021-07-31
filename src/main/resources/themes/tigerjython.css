@@ -196,6 +196,7 @@
 
 .styled-text-area .name-call {
     -fx-fill: #006699;
+    //-rtfx-background-color: yellow;
 }
 
 .styled-text-area .name-arg {
@@ -253,7 +254,13 @@
     -fx-fill: #663300;
 }
 
+.styled-text-area .annotation {
+	-fx-fill: #667777;
+    -fx-font-style: italic;
+}
+
 .styled-text-area .comment {
-	-fx-fill: #339933;
+    //-fx-font-family: sans-serif;
+	-fx-fill: #336633;
     -fx-font-style: italic;
 }
