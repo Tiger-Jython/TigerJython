@@ -14,15 +14,31 @@ import tigerjython.execute.ExecutionController
 /**
  * @author Tobias Kohn
  */
-abstract class MicroDeviceFlasher {
+abstract class MicroDeviceFlasher(val deviceName: String) {
 
   def controller: ExecutionController
 
   def addTextFile(name: String, data: String): Unit
 
+  protected def clearDevicePath(): Unit
+
   def createHexFile: String
 
-  def writeToDevice(path: String = null): Unit
+  def getDevicePath: String
+
+  def writeToDevice(path: String = null): Unit =
+    if (path != null) {
+      if (path.toLowerCase.endsWith(".hex"))
+        writeToDevice(new File(path))
+      else
+        writeToDevice(new File(path, "tigerjython.hex"))
+    } else {
+      val devicePath = getDevicePath
+      if (devicePath != null)
+        writeToDevice(new File(devicePath, "tigerjython.hex"))
+      else
+        controller.appendToErrorOutput("no %s device detected".format(deviceName))
+    }
 
   def writeToDevice(path: File): Unit = {
     controller.appendToLog("Writing hex file to path: " + path.getAbsoluteFile)

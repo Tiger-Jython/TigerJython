@@ -144,6 +144,14 @@ class Document(protected val prefNode: JPreferences) {
     result
   }
 
+  def getExecutableFileAsString(execLanguage: ExecLanguage.Value): String =
+    PythonCodeTranslator.translate(this.text.get, execLanguage) match {
+      case Some(text) =>
+        text
+      case None =>
+        this.text.get
+    }
+
   def saveExecutableFile(execLanguage: ExecLanguage.Value): Unit = {
     getExecutableFile(execLanguage)
   }

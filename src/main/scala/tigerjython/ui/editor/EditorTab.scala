@@ -338,6 +338,13 @@ abstract class EditorTab extends TabFrame with ExecutionController {
     } else
       null
 
+  def getExecutableFileAsString: String =
+    if (document != null && execFactory != null) {
+      val execLanguage = execFactory.getExecLanguage
+      document.getExecutableFileAsString(execLanguage)
+    } else
+      null
+
   def getFile: java.io.File = file
 
   def getSelectedText: String =

@@ -231,6 +231,8 @@ class NotebookTab extends TabFrame with ExecutionController {
 
   def getExecutableFile: File = null
 
+  def getExecutableFileAsString: String = null
+
   def getText: String = null
 
   def updateRunStatus(executor: Executor, running: Boolean): Unit = {}

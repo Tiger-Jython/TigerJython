@@ -72,6 +72,32 @@ object DeviceDetector {
   private def detectMicrobitWindows(): Boolean = {
     _calliopePath = null
     _microBitPath = null
-    false
+    val wmiProcess = new OSProcess("wmic")
+    wmiProcess.exec("logicaldisk", "where", "drivetype=2", "get", "description,deviceid,volumename")
+    val lines = wmiProcess.waitForOutput().split('\n')
+    if (lines.nonEmpty) {
+      val lineIter = lines.iterator
+      // Get the width of the individual columns
+      val headers = lineIter.next().toLowerCase
+      val startIndices = new Array[Int](3)
+      startIndices(0) = headers.indexOf("description")
+      startIndices(1) = headers.indexOf("deviceid")
+      startIndices(2) = headers.indexOf("volumename")
+      for (line <- lineIter) {
+        if (line.length > startIndices(2)) {
+          val volumeId = line.substring(startIndices(1), startIndices(2)).trim
+          val volumeName = line.substring(startIndices(2)).trim
+          if (volumeName.endsWith("MICROBIT") && _microBitPath == null)
+            _microBitPath = volumeId
+          if (volumeName.endsWith("MINI") && _calliopePath == null)
+            _calliopePath = volumeId
+          println(s"Found volume: `$volumeName` on `$volumeId`")
+        } else
+        if (line.nonEmpty)
+          println(s"Found name-less volume: $line")
+      }
+    } else
+      println("Have not found any volumes")
+    _microBitPath != null
   }
 }

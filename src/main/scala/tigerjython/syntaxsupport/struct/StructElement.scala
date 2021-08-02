@@ -105,6 +105,8 @@ abstract class StructElement {
   protected def length_=(l: Int): Unit =
     _length = l
 
+  def listImportedModules(modules: collection.mutable.ArrayBuffer[String]): Unit
+
   protected[struct] def offset: Int = _offset
   protected[struct] def offset_=(o: Int): Unit =
     _offset = o

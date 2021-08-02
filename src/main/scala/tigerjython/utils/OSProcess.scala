@@ -73,14 +73,19 @@ class OSProcess(val cmd: String, val isJavaProcess: Boolean) {
 
     def run(): Unit = {
       val reader = new InputStreamReader(inputStream)
-      var char = reader.read()
-      while (char >= 0) {
-        addToBuffer(char.toChar)
-        char = reader.read()
+      try {
+        var char = reader.read()
+        while (char >= 0) {
+          addToBuffer(char.toChar)
+          char = reader.read()
+        }
+        Thread.sleep(10)
+        reader.close()
+        _done = true
+      } catch {
+        case _: IOException =>
+          _done = true
       }
-      Thread.sleep(10)
-      reader.close()
-      _done = true
     }
   }
 
@@ -174,8 +179,12 @@ class OSProcess(val cmd: String, val isJavaProcess: Boolean) {
       stdOutput = new ThreadReader(process.getInputStream)
       stdError = new ThreadReader(process.getErrorStream)
       stdInput = new OutputStreamWriter(process.getOutputStream)
-      new Thread(stdOutput).start()
-      new Thread(stdError).start()
+      val t1 = new Thread(stdOutput)
+      t1.setDaemon(true)
+      t1.start()
+      val t2 = new Thread(stdError)
+      t2.setDaemon(true)
+      t2.start()
       _isRunning.set(true)
       if (process.isAlive) {
         started()

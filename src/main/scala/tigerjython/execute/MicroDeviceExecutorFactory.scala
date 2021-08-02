@@ -13,8 +13,10 @@ package tigerjython.execute
 class MicroDeviceExecutorFactory(val name: String,
                                  val execLanguage: ExecLanguage.Value) extends ExecutorFactory {
 
+  override def canEvaluate: Boolean = false
+
   def createEvaluator(controller: ExecutionController, onReady: Evaluator=>Unit): Unit =
-    throw new RuntimeException("no evaluator available!")
+    throw new RuntimeException("cannot evaluate individual expressions!")
 
   def createExecutor(controller: ExecutionController, onReady: Executor=>Unit): Unit = {
     val executor = new MicroDeviceExecutor(controller, name)

@@ -8,7 +8,9 @@
 package tigerjython.ui.editor
 
 import org.fxmisc.richtext._
-import tigerjython.files.Document
+import tigerjython.execute.ExecLanguage
+import tigerjython.files.{Document, Documents}
+import tigerjython.syntaxsupport.SyntaxDocument
 
 /**
  * This is a specialisation of the more general `EditorTab` to use the Python-editor.
@@ -17,6 +19,8 @@ import tigerjython.files.Document
  */
 class PythonEditorTab extends EditorTab {
 
+  private var _syntaxDocument: SyntaxDocument = _
+
   {
     caption.setValue("untitled %d".format(PythonEditorTab.nextNameIndex))
   }
@@ -24,6 +28,24 @@ class PythonEditorTab extends EditorTab {
   protected def createEditorNode: CodeArea = {
     val result = new PythonEditor()
     result.onAutoSave = autoSave
+    _syntaxDocument = result.syntaxDocument
+    result
+  }
+
+  override def getRequiredModules(target: String, execLanguage: ExecLanguage.Value): Iterable[(String, String)] = {
+    _syntaxDocument.setText(getText)
+    val modules = _syntaxDocument.getImportedModules
+    val result = collection.mutable.ArrayBuffer[(String, String)]()
+    for (mod <- modules) {
+      val moduleNameParts = mod.split('.')
+      if (moduleNameParts.length == 1 || moduleNameParts.length == 2)
+        Documents.findDocumentWithName(moduleNameParts(0)) match {
+          case Some(document) =>
+            val text = document.getExecutableFileAsString(execLanguage)
+            result += ((document.name.get(), text))
+          case _ =>
+        }
+    }
     result
   }
 }

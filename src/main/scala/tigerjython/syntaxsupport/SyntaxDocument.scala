@@ -101,6 +101,12 @@ class SyntaxDocument {
     }
   }
 
+  def getImportedModules: Array[String] = {
+    val result = collection.mutable.ArrayBuffer[String]()
+    struct.listImportedModules(result)
+    result.toArray
+  }
+
   def insert(position: Int, insText: String): Unit = synchronized {
     if (insText != null && insText.nonEmpty) {
       if (position == 0) {

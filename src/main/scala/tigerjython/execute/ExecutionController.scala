@@ -24,6 +24,17 @@ trait ExecutionController {
 
   def getExecutableFile: File
 
+  def getExecutableFileAsString: String
+
+  /**
+   * Returns an iterator providing the names and source code of all the modules required to execute the program on the
+   * given target platform/device.
+   *
+   * This is primarily meant to run an entire 'project' containing more than one module on an external device such as
+   * the Micro:bit.
+   */
+  def getRequiredModules(target: String, execLanguage: ExecLanguage.Value): Iterable[(String, String)] = Iterable.empty
+
   def getText: String
 
   def handleError(errorText: String): Unit =

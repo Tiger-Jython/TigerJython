@@ -185,6 +185,10 @@ abstract class StructContainer extends StructElement {
 
   protected[struct] def invalidate(tokens: TokenArray): Unit = {}
 
+  def listImportedModules(modules: collection.mutable.ArrayBuffer[String]): Unit =
+    for (child <- children)
+      child.listImportedModules(modules)
+
   protected[struct] def parse(tokens: TokenArray, startIndex: Int): Int = {
     val relStartIndex = startIndex - this.index
     var i = startIndex

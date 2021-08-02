@@ -48,6 +48,13 @@ object Documents {
     "file_x%s%s".format("0" * prefix, name)
   }
 
+  def findDocumentWithName(name: String): Option[Document] = {
+    for (doc <- documents)
+      if (doc.name.get == name)
+        return Some(doc)
+    None
+  }
+
   def getDocumentForFile(file: java.io.File): Document =
     if (file != null)
       getDocumentForPath(file.toPath)

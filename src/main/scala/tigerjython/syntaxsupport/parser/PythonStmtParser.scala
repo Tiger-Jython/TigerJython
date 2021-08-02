@@ -199,12 +199,21 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
 
   protected def parseImportFrom(): StatementType = {
     val moduleName = readImportModule()
+    val modules = collection.mutable.ArrayBuffer[String]()
     if (source.expectKeyword("import")) {
-      var a = readAlias()
-      while (a != null && source.expectComma())
-        a = readAlias()
+      if (source.expectStar())
+        modules += moduleName + ".*"
+      else {
+        var a = readAlias()
+        while (a != null && source.expectComma()) {
+          modules += moduleName + "." + a
+          a = readAlias()
+        }
+        if (a != null)
+          modules += moduleName + "." + a
+      }
     }
-    StatementType.IMPORT(Array(moduleName))
+    StatementType.IMPORT(modules.toArray)
   }
 
   protected def parseRaise(): StatementType = {
@@ -459,10 +468,9 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
         if (source.expectKeyword("as")) {
           n.nameTokenType = NameTokenType.LOAD
           source.expectName(NameTokenType.STORE)
-        } else {
+        } else
           n.nameTokenType = NameTokenType.STORE
-          s
-        }
+        s
       case _ =>
         null
     }
@@ -472,6 +480,7 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
       source.next() match {
         case name: NameToken if name.tokenType == TokenType.NAME || name.tokenType == TokenType.BUILTIN_NAME =>
           name.nameTokenType = NameTokenType.ATTRIBUTE
+        case null =>
         case _ =>
           source.back()
       }

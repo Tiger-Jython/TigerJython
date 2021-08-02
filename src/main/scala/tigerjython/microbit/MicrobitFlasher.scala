@@ -14,8 +14,9 @@ import tigerjython.execute.ExecutionController
 /**
  * @author Tobias Kohn
  */
-class MicrobitFlasher(val controller: ExecutionController) extends MicroDeviceFlasher {
+class MicrobitFlasher(val controller: ExecutionController) extends MicroDeviceFlasher("Micro:bit") {
 
+  private var devicePath: String = _
   private val fileSystem_v1 = new MicrobitFileSystem(1)
   private val fileSystem_v2 = new MicrobitFileSystem(2)
 
@@ -30,6 +31,9 @@ class MicrobitFlasher(val controller: ExecutionController) extends MicroDeviceFl
     else if (version == 2)
       fileSystem_v2.addTextFile(name, data)
   }
+
+  protected def clearDevicePath(): Unit =
+    devicePath = null
 
   def createHexFile: String = {
     if (fileSystem_v2.isOutOfMemory) {
@@ -55,11 +59,9 @@ class MicrobitFlasher(val controller: ExecutionController) extends MicroDeviceFl
     hexMaker.output
   }
 
-  def writeToDevice(path: String = null): Unit =
-    if (path != null)
-      writeToDevice(new File(path))
-    else if (DeviceDetector.hasMicrobitReady) {
-      writeToDevice(new File(DeviceDetector.getMicrobitPath, "tigerjython.hex"))
-    } else
-      controller.appendToErrorOutput("no micro:bit device detected")
+  override def getDevicePath: String = {
+    if (devicePath == null && DeviceDetector.hasMicrobitReady)
+      devicePath = DeviceDetector.getMicrobitPath
+    devicePath
+  }
 }

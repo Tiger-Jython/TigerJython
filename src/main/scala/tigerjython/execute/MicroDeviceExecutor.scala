@@ -8,6 +8,7 @@
 package tigerjython.execute
 
 import tigerjython.microbit._
+import tigerjython.ui.Dialogs
 
 /**
  * @author Tobias Kohn
@@ -25,10 +26,23 @@ class MicroDeviceExecutor(val controller: ExecutionController, val deviceName: S
   def run(): Unit = {
     val filename = controller.getExecutableFile.getAbsolutePath
     controller.appendToLog("Downloading '%s' to '%s'".format(filename, deviceName))
-    flasher.addTextFile("main.py", controller.getText)
+    flasher.addTextFile("main.py", controller.getExecutableFileAsString)
+    for ((name, text) <- controller.getRequiredModules(deviceName, ExecLanguage.PYTHON_3))
+      flasher.addTextFile(name + ".py", text)
     controller.clearOutput()
-    flasher.writeToDevice()
-    controller.appendToLog("Download complete")
+    if (flasher.getDevicePath == null)
+      Dialogs.selectMicroDeviceTarget(deviceName) match {
+        case Some(path) =>
+          controller.appendToLog("Target path: '%s'".format(path))
+          flasher.writeToDevice(path)
+          controller.appendToLog("Download completed")
+        case _ =>
+      }
+    else {
+      controller.appendToLog("Target path: '%s'".format(flasher.getDevicePath))
+      flasher.writeToDevice()
+      controller.appendToLog("Download completed")
+    }
   }
 
   override def shutdown(): Unit = {}

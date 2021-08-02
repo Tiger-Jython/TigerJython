@@ -30,7 +30,7 @@ class PythonCodeArea extends CodeArea {
 
   protected val undoQueue = new TigerJythonChangeQueue[PlainTextChange]()
 
-  protected val syntaxDocument: SyntaxDocument = new SyntaxDocument()
+  val syntaxDocument: SyntaxDocument = new SyntaxDocument()
 
   {
     setStyle("-fx-font-family: \"%s\";".format(Preferences.fontFamily.get))
@@ -118,7 +118,8 @@ class PythonCodeArea extends CodeArea {
   //    SyntaxHighlighter.computeHighlightingAsync(this.getText())
 
   private def applyHighlighting(highlighting: StyleSpans[java.util.Collection[String]]): Unit =
-    this.setStyleSpans(0, highlighting)
+    if (highlighting != null)
+      this.setStyleSpans(0, highlighting)
 
   def getUndoBuffer: Array[PlainTextChange] = {
     val result = new Array[PlainTextChange](undoQueue.getHistoryLength)

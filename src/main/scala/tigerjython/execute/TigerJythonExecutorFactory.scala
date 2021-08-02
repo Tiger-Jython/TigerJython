@@ -34,5 +34,5 @@ object TigerJythonExecutorFactory extends ExecutorFactory {
     onReady(newInstance(controller))
   }
 
-  def getExecLanguage: ExecLanguage.Value = ExecLanguage.PYTHON_2
+  def getExecLanguage: ExecLanguage.Value = ExecLanguage.PYTHON_3
 }

@@ -14,13 +14,17 @@ import tigerjython.execute.ExecutionController
 /**
  * @author Tobias Kohn
  */
-class CalliopeFlasher(val controller: ExecutionController) extends MicroDeviceFlasher {
+class CalliopeFlasher(val controller: ExecutionController) extends MicroDeviceFlasher("Calliope Mini") {
 
+  private var devicePath: String = _
   private val fileSystem = new MicrobitFileSystem(1)
 
   def addTextFile(name: String, data: String): Unit = {
     fileSystem.addTextFile(name, data)
   }
+
+  protected def clearDevicePath(): Unit =
+    devicePath = null
 
   def createHexFile: String = {
     if (fileSystem.isOutOfMemory) {
@@ -35,11 +39,9 @@ class CalliopeFlasher(val controller: ExecutionController) extends MicroDeviceFl
     hexMaker.output
   }
 
-  def writeToDevice(path: String = null): Unit =
-    if (path != null)
-      writeToDevice(new File(path))
-    else if (DeviceDetector.hasCalliopeReady) {
-      writeToDevice(new File(DeviceDetector.getCalliopePath, "tigerjython.hex"))
-    } else
-      controller.appendToErrorOutput("no Calliope Mini device detected")
+  override def getDevicePath: String = {
+    if (devicePath == null && DeviceDetector.hasCalliopeReady)
+      devicePath = DeviceDetector.getCalliopePath
+    devicePath
+  }
 }

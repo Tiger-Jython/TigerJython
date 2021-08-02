@@ -90,6 +90,13 @@ class StructLine extends StructContainer {
 
   def isEmpty: Boolean = _isEmpty
 
+  override def listImportedModules(modules: collection.mutable.ArrayBuffer[String]): Unit =
+    _stmtType match {
+      case StatementType.IMPORT(mod) =>
+        modules ++= mod
+      case _ =>
+    }
+
   override protected[struct] def offset: Int = 0
   override protected[struct] def offset_=(o: Int): Unit = {}
 
