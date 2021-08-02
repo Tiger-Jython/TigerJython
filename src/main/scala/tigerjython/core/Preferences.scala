@@ -73,6 +73,8 @@ object Preferences {
 
   val languageCode: StringProperty = new SimpleStringProperty()
 
+  val selectedDocument: StringProperty = new PrefStringProperty(preferences, "selectedDocument", "")
+
   val tabWidth: IntegerProperty = new PrefIntegerProperty(preferences, "tabWidth", 4)
 
   val theme: StringProperty = new PrefStringProperty(preferences, "editor.theme", getDefaultTheme)

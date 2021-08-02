@@ -10,6 +10,8 @@ the [JAR-file](https://github.com/Tiger-Jython/TigerJython/releases/download/v3.
 **Several features are not yet working, including syntax highlighting&mdash;there is no sense in raising issue tickets
 at the moment, as we are constantly working on the IDE.**
 
+**This version of TigerJython requires JRE version 9+ and will not run with JRE 8.**
+
 
 ## Features and Design
 

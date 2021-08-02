@@ -5,6 +5,7 @@ import java.nio.file.Path
 import java.util.prefs.{Preferences => JPreferences}
 
 import sun.security.action.GetPropertyAction
+import tigerjython.core.Preferences
 import tigerjython.execute.ExecLanguage
 import tigerjython.ui.{TigerJythonApplication, editor}
 
@@ -122,6 +123,7 @@ object Documents {
    * Reads all the documents from the preferences.
    */
   def initialize(): Unit = {
+    val selected = Preferences.selectedDocument.get()
     currentIndex = preferences.getInt("index", currentIndex)
     val openDocuments = collection.mutable.ArrayBuffer[Document]()
     for (childName <- preferences.childrenNames()) {
@@ -136,5 +138,7 @@ object Documents {
     }
     if (openDocuments.isEmpty)
       TigerJythonApplication.tabManager.addTab(editor.PythonEditorTab())
+    else
+      TigerJythonApplication.tabManager.selectDocument(selected)
   }
 }

@@ -330,6 +330,12 @@ abstract class EditorTab extends TabFrame with ExecutionController {
   def getCaretPosition: Int =
     editor.getCaretPosition
 
+  def getDocumentName: String =
+    if (document != null)
+      document.name.get()
+    else
+      ""
+
   def getExecutableFile: java.io.File =
     if (document != null && execFactory != null) {
       val execLanguage = execFactory.getExecLanguage

@@ -7,9 +7,12 @@
  */
 package tigerjython.ui
 
+import javafx.application.Platform
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.scene.Node
 import javafx.scene.control.{Tab, TabPane}
+import jdk.internal.ref.CleanerImpl.PhantomCleanableRef
+import tigerjython.core.Preferences
 import tigerjython.files.Document
 import tigerjython.ui.editor.{EditorTab, PythonEditorTab}
 import tigerjython.ui.tabs.OpenDocumentTab
@@ -34,6 +37,9 @@ class DefaultTabManager extends TabPane with TabManager {
         }
       if (newTab != null)
         newTab.getContent match {
+          case frame: EditorTab =>
+            frame.focusChanged(true)
+            Preferences.selectedDocument.setValue(frame.getDocumentName)
           case frame: TabFrame =>
             frame.focusChanged(true)
           case _  =>
@@ -139,6 +145,28 @@ class DefaultTabManager extends TabPane with TabManager {
       }
     true
   }
+
+  def selectDocument(name: String = null): Unit =
+    if (name == null) {
+      val selected = Preferences.selectedDocument.get()
+      if (selected != null && selected != "")
+        selectDocument(selected)
+    }
+    else if (name != "") {
+      for (t <- getTabs.asScala)
+        t match {
+          case tab: Tab =>
+            tab.getContent match {
+              case editorTab: EditorTab if editorTab.getDocumentName == name =>
+                Platform.runLater(() => {
+                  getSelectionModel.select(tab)
+                })
+                return
+              case _ =>
+            }
+          case _=>
+        }
+    }
 
   def showOrAdd(frame: TabFrame): Unit = {
     for (t <- getTabs.asScala)

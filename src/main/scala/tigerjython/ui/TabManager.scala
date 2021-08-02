@@ -8,6 +8,7 @@
 package tigerjython.ui
 
 import javafx.scene.Node
+import tigerjython.core.Preferences
 import tigerjython.files.Document
 
 /**
@@ -57,6 +58,12 @@ trait TabManager {
    * @param document
    */
   def openDocument(document: Document): Unit
+
+  /**
+   *
+   * @param name
+   */
+  def selectDocument(name: String = null): Unit
 
   /**
    *

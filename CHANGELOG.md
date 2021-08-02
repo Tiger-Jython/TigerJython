@@ -1,10 +1,11 @@
 # Changelog
 
-### 3.0 Early Access Preview 8 (31 July 2021)
+### 3.0 Early Access Preview 8 (2 August 2021)
 
 Implemented:
 - Syntax highlighting for Python;
 - Initial support for Micro:bit and Calliope Mini;
+- Support for `repeat`-loops and modules on Micro:bit and Calliope Mini;
 
 Bug fixes:
 - Running external processes could deadlock when the output was too long;
@@ -101,7 +102,7 @@ Still missing:
 - Full customisation of the interface (such as selecting font family or themes);
 - Interaction with the server (check for updates, send usage statistics);
 - Adding custom Python interpreters (that are not detected by TigerJython);
-- Interctive concole and/or notebooks.
+- Interactive console and/or notebooks.
 
 
 ## Changes From Version 2
