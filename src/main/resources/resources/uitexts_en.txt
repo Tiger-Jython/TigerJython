@@ -1,1 +1,1 @@
-../../../../TigerJython-Localisation/User-Interface/uitexts.txt
+../../../../TigerJython-Localisation/User-Interface/uitexts_en.txt

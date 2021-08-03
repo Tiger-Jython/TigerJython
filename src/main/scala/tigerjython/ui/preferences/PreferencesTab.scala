@@ -30,6 +30,7 @@ class PreferencesTab protected () extends TabFrame {
       mainBox.getPanes.add(titlePane)
     }
     mainBox.prefWidthProperty.bind(widthProperty())
+    mainBox.prefHeightProperty.bind(heightProperty())
     mainBox.setExpandedPane(mainBox.getPanes.get(0))
     getChildren.add(mainBox)
     caption.setValue("Preferences")
@@ -39,7 +40,8 @@ class PreferencesTab protected () extends TabFrame {
     Array(
       new GeneralPreferencesPane(),
       new AppearancePreferencesPane(),
-      new PythonPreferencesPane()
+      new PythonPreferencesPane(),
+      new StatusMessagesPane()
     )
   }
 }

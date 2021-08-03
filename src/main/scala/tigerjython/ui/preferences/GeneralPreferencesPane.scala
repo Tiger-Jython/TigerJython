@@ -37,6 +37,7 @@ class GeneralPreferencesPane extends PreferencePane {
     val label = new Label("Language:")
     val chooser = new ComboBox[String]()
     label.setLabelFor(chooser)
+    UIString("prefs.language") += label.textProperty()
     chooser.getItems.addAll( availableLanguages.map(_._2): _* )
     chooser.setButtonCell(new ImageListCell())
     chooser.setCellFactory(_ => {
@@ -71,6 +72,7 @@ class GeneralPreferencesPane extends PreferencePane {
     val label = new Label("Zoom level:")
     val zoomChooser = new ComboBox[String]()
     label.setLabelFor(zoomChooser)
+    UIString("prefs.zoom") += label.textProperty()
     zoomChooser.getItems.addAll( zoomOptions: _* )
     val currentValue = "%d%%".format(math.round(Preferences.globalZoom.get * 100))
     if (!zoomOptions.contains(currentValue))

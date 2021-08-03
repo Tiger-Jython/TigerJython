@@ -62,6 +62,14 @@ object Configuration {
    */
   def getDefaultPort: Int = 0
 
+  def getFullJavaVersion: String = {
+    val result = collection.mutable.ArrayBuffer[String]()
+    result += System.getProperty("java.runtime.version")
+    result += System.getProperty("java.version.date")
+    result += System.getProperty("javafx.version")
+    "Java %d (%s)".format(getJavaVersion, result.filter(_ != null).mkString(", "))
+  }
+
   /**
    * Returns the version of the JRE the program is running on.  This only returns the major version.
    */

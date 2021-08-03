@@ -74,6 +74,12 @@ object TigerJython {
     println("  on Java " + Configuration.getJavaVersion.toString)
     println("  on " + OSPlatform.system.toString)
 
+    if (Configuration.getJavaVersion <= 8)
+      SystemErrors.fatalError(
+        ("TigerJython requires Java 11 or newer to run.\n" +
+          "You are using %s").format(Configuration.getFullJavaVersion)
+      )
+
     tigerjython.execute.PythonInstallations.initialize()
     tigerjython.core.Configuration.initialize()
     tigerjython.remote.ExecuteServer.initialize()

@@ -37,5 +37,13 @@ object OSPlatform extends Enumeration {
       UNKNOWN
   }
 
+  def getFullSystemName: String = {
+    val result = collection.mutable.ArrayBuffer[String]()
+    result += System.getProperty("os.name")
+    result += System.getProperty("os.version")
+    result += System.getProperty("os.arch")
+    "%s (%s)".format(system.toString, result.filter(_ != null).mkString(", "))
+  }
+
   def isWindows: Boolean = system == WINDOWS
 }
