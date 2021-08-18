@@ -180,6 +180,15 @@
     -fx-background-color: #F9F3EE;
 }
 
+.styled-text-area .scope {
+    -fx-highlight-fill: #F9F3EE;
+    -fx-opacity: 0.75;
+}
+
+.styled-text-area .line-highlighter {
+    -fx-highlight-fill: #F9F3EE;
+}
+
 .styled-text-area .keyword {
     -fx-fill: #0033AA;
     -fx-font-weight: bold;

@@ -30,17 +30,17 @@ class SyntaxDocument {
   /* The `Document` keeps three separate 'lists' that represent the entire document/text:
    * - The `text` contains the actual text as a 'modifiable' string (actually `StringBuilder`)
    * - The `tokens` is an array with all the tokens representing the text
-   * - The `range`s is a hierarchical representation of the code that identifies lines, suites, scopes, brackets, etc.
+   * - The `struct` is a hierarchical representation of the code that identifies lines, suites, scopes, brackets, etc.
    *
    * It is crucial that all three representations are kept in sync!
    */
-  protected val struct: StructElement = createProgramTokenRange()
+  protected val struct: StructProgram = createProgramTokenRange()
   protected[syntaxsupport] val text: StringBuilder = new StringBuilder()
   protected[syntaxsupport] val tokens: TokenArray = new TokenArray(this)
 
   protected val tokenizer: Tokenizer = createTokenizer()
 
-  protected def createProgramTokenRange(): StructElement =
+  protected def createProgramTokenRange(): StructProgram =
     new StructProgram(this)
 
   protected def createTokenizer(): PythonTokenizer =
@@ -101,11 +101,58 @@ class SyntaxDocument {
     }
   }
 
+  def getCurrentBlock(caretPos: Int): Option[(Int, Int)] = {
+    val line = getLineIndexFromPosition(caretPos)
+    if (0 <= line && line < struct.count) {
+      val firstLineNo = struct.getFirstLineOfBlock(line)
+      val lastLineNo = struct.getLastLineOfBlock(line)
+      Some((firstLineNo, lastLineNo))
+    }
+    else if (line == struct.count) {
+      val firstLineNo = struct.getFirstLineOfBlock(line - 1)
+      Some((firstLineNo, line + 1))
+    } else
+      None
+  }
+
+  def getCurrentBlockRegion(caretPos: Int, fullScope: Boolean): Option[(Int, Int)] =
+    if (fullScope)
+      getCurrentScope(caretPos)
+    else
+      getCurrentBlock(caretPos)
+
+  def getCurrentScope(caretPos: Int): Option[(Int, Int)] = {
+    val line = getLineIndexFromPosition(caretPos)
+    if (0 <= line && line < struct.count) {
+      val firstLineNo = struct.getFirstLineOfScope(line)
+      val lastLineNo = struct.getLastLineOfScope(line)
+      Some((firstLineNo, lastLineNo))
+    }
+    else if (line == struct.count) {
+      val firstLineNo = struct.getFirstLineOfScope(line - 1)
+      Some((firstLineNo, line + 1))
+    } else
+      None
+  }
+
   def getImportedModules: Array[String] = {
     val result = collection.mutable.ArrayBuffer[String]()
     struct.listImportedModules(result)
     result.toArray
   }
+
+  protected def getLineIndexFromPosition(pos: Int): Int =
+    if (pos <= text.length()) {
+      var result = 0
+      var i = 0
+      while (i < pos) {
+        if (text(i) == '\n')
+          result += 1
+        i += 1
+      }
+      result
+    } else
+      -1
 
   def insert(position: Int, insText: String): Unit = synchronized {
     if (insText != null && insText.nonEmpty) {

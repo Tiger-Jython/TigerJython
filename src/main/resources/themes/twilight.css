@@ -184,6 +184,10 @@
     -fx-background-color: #080808;
 }
 
+.styled-text-area .scope {
+    -fx-highlight-fill: #080808;
+}
+
 .styled-text-area .keyword {
     -fx-fill: #CDA869;
 }

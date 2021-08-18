@@ -63,6 +63,58 @@ class StructProgram(val document: SyntaxDocument) extends StructContainer {
 
   override protected def getDocument: SyntaxDocument = document
 
+  def getFirstLineOfBlock(lineNo: Int): Int = {
+    var i = lineNo
+    while (i > 0 && line(i).isEmpty)
+      i -= 1
+    val indent = line(i).indent
+    if (i == lineNo && i+1 < children.length && line(i+1).indent > indent)
+      return lineNo
+    if (indent == 0)
+      return 0
+    while (i > 0 && line(i-1).hasIndent(indent))
+      i -= 1
+    (i - 1) max 0
+  }
+
+  def getLastLineOfBlock(lineNo: Int): Int = {
+    var i = lineNo
+    while (i > 0 && line(i).isEmpty)
+      i -= 1
+    val indent = line(i).indent
+    if (indent == 0)
+      children.length + 1
+    i = lineNo
+    while (i < children.length && line(i).hasIndent(indent))
+      i += 1
+    i
+  }
+
+  def getFirstLineOfScope(lineNo: Int): Int = {
+    var i = lineNo
+    while (i > 0 && line(i).isEmpty)
+      i -= 1
+    val indent = line(i).indent
+    if (indent == 0)
+      return 0
+    while (i > 0 && line(i-1).hasIndent(indent))
+      i -= 1
+    (i - 1) max 0
+  }
+
+  def getLastLineOfScope(lineNo: Int): Int = {
+    var i = lineNo
+    while (i > 0 && line(i).isEmpty)
+      i -= 1
+    val indent = line(i).indent
+    if (indent == 0)
+      children.length + 1
+    i = lineNo
+    while (i < children.length && line(i).hasIndent(indent))
+      i += 1
+    i
+  }
+
   def getParentScopeForLine(line: Int): Scope = {
     val indent = children(line).asInstanceOf[StructLine].indent
     if (indent == 0)

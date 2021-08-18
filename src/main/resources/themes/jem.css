@@ -171,6 +171,10 @@
     -fx-background-color: #FFFFAA;
 }
 
+.styled-text-area .scope {
+    -fx-highlight-fill: #FFFFAA;
+}
+
 .styled-text-area .keyword {
     -fx-fill: #0033AA;
     -fx-font-weight: bold;

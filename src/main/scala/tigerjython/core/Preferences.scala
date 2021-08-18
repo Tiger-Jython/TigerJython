@@ -69,6 +69,12 @@ object Preferences {
 
   val globalZoom: DoubleProperty = new PrefDoubleProperty(preferences, "global.zoom", 1.0)
 
+  val highlightBlock: BooleanProperty = new PrefBooleanProperty(preferences, "editor.highlight.block", true)
+
+  val highlightLine: BooleanProperty = new PrefBooleanProperty(preferences, "editor.highlight.line", true)
+
+  val highlightScope: BooleanProperty = new PrefBooleanProperty(preferences, "editor.highlight.scope", false)
+
   val language: StringProperty = new PrefStringProperty(preferences, "language", getDefaultLanguage)
 
   val languageCode: StringProperty = new SimpleStringProperty()

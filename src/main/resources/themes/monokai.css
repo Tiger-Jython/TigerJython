@@ -185,6 +185,10 @@
     -fx-background-color: #202020;
 }
 
+.styled-text-area .scope {
+    -fx-highlight-fill: #202020;
+}
+
 .styled-text-area .keyword {
     -fx-fill: #F92672;
     -fx-font-weight: bold;

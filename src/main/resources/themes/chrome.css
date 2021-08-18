@@ -170,6 +170,10 @@
     -fx-background-color: #F5F5F5;
 }
 
+.styled-text-area .scope {
+    -fx-highlight-fill: #F5F5F5;
+}
+
 .styled-text-area .keyword {
     -fx-font-weight: bold;
     -fx-fill: #687687;

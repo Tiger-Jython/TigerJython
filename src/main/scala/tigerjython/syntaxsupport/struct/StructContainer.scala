@@ -75,6 +75,8 @@ abstract class StructContainer extends StructElement {
   protected def clearRange(fromItem: StructElement, untilItem: StructElement): Unit =
     clearRange(children.indexOf(fromItem), children.indexOf(untilItem))
 
+  def count: Int = children.length
+
   private[struct] def deleteItem(item: StructElement): Unit = {
     val idx = children.indexOf(item)
     children.remove(idx)
@@ -136,7 +138,7 @@ abstract class StructContainer extends StructElement {
                 item.offset += insCount
                 length += insCount
                 message.handled()
-              case None =>
+              case _ =>
                 length += insCount
                 message.handled()
             }

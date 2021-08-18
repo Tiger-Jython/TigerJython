@@ -59,6 +59,9 @@ class StructLine extends StructContainer {
     else
       super.getScope
 
+  def hasIndent(indent: Int): Boolean =
+    (_indent >= indent) || isEmpty
+
   def indent: Int = _indent
   def indent_=(i: Int): Unit =
     if (i != _indent && i >= 0) {

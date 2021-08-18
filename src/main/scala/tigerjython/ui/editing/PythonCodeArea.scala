@@ -11,6 +11,7 @@ import java.time.Duration
 import java.util.Optional
 
 import javafx.application.Platform
+import javafx.beans.value.ObservableValue
 import javafx.concurrent.Task
 import javafx.scene.input.{KeyCode, KeyEvent}
 import org.fxmisc.richtext._
@@ -18,7 +19,6 @@ import org.fxmisc.richtext.model.{PlainTextChange, StyleSpans}
 import tigerjython.core.Preferences
 import tigerjython.plugins.EventManager
 import tigerjython.ui.Utils.onFX
-
 import tigerjython.syntaxsupport.SyntaxDocument
 
 /**
@@ -28,16 +28,29 @@ import tigerjython.syntaxsupport.SyntaxDocument
  */
 class PythonCodeArea extends CodeArea {
 
+  private var highlightBlock: Boolean = Preferences.highlightBlock.get
+  private var highlightScope: Boolean = Preferences.highlightScope.get
+
   protected val undoQueue = new TigerJythonChangeQueue[PlainTextChange]()
 
   val syntaxDocument: SyntaxDocument = new SyntaxDocument()
 
+  /**
+   * The `scopeSelection` highlights either the current block or the current block, depending on preferences.
+   */
+  lazy val scopeSelection: Selection[java.util.Collection[String], String, java.util.Collection[String]] =
+    new SelectionImpl("scope", this, (path: SelectionPath) => {
+      path.setStrokeWidth(0)
+    })
+
   {
     setStyle("-fx-font-family: \"%s\";".format(Preferences.fontFamily.get))
     setUndoManager(UndoFactory.createUndoManager(this, undoQueue))
+    addSelection(scopeSelection)
+    this.setLineHighlighterOn(Preferences.highlightLine.get)
 
     this.multiPlainChanges()
-      .successionEnds(Duration.ofMillis(50))
+      .successionEnds(Duration.ofMillis(10))
       .supplyTask(() => computeHighlightingAsync())
       .awaitLatest(this.multiPlainChanges())
       .filterMap((t: org.reactfx.util.Try[StyleSpans[java.util.Collection[String]]]) => {
@@ -51,6 +64,34 @@ class PythonCodeArea extends CodeArea {
         result
       })
       .subscribe(h => applyHighlighting(h))
+
+    this.caretPositionProperty().addListener(
+      (_: ObservableValue[_], _: java.lang.Integer, newValue: java.lang.Integer) => {
+        if (highlightBlock) {
+          if (selectionProperty().getValue.getLength == 0) {
+            syntaxDocument.setText(this.getText())
+            syntaxDocument.getCurrentBlockRegion(newValue, highlightScope) match {
+              case Some((start, end)) =>
+                scopeSelection.selectRange(start, 0, end, 0)
+              case _ =>
+                scopeSelection.deselect()
+            }
+          } else
+            scopeSelection.deselect()
+        }
+      })
+
+    Preferences.highlightLine.addListener((_, _, newValue) => {
+      this.setLineHighlighterOn(newValue)
+    })
+    Preferences.highlightBlock.addListener((_, _, newValue) => {
+      this.highlightBlock = newValue
+      scopeSelection.deselect()
+    })
+    Preferences.highlightScope.addListener((_, _, newValue) => {
+      this.highlightScope = newValue
+      scopeSelection.deselect()
+    })
   }
 
   addEventFilter(KeyEvent.KEY_TYPED, (key: KeyEvent) => {
