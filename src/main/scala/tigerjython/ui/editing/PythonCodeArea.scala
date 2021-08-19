@@ -71,8 +71,8 @@ class PythonCodeArea extends CodeArea {
           if (selectionProperty().getValue.getLength == 0) {
             syntaxDocument.setText(this.getText())
             syntaxDocument.getCurrentBlockRegion(newValue, highlightScope) match {
-              case Some((start, end)) =>
-                scopeSelection.selectRange(start, 0, end, 0)
+              case Some((start, startOffset, end, endOffset)) =>
+                scopeSelection.selectRange(start, startOffset, end, endOffset)
               case _ =>
                 scopeSelection.deselect()
             }

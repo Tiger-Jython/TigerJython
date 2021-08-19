@@ -68,7 +68,11 @@ class TokenArray(val document: SyntaxDocument) extends Iterable[Token] {
       recordChange(TokenArrayInsertion(items.length - 1, 1))
     }
 
-  def apply(index: Int): Token = items(index)
+  def apply(index: Int): Token =
+    if (index < items.length)
+      items(index)
+    else
+      null
 
   def bracketBalance: Int = _bracketBalance
 

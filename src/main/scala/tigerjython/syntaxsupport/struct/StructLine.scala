@@ -53,11 +53,46 @@ class StructLine extends StructContainer {
     true
   }
 
+  def countLinebreaks: Int =
+    countLinebreaks(getDocument.tokens)
+
+  def countLinebreaks(tokens: TokenArray): Int =
+    countLinebreaks(tokens, index)
+
+  def countLinebreaks(tokens: TokenArray, startIndex: Int): Int = {
+    var result = 0
+    for (i <- 0 until length;
+         token = tokens(startIndex + i)
+         if token != null)
+      token.tokenType match {
+        case TokenType.NEWLINE =>
+          result += 1
+        case _ =>
+      }
+    result
+  }
+
   override def getScope: Scope =
     if (_scope != null)
       _scope
     else
       super.getScope
+
+  def getTextLength: Int =
+    getTextLength(getDocument.tokens)
+
+  def getTextLength(tokens: TokenArray): Int =
+    getTextLength(tokens, index)
+
+  def getTextLength(tokens: TokenArray, startIndex: Int): Int = {
+    var result = 0
+    for (i <- 0 until length) {
+      val tkn = tokens(startIndex + i)
+      if (tkn != null)
+        result += tkn.length
+    }
+    result
+  }
 
   def hasIndent(indent: Int): Boolean =
     (_indent >= indent) || isEmpty

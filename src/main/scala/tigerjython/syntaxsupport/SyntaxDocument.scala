@@ -101,39 +101,36 @@ class SyntaxDocument {
     }
   }
 
-  def getCurrentBlock(caretPos: Int): Option[(Int, Int)] = {
+  def getCurrentBlock(caretPos: Int): Option[(Int, Int, Int, Int)] = {
     val line = getLineIndexFromPosition(caretPos)
     if (0 <= line && line < struct.count) {
-      val firstLineNo = struct.getFirstLineOfBlock(line)
-      val lastLineNo = struct.getLastLineOfBlock(line)
-      Some((firstLineNo, lastLineNo))
+      val (firstLine, lastLine) = struct.getBlockExtent(line)
+      if (firstLine >= 0 && lastLine >= firstLine)
+        Some((firstLine, 0, lastLine, 0))
+      else
+        None
     }
     else if (line == struct.count) {
       val firstLineNo = struct.getFirstLineOfBlock(line - 1)
-      Some((firstLineNo, line + 1))
+      val firstLine = struct.getPhysicalLineOf(firstLineNo)
+      if (firstLine > 0)
+        Some((firstLine, 0, struct.getPhysicalLineOf(line) + 1, 0))
+      else
+        None
     } else
       None
   }
 
-  def getCurrentBlockRegion(caretPos: Int, fullScope: Boolean): Option[(Int, Int)] =
+  // TODO: add support for parentheses and brackets as possible ranges
+  def getCurrentBlockRegion(caretPos: Int, fullScope: Boolean): Option[(Int, Int, Int, Int)] =
     if (fullScope)
       getCurrentScope(caretPos)
     else
       getCurrentBlock(caretPos)
 
-  def getCurrentScope(caretPos: Int): Option[(Int, Int)] = {
-    val line = getLineIndexFromPosition(caretPos)
-    if (0 <= line && line < struct.count) {
-      val firstLineNo = struct.getFirstLineOfScope(line)
-      val lastLineNo = struct.getLastLineOfScope(line)
-      Some((firstLineNo, lastLineNo))
-    }
-    else if (line == struct.count) {
-      val firstLineNo = struct.getFirstLineOfScope(line - 1)
-      Some((firstLineNo, line + 1))
-    } else
-      None
-  }
+  // TODO: properly implement this to return the actual scope
+  def getCurrentScope(caretPos: Int): Option[(Int, Int, Int, Int)] =
+    getCurrentBlock(caretPos)
 
   def getImportedModules: Array[String] = {
     val result = collection.mutable.ArrayBuffer[String]()
@@ -143,14 +140,17 @@ class SyntaxDocument {
 
   protected def getLineIndexFromPosition(pos: Int): Int =
     if (pos <= text.length()) {
-      var result = 0
-      var i = 0
-      while (i < pos) {
-        if (text(i) == '\n')
-          result += 1
-        i += 1
+      var p: Int = 0
+      var tknIndex = 0
+      for (ln <- 0 until struct.count) {
+        if (pos == p)
+          return ln
+        p += struct(ln).getTextLength(tokens, tknIndex)
+        tknIndex += struct(ln).length
+        if (pos < p)
+          return ln
       }
-      result
+      struct.count
     } else
       -1
 

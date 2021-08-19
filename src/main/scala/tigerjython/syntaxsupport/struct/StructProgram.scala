@@ -56,6 +56,8 @@ class StructProgram(val document: SyntaxDocument) extends StructContainer {
     } else
       super.append(item)
 
+  def apply(i: Int): StructLine = children(i).asInstanceOf[StructLine]
+
   protected def createGlobalScope(): Scope = new Scope(null)
 
   protected def createParser(): StmtParser =
@@ -65,52 +67,78 @@ class StructProgram(val document: SyntaxDocument) extends StructContainer {
 
   def getFirstLineOfBlock(lineNo: Int): Int = {
     var i = lineNo
-    while (i > 0 && line(i).isEmpty)
+    while (i > 0 && this(i).isEmpty)
       i -= 1
-    val indent = line(i).indent
-    if (i == lineNo && i+1 < children.length && line(i+1).indent > indent)
+    val indent = this(i).indent
+    if (i == lineNo && i+1 < children.length && this(i+1).indent > indent)
       return lineNo
     if (indent == 0)
       return 0
-    while (i > 0 && line(i-1).hasIndent(indent))
+    while (i > 0 && this(i-1).hasIndent(indent))
       i -= 1
     (i - 1) max 0
   }
 
   def getLastLineOfBlock(lineNo: Int): Int = {
     var i = lineNo
-    while (i > 0 && line(i).isEmpty)
+    while (i > 0 && this(i).isEmpty)
       i -= 1
-    val indent = line(i).indent
+    val indent = this(i).indent
     if (indent == 0)
       children.length + 1
     i = lineNo
-    while (i < children.length && line(i).hasIndent(indent))
+    while (i < children.length && this(i).hasIndent(indent))
       i += 1
     i
   }
 
+  def getBlockExtent(lineNo: Int): (Int, Int) = {
+    var i = lineNo
+    while (i > 0 && this(i).isEmpty)
+      i -= 1
+    val indent = this(i).indent
+    // Check for the special case where we are on the 'head' line of a composite statement
+    if (i == lineNo && i+1 < children.length && this(i+1).indent > indent) {
+      i = lineNo + 1
+      val indent = this(i+1).indent
+      while (i < children.length && this(i).hasIndent(indent))
+        i += 1
+      (getPhysicalLineOf(lineNo), getPhysicalLineOf(i))
+    }
+    else if (indent > 0) {
+      while (i > 0 && this(i-1).hasIndent(indent))
+        i -= 1
+      val startLine = (i - 1) max 0
+      i = lineNo
+      while (i < children.length && this(i).hasIndent(indent))
+        i += 1
+      (getPhysicalLineOf(startLine), getPhysicalLineOf(i))
+    } else
+      (-1, -1)
+      //(0, getPhysicalLineOf(children.length))
+  }
+
   def getFirstLineOfScope(lineNo: Int): Int = {
     var i = lineNo
-    while (i > 0 && line(i).isEmpty)
+    while (i > 0 && this(i).isEmpty)
       i -= 1
-    val indent = line(i).indent
+    val indent = this(i).indent
     if (indent == 0)
       return 0
-    while (i > 0 && line(i-1).hasIndent(indent))
+    while (i > 0 && this(i-1).hasIndent(indent))
       i -= 1
     (i - 1) max 0
   }
 
   def getLastLineOfScope(lineNo: Int): Int = {
     var i = lineNo
-    while (i > 0 && line(i).isEmpty)
+    while (i > 0 && this(i).isEmpty)
       i -= 1
-    val indent = line(i).indent
+    val indent = this(i).indent
     if (indent == 0)
       children.length + 1
     i = lineNo
-    while (i < children.length && line(i).hasIndent(indent))
+    while (i < children.length && this(i).hasIndent(indent))
       i += 1
     i
   }
@@ -131,6 +159,33 @@ class StructProgram(val document: SyntaxDocument) extends StructContainer {
 
   def getParentScopeForLine(line: StructLine): Scope =
     getParentScopeForLine(children.indexOf(line))
+
+  def getPhysicalLineOf(line: Int): Int = {
+    val tokens = getDocument.tokens
+    var result = 0
+    var idx = 0
+    for (i <- 0 until line;
+         ln = apply(i)) {
+      result += ln.countLinebreaks(tokens, idx)
+      idx += ln.length
+    }
+    result
+  }
+
+  def getPhysicalLineOf(line: StructLine): Int = {
+    val tokens = getDocument.tokens
+    var result = 0
+    var idx = 0
+    for (l <- children;
+         ln = l.asInstanceOf[StructLine])
+      if (ln eq line)
+        return result
+      else {
+        result += ln.countLinebreaks(tokens, idx)
+        idx += ln.length
+      }
+    result
+  }
 
   override def getScope: Scope = scope
 
@@ -161,16 +216,14 @@ class StructProgram(val document: SyntaxDocument) extends StructContainer {
     }
   }
 
-  def line(i: Int): StructLine = children(i).asInstanceOf[StructLine]
-
   def notifyIndentationChanged(sender: StructLine, delta: Int): Unit = {
     var i = children.indexOf(sender)
     sender.setParentScope(getParentScopeForLine(i))
     i += 1
     val baseIndent = if (delta < 0) sender.indent else sender.index - delta
-    while (i < children.length && (line(i).indent > baseIndent || line(i).isEmpty)) {
+    while (i < children.length && (this(i).indent > baseIndent || this(i).isEmpty)) {
       val newScope = getParentScopeForLine(i)
-      line(i).setParentScope(newScope)
+      this(i).setParentScope(newScope)
       i += 1
     }
   }
