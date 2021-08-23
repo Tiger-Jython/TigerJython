@@ -159,9 +159,10 @@ abstract class EditorTab extends TabFrame with ExecutionController {
     val result = new MenuItem(name)
     result.setOnAction(_ => {
       targetImage.setImage(img)
-      if (execFactory != factory) {
+      if (document != null)
+        document.execTarget.setValue(factory.name)
+      if (execFactory != factory)
         execFactory = factory
-      }
     })
     result.setGraphic(new ImageView(img))
     result.setUserData(factory)
@@ -404,7 +405,26 @@ abstract class EditorTab extends TabFrame with ExecutionController {
       document.open(this)
       caption.setValue(document.name.get)
       caption.bindBidirectional(document.name)
+      selectTargetForDocument()
     }
+
+  private def selectTargetForDocument(): Unit = {
+    val targetName = document.execTarget.getValue
+    if (targetName != null && targetName != "") {
+      val targetItems = targetButton.getItems
+      for (i <- 0 until targetItems.size())
+        targetItems.get(i).getUserData match {
+          case factory: ExecutorFactory =>
+            if (factory.name == targetName) {
+              Platform.runLater(() => {
+                targetItems.get(i).fire()
+              })
+              return
+            }
+          case _ =>
+        }
+    }
+  }
 
   override def onClose(): Unit = {
     if (document != null)

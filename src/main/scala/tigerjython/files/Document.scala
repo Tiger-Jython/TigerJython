@@ -60,6 +60,8 @@ class Document(protected val prefNode: JPreferences) {
 
   val description: StringProperty = new PrefStringProperty(prefNode, "description", "")
 
+  val execTarget: StringProperty = new PrefStringProperty(prefNode, "exec-target", "")
+
   def exists: Boolean =
     path match {
       case Some(p) =>

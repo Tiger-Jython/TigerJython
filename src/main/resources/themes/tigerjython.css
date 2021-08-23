@@ -177,7 +177,7 @@
 }
 
 .styled-text-area .paragraph-box:has-caret {
-    -fx-background-color: #F9F3EE;
+//    -fx-background-color: #F9F3EE;
 }
 
 .styled-text-area .scope {
@@ -187,6 +187,7 @@
 
 .styled-text-area .line-highlighter {
     -fx-highlight-fill: #F9F3EE;
+    -fx-opacity: 0.25;
 }
 
 .styled-text-area .keyword {
