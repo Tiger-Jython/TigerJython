@@ -89,12 +89,7 @@ trait ZoomMixin { self: Node =>
     }
 
   private def getCenter(bounds: Bounds): (Double, Double) =
-    try {
-      (bounds.getCenterX, bounds.getCenterY)
-    } catch {
-      case _: NoSuchMethodError =>
-        (bounds.getMinX + bounds.getMaxX / 2, (bounds.getMinY + bounds.getMaxY) / 2)
-    }
+    (bounds.getMinX + bounds.getMaxX / 2, (bounds.getMinY + bounds.getMaxY) / 2)
 
   self.addEventFilter(ScrollEvent.ANY, (event: ScrollEvent) => {
     if (event.isControlDown) {

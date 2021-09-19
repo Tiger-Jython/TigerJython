@@ -24,10 +24,15 @@ import tigerjython.utils.{OSPlatform, OSProcess}
 object PythonDetective {
 
   /**
-   * We need a word-around for older Java-versions because `stripTrailing` is a rather new method.
+   * We need a work-around for older Java-versions because `stripTrailing` is a rather new method.
    */
-  private def stripTrailing(s: String): String =
-    try {
+  private def stripTrailing(s: String): String = {
+    var i = s.length
+    while (i > 0 && s(i-1).isWhitespace)
+      i -= 1
+    s.take(i)
+  }
+    /*try {
       s.stripTrailing()
     } catch {
       case _: NoSuchMethodError =>
@@ -35,7 +40,7 @@ object PythonDetective {
         while (i > 0 && s(i-1).isWhitespace)
           i -= 1
         s.take(i)
-    }
+    }*/
 
   /**
    * Helper for the `discover`-method: looks for Python on Linux and related operating systems.

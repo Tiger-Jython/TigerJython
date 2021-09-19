@@ -11,7 +11,6 @@ import javafx.application.Platform
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.scene.Node
 import javafx.scene.control.{Tab, TabPane}
-import jdk.internal.ref.CleanerImpl.PhantomCleanableRef
 import tigerjython.core.Preferences
 import tigerjython.files.Document
 import tigerjython.ui.editor.{EditorTab, PythonEditorTab}

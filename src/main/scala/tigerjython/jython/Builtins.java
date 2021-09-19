@@ -65,7 +65,30 @@ public class Builtins {
         return Py.None;
     }
 
-    public static java.awt.Color makeColor(String value) {
+    public static PyColor makeColor(PyObject[] args, PyObject[] keywords) {
+        switch (args.length) {
+            case 1:
+                return ColorSupport.makeColor(args[0]);
+            case 2:
+                return ColorSupport.makeColor(args[0], args[1]);
+            case 3:
+                return ColorSupport.makeColor(args[0], args[1], args[2]);
+            case 4:
+                return ColorSupport.makeColor(args[0], args[1], args[2], args[3]);
+            default:
+                throw new RuntimeException("");
+        }
+    }
+
+    /*public static java.awt.Color makeColor(String value) {
+        javafx.scene.paint.Color color = javafx.scene.paint.Color.valueOf(value);
+        int r = (int)Math.round(color.getRed() * 255);
+        int g = (int)Math.round(color.getGreen() * 255);
+        int b = (int)Math.round(color.getBlue() * 255);
+        return new java.awt.Color(r, g, b);
+    }*/
+
+    private static java.awt.Color colorFromString(String value) {
         javafx.scene.paint.Color color = javafx.scene.paint.Color.valueOf(value);
         int r = (int)Math.round(color.getRed() * 255);
         int g = (int)Math.round(color.getGreen() * 255);

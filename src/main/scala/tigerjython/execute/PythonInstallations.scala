@@ -38,10 +38,8 @@ object PythonInstallations {
     val cls = classOf[org.python.util.PythonInterpreter]
     val path = cls.getProtectionDomain.getCodeSource.getLocation.toURI
     try {
-      Path.of(path)
+      Paths.get(path)
     } catch {
-      case _: NoSuchMethodError =>
-        Paths.get(path)
       case _: Throwable =>
         null
     }
@@ -85,7 +83,7 @@ object PythonInstallations {
   }
 
   def add(version: String, path: String): Unit =
-    add(version, Path.of(path))
+    add(version, Paths.get(path))
 
   def add(file: java.io.File, onSuccess: ()=>Unit = null): Unit =
     if (file.exists() && file.canExecute) {
@@ -148,7 +146,7 @@ object PythonInstallations {
       for (version <- p.keys()) {
         val path = p.get(version, null)
         if (path != null)
-          versions += ((version, Path.of(path)))
+          versions += ((version, Paths.get(path)))
       }
       addVersions(versions.toArray)
     }

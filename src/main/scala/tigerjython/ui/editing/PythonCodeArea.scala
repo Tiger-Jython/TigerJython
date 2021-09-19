@@ -47,7 +47,8 @@ class PythonCodeArea extends CodeArea {
     setStyle("-fx-font-family: \"%s\";".format(Preferences.fontFamily.get))
     setUndoManager(UndoFactory.createUndoManager(this, undoQueue))
     addSelection(scopeSelection)
-    this.setLineHighlighterOn(Preferences.highlightLine.get)
+    // This causes a NullPointer-Exception:
+    //this.setLineHighlighterOn(Preferences.highlightLine.get)
 
     this.multiPlainChanges()
       .successionEnds(Duration.ofMillis(10))
@@ -105,6 +106,8 @@ class PythonCodeArea extends CodeArea {
   addEventFilter(KeyEvent.KEY_PRESSED, (key: KeyEvent) =>
     key.getCode match {
       case KeyCode.ENTER =>
+        if (getSelection.getLength > 0)
+          deleteText(getSelection)
         val currentLine = getText(getCurrentParagraph)
         var indentation = currentLine.takeWhile(_ == ' ')
         val column = getCaretColumn
@@ -119,29 +122,29 @@ class PythonCodeArea extends CodeArea {
         }
         EventManager.fireOnKeyPressed(getCaretPosition, KeyCode.ENTER.toString)
       case KeyCode.TAB =>
-        val tabWidth = Preferences.tabWidth.get
-        val x = tabWidth - (getCaretColumn % tabWidth)
-        val pos = getCaretPosition
-        onFX(() => { insertText(pos, " " * x) })
-        syntaxDocument.insert(pos, " " * x)
+        handleTab(key)
         key.consume()
         EventManager.fireOnKeyPressed(getCaretPosition, KeyCode.TAB.toString)
       case KeyCode.BACK_SPACE =>
-        val tabWidth = Preferences.tabWidth.get
-        val currentLine = getText(getCurrentParagraph)
-        val indentation = currentLine.segmentLength(_ == ' ')
-        val back_width = {
-          val value = indentation % tabWidth
-          if (value == 0 && indentation >= tabWidth)
-            tabWidth
-          else
-            value
-        }
-        if (back_width > 1 && getCaretColumn == indentation) {
-          val pos = getCaretPosition
-          onFX(() => { replaceText(pos - back_width, pos, "") })
-          syntaxDocument.delete(pos - back_width, back_width)
-          key.consume()
+        if (getSelection.getLength == 0) {
+          val tabWidth = Preferences.tabWidth.get
+          val currentLine = getText(getCurrentParagraph)
+          val indentation = currentLine.segmentLength(_ == ' ')
+          val back_width = {
+            val value = indentation % tabWidth
+            if (value == 0 && indentation >= tabWidth)
+              tabWidth
+            else
+              value
+          }
+          if (back_width > 1 && getCaretColumn == indentation) {
+            val pos = getCaretPosition
+            onFX(() => {
+              replaceText(pos - back_width, pos, "")
+            })
+            syntaxDocument.delete(pos - back_width, back_width)
+            key.consume()
+          }
         }
         EventManager.fireOnKeyPressed(getCaretPosition, KeyCode.BACK_SPACE.toString)
       case KeyCode.DELETE =>
@@ -167,6 +170,70 @@ class PythonCodeArea extends CodeArea {
     for (i <- result.indices)
       result(i) = undoQueue.getHistoryItem(i)
     result
+  }
+
+  private def handleTab(key: KeyEvent): Unit = {
+    val tabWidth = Preferences.tabWidth.get
+    if (getSelection.getLength > 0) {
+      val (startIdx, endIdx) = {
+        val startIdx = getCaretSelectionBind.getStartParagraphIndex
+        val endIdx = getCaretSelectionBind.getEndParagraphIndex
+        if (getCaretSelectionBind.getEndColumnPosition == 0 &&
+          startIdx < endIdx)
+          (startIdx, endIdx - 1)
+        else
+          (startIdx, endIdx)
+      }
+      if (key.isShiftDown) {
+        val delCounts = collection.mutable.ArrayBuffer[(Int, Int)]()
+        for (i <- startIdx to endIdx) {
+          val pos = getDocument.getAbsolutePosition(i, 0)
+          val delCount = getDocument.getText(i).segmentLength(_ == ' ') min tabWidth
+          delCounts += ((pos, delCount))
+        }
+        onFX(() => {
+          for ((pos, delCount) <- delCounts.reverse) {
+            if (delCount > 0)
+              deleteText(pos, pos + delCount)
+          }
+          selectRange(startIdx, 0, endIdx + 1, 0)
+          syntaxDocument.setText(getText)
+        })
+      } else {
+        onFX(() => {
+          val indent = " " * tabWidth
+          for (i <- startIdx to endIdx) {
+            val pos = getDocument.getAbsolutePosition(i, 0)
+            insertText(pos, indent)
+          }
+          selectRange(startIdx, 0, endIdx + 1, 0)
+        })
+        val indent = " " * tabWidth
+        for (i <- startIdx to endIdx) {
+          val pos = getDocument.getAbsolutePosition(i, 0)
+          syntaxDocument.insert(pos, indent)
+        }
+      }
+    } else {
+      if (key.isShiftDown) {
+        val pos = getAbsolutePosition(getCurrentParagraph, 0)
+        val s = getText(getCurrentParagraph)
+        val delCount = s.segmentLength(_ == ' ') min tabWidth
+        if (delCount > 0) {
+          onFX(() => {
+            deleteText(pos, pos + delCount)
+          })
+          syntaxDocument.delete(pos, delCount)
+        }
+      } else {
+        val x = tabWidth - (getCaretColumn % tabWidth)
+        val pos = getCaretPosition
+        onFX(() => {
+          insertText(pos, " " * x)
+        })
+        syntaxDocument.insert(pos, " " * x)
+      }
+    }
   }
 
   def setInitialText(text: String): Unit =

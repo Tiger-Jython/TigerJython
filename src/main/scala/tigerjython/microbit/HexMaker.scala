@@ -7,6 +7,7 @@
  */
 package tigerjython.microbit
 
+import java.io.InputStream
 import java.nio.charset.StandardCharsets
 
 /**
@@ -161,7 +162,8 @@ class HexMaker(private val startAddress: Int) {
   def addRawResource(fileName: String): Unit = {
     val stream = getClass.getClassLoader.getResourceAsStream("resources/%s.hex".format(fileName))
     if (stream != null) {
-      var data = stream.readAllBytes()
+      var data = readAllBytes(stream)
+//      var data = stream.readAllBytes()
       if (data.contains('\r'))
         data = data.filter(_ != '\r')
       while (data.length > 2 && data.last == '\n' && data(data.length - 2) == '\n')
@@ -173,6 +175,44 @@ class HexMaker(private val startAddress: Int) {
       }
     }
   }
+
+  // TODO: Properly test this method!
+  // This method is required because `stream.readAllBytes` was introduced with Java 9.  However, it loosely
+  // follows that code.
+  private def readAllBytes(stream: InputStream): Array[Byte] = {
+    val buffer = _readAllBytes(stream)
+    if (buffer.isEmpty)
+      return new Array[Byte](0)
+    else if (buffer.length == 1)
+      return buffer.head
+    val len = buffer.map(_.length).sum
+    val result = new Array[Byte](len)
+    var i = 0
+    for (item <- buffer) {
+      Array.copy(item, 0, result, i, item.length)
+      i += item.length
+    }
+    result
+  }
+
+  private def _readAllBytes(stream: InputStream): List[Array[Byte]] =
+    if (stream.available() > 0) {
+      val data = new Array[Byte](stream.available())
+      val len = stream.read(data)
+      if (len < data.length)
+        data.take(len) :: Nil
+      else
+        data :: _readAllBytes(stream)
+    } else {
+      val buffer = new Array[Byte](1024)
+      val n = stream.read(buffer)
+      if (n == 0)
+        Nil
+      else if (n < buffer.length)
+        buffer.take(n) :: Nil
+      else
+        buffer :: _readAllBytes(stream)
+    }
 
   def addText(data: String): Unit =
     addBinary(data.getBytes(StandardCharsets.UTF_8))
