@@ -99,4 +99,39 @@ public class Builtins {
     public static PyObject getTigerJythonFlag(String name) {
         return TigerJythonBuiltins.getTigerJythonSeting(name);
     }
+
+    // These are dummy functions for backward compatibility with TigerJython 2
+
+    @Deprecated
+    public static void hideFromDebugView() {}
+
+    @Deprecated
+    public static void hideFromDebugView(PyObject obj) {}
+
+    @Deprecated
+    public static PyObject getTigerJythonPath(String f) { return Py.None; }
+
+    @Deprecated
+    public static void TJ_hideConstsFromDebugView(PyObject obj) {}
+
+    @Deprecated
+    public static void exposeParameter(PyObject[] args, String[] keywords) {}
+
+    @Deprecated
+    public static String getMainFileName() { return ""; }
+
+    @Deprecated
+    public static String getMainFilePath() { return ""; }
+
+    @Deprecated
+    public static void registerExitFunction(PyObject f) {}
+
+    @Deprecated
+    public static void registerStopFunction(PyObject f) {}
+
+    @Deprecated
+    public static void getProgramCounter() {}
+
+    @Deprecated
+    public static void clrScr() {}
 }

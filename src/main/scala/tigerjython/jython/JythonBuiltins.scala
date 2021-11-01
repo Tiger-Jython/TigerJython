@@ -27,6 +27,12 @@ object JythonBuiltins {
     //"inputInt", "inputString",
     "isInteger",
     "makeColor", "msgDlg", "raw_input",
+    //"askYesNo",
+    //"head", "tail", "indices",
+    //"lower", "upper", "join",
+    // Deprecated functions that are here for compatibility reasons with TigerJython 2
+    "hideFromDebugView", "TJ_hideConstsFromDebugView", "getTigerJythonPath", "exposeParameter", "clrScr",
+    "registerExitFunction", "getMainFilePath", "registerStopFunction", "getProgramCounter"
   )
 
   /**
@@ -38,7 +44,10 @@ object JythonBuiltins {
     for (method <- classOf[Builtins].getMethods)
       if (method.getName == name)
         methods += method
-    new PyReflectedFunction(methods.toSeq: _*)._doget(null)
+    if (methods.nonEmpty)
+      new PyReflectedFunction(methods.toSeq: _*)._doget(null)
+    else
+      throw new RuntimeException("There was a problem while creating built-in function '%s'".format(name))
   }
 
   def initialize(): Unit =
