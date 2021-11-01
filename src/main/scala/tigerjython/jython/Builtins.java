@@ -65,7 +65,7 @@ public class Builtins {
         return Py.None;
     }
 
-    public static PyColor makeColor(PyObject[] args, PyObject[] keywords) {
+    public static PyColor makeColor(PyObject[] args, String[] keywords) {
         switch (args.length) {
             case 1:
                 return ColorSupport.makeColor(args[0]);
