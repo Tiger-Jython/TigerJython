@@ -91,7 +91,7 @@ object Documents {
   }
 
   lazy val tempDir: File =
-    new File(GetPropertyAction.privilegedGetProperty("java.io.tmpdir"))
+    new File(System.getProperty("java.io.tmpdir"))
 
   private[files]
   def removeDocument(document: Document): Unit = {
