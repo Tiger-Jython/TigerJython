@@ -244,7 +244,10 @@ class SyntaxDocument {
   def repeatIsKeyword_=(r: Boolean): Unit =
     tokenizer match {
       case p: PythonTokenizer =>
-        p.repeatIsKeyword = r
+        if (p.repeatIsKeyword != r) {
+          p.repeatIsKeyword = r
+          // Needs to update tokens
+        }
       case _ =>
     }
 

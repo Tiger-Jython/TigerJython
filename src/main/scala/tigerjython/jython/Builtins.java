@@ -7,13 +7,14 @@
  */
 package tigerjython.jython;
 
-import javax.swing.JOptionPane;
-
 import org.python.core.*;
 
 /**
  * Since Scala has no static methods, we need to define the static methods for built-in replacements inside a
  * Java class.
+ *
+ * Note: when adding methods here, you also need to add them in `JythonBuiltins` to make them visible to Python
+ * programs.
  *
  * @author Tobias Kohn
  */
@@ -24,11 +25,7 @@ public class Builtins {
     }
 
     public static PyObject raw_input(String prompt) {
-        String result = JOptionPane.showInputDialog(prompt);
-        if (result != null)
-            return Py.newString(result);
-        else
-            return Py.None;
+        return IOFunctions.inputString(prompt);
     }
 
     public static PyObject input() {
@@ -36,15 +33,30 @@ public class Builtins {
     }
 
     public static PyObject input(String prompt) {
-        PyObject eval = Py.getSystemState().builtins.__getitem__(Py.newString("eval"));
-        String result = JOptionPane.showInputDialog(prompt);
-        if (result != null) {
-            if (eval != null)
-                return eval.__call__(Py.newString(result));
-            else
-                return Py.newString(result);
-        } else
-            return Py.None;
+        return IOFunctions.input(prompt);
+    }
+
+    public static PyObject inputFloat() { return inputFloat(""); }
+
+    public static PyObject inputFloat(String prompt) {
+        return IOFunctions.inputFloat(prompt);
+    }
+
+    public static PyObject inputInt() { return inputInt(""); }
+
+    public static PyObject inputInt(String prompt) {
+        return IOFunctions.inputInt(prompt);
+    }
+
+    public static PyObject inputString() { return inputString(""); }
+
+    public static PyObject inputString(String prompt) {
+        return IOFunctions.inputString(prompt);
+    }
+
+    public static PyObject msgDlg(PyObject[] messages) {
+        IOFunctions.msgDlg(messages);
+        return Py.None;
     }
 
     public static PyObject isInteger(PyObject obj) {
@@ -58,11 +70,6 @@ public class Builtins {
                 return Py.False;
         } else
             return Py.False;
-    }
-
-    public static PyObject msgDlg(PyObject message) {
-        JOptionPane.showMessageDialog(null, message);
-        return Py.None;
     }
 
     public static PyColor makeColor(PyObject[] args, String[] keywords) {
@@ -94,6 +101,23 @@ public class Builtins {
         int g = (int)Math.round(color.getGreen() * 255);
         int b = (int)Math.round(color.getBlue() * 255);
         return new java.awt.Color(r, g, b);
+    }
+
+    /**
+     * Plays a simple sound (MIDI or sine wave).
+     */
+    public static void playTone(PyObject[] args, String[] keywords) {
+        if (args.length - keywords.length > 0)
+            SoundSupport.playTone(args, keywords);
+        else
+            throw Py.TypeError("playTone() takes exactly 1 non-keyword argument (0 given)");
+    }
+
+    public static void startTone(PyObject[] args, String[] keywords) {
+        if (args.length - keywords.length > 0)
+            SoundSupport.startTone(args, keywords);
+        else
+            throw Py.TypeError("startTone() takes exactly 1 non-keyword argument (0 given)");
     }
 
     public static PyObject getTigerJythonFlag(String name) {

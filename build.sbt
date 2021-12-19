@@ -8,11 +8,11 @@
 // at runtime.
 def generateBuildInfo(packageName: String,
                       objectName: String = "BuildInfo"): Setting[_] =
-  sourceGenerators in Compile += Def.task {
+  Compile / sourceGenerators += Def.task {
     val file =
       packageName
         .split('.')
-        .foldLeft((sourceManaged in Compile).value)(_ / _) / s"$objectName.scala"
+        .foldLeft((Compile / sourceManaged).value)(_ / _) / s"$objectName.scala"
         
     IO.write(
       file,
@@ -57,7 +57,7 @@ val buildTag = "-SNAPSHOT"
 val buildVersion = "ea+12"
 
 // This is needed to run/test the project without having to restart SBT afterwards
-fork in run := true
+run / fork := true
 
 // Installing the correct JavaFX libraries is OS-dependent...
 val osName: SettingKey[String] = SettingKey[String]("osName")
@@ -102,10 +102,12 @@ libraryDependencies += "org.fxmisc.richtext" % "richtextfx" % "0.10.5"
 
 // When building a common JAR, some files are typically shared and we need to discard
 // any superfluous files
-assemblyMergeStrategy in assembly := {
+assembly / assemblyMergeStrategy := {
  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
  case x => MergeStrategy.first
 }
+
+assembly / assemblyJarName := s"TigerJython3-${buildVersion}.jar"
 
 // Update build info (like app name, version, etc.)
 generateBuildInfo("tigerjython.core")

@@ -23,10 +23,11 @@ object JythonBuiltins {
    */
   val builtinNames: Array[String] = Array(
     "getTigerJythonFlag",
-    "input", //"inputFloat",
-    //"inputInt", "inputString",
+    "input", "inputFloat",
+    "inputInt", "inputString",
     "isInteger",
     "makeColor", "msgDlg", "raw_input",
+    "playTone", "startTone",
     //"askYesNo",
     //"head", "tail", "indices",
     //"lower", "upper", "join",
