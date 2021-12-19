@@ -126,6 +126,9 @@ class StructLine extends StructContainer {
       astNode = parser.parse(this)
   }
 
+  override def isDefinitionStatement: Boolean =
+    _stmtType.isInstanceOf[StatementType.DefinitionStmt]
+
   def isEmpty: Boolean = _isEmpty
 
   override def listImportedModules(modules: collection.mutable.ArrayBuffer[String]): Unit =

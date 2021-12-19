@@ -20,6 +20,17 @@ object SyntaxHighlighter {
 
   private val executor = Executors.newSingleThreadExecutor()
 
+  private def isTextValid(text: String): Boolean = {
+    for (ch <- text)
+      if (ch < ' ') {
+        if (!(ch == '\n' || ch == '\r' || ch == '\t'))
+          return false
+      }
+      else if (ch == 0x7F)
+        return false
+    true
+  }
+
   def computeHighlightingAsync(text: String, syntaxDocument: SyntaxDocument): Task[StyleSpans[java.util.Collection[String]]] = {
     val task = new Task[StyleSpans[java.util.Collection[String]]]() {
       override def call(): StyleSpans[java.util.Collection[String]] =

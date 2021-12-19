@@ -86,6 +86,17 @@ class SyntaxDocument {
               }
             case _ =>
           }
+        // Do not reparse names if we merely remove a single character
+        case token @ NameToken(TokenType.NAME, nameTokenType, tokenText) if pos < position &&
+            position + delLength < pos + tokenText.length =>
+          val p = position - pos
+          val s = new StringBuilder(tokenText).delete(p, p + delLength).toString()
+          val tt = tokenizer.getTokenTypeForName(s)
+          if (tt == token.tokenType) {
+            text.delete(position, position + delLength)
+            token.text = s // text.substring(pos, pos + token.length - delLength)
+            return
+          }
         case _ =>
       }
       val offset = position - pos
@@ -154,8 +165,17 @@ class SyntaxDocument {
     } else
       -1
 
+  @inline
+  private def _ignoreChar(c: Char): Boolean =
+    if (c < ' ')
+      c != '\t' && c != '\n' && c != '\r'
+    else
+      c == 0x7F
+
   def insert(position: Int, insText: String): Unit = synchronized {
     if (insText != null && insText.nonEmpty) {
+      if (insText.length == 1 && _ignoreChar(insText(0)))
+        return
       if (position == 0) {
         val length =
           if (tokens.nonEmpty)
@@ -186,6 +206,22 @@ class SyntaxDocument {
           }
         }
         val (pos, index) = tokenIndexFromPosition(position)
+
+        // Check if we are inserting a letter into a name
+        if (insText.length == 1 && insText(0).isLetterOrDigit)
+          tokens(index) match {
+            case token @ NameToken(TokenType.NAME, nameTokenType, tokenText) if pos < position =>
+              val p = position - pos
+              val s = new StringBuilder(tokenText).insert(p, insText).toString()
+              val tt = tokenizer.getTokenTypeForName(s)
+              if (tt == token.tokenType) {
+                text.insert(position, insText)
+                token.text = s // text.substring(pos, pos + token.length - delLength)
+                return
+              }
+            case _ =>
+          }
+
         val length =
           if (position == pos + tokens(index).length && index + 1 < tokens.length)
             // We are between two tokens ...
@@ -208,7 +244,7 @@ class SyntaxDocument {
     }
   }
 
-  protected def invalidate(index: Int, startPos: Int, endPos: Int): Unit =
+  protected def invalidate(index: Int, startPos: Int, endPos: Int): Unit = {
     if (index > 0 && tokens(index - 1).tokenType == TokenType.NUMBER) {
       // A special case: if the preceding token is a number, it might be possible to connect to it
       // Example: 123e.45 -> '123', 'e', '.', '45';; remove the dot and it becomes one token '123e45'
@@ -219,9 +255,11 @@ class SyntaxDocument {
       tokenizer.setParseRange(startPos, endPos)
       var len = endPos - startPos
       var i = index
+      val parsedTokens = collection.mutable.ArrayBuffer[String]()
       while (len > 0 && tokenizer.hasNext) {
         val token = tokenizer.next()
         tokens.insert(i, token)
+        parsedTokens += token.toString
         i += 1
         len -= token.length
         while (len < 0) {
@@ -233,6 +271,7 @@ class SyntaxDocument {
       for (message <- tokens.createMessages())
         struct.handleMessage(message.index, message)
     }
+  }
 
   def repeatIsKeyword: Boolean =
     tokenizer match {

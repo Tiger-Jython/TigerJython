@@ -7,7 +7,12 @@ import javax.sound.sampled.{AudioFormat, AudioSystem}
 import javax.sound.midi.MidiSystem
 
 /**
- * This module provides support for playing simple audio (sine waves and MIDI).
+ * This object provides support for playing simple audio (sine waves and MIDI).  There are two main methods here:
+ * `playTone()` and `startTone()`, where the former is blocking and the latter asynchronously playing sounds.
+ *
+ * This module for playing sounds is not particularly sophisticated.  On the one hand, it really only provides the
+ * very basics and should be accompanied/replaced by better sound modules.  On the other hand, there is still a lot
+ * that could be done to improve this, such as caching the synthesisers etc.
  *
  * @author Tobias Kohn
  */

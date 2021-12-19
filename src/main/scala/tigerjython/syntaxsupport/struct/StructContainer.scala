@@ -120,32 +120,36 @@ abstract class StructContainer extends StructElement {
     -1
   }
 
-  def handleMessage(relIndex: Int, message: TokenChangeMessage): Unit = {
-    passMessageToChildren(relIndex, message)
-    if (!message.isHandled && 0 <= relIndex && relIndex <= length)
-      message match {
-        case TokenChangeMessage.TokenChanged(tokens, index) =>
-          // TODO: handle this case
-          invalidate(tokens)
-        case TokenChangeMessage.TokensDeleted(tokens, index, delCount) if relIndex + delCount < length =>
-          if (handleDeleteMessage(relIndex, tokens, index, delCount))
-            message.handled()
-          invalidate(tokens)
-        case insMsg @ TokenChangeMessage.TokensInserted(tokens, _, insCount) if relIndex < length =>
-          if (!insMsg.hasBrackets && (!insMsg.hasNewlines || getNestDepth > 0)) {
-            getChildForIndex(relIndex) match {
-              case Some((offs, item)) if offs < 0 =>
-                item.offset += insCount
-                length += insCount
-                message.handled()
-              case _ =>
-                length += insCount
-                message.handled()
+  def handleMessage(relIndex: Int, message: TokenChangeMessage): Unit =
+    if (0 <= relIndex && relIndex <= length) {
+      passMessageToChildren(relIndex, message)
+      if (!message.isHandled)
+        message match {
+          case TokenChangeMessage.TokenChanged(tokens, index) =>
+            // TODO: handle this case
+            invalidate(tokens)
+          case TokenChangeMessage.TokensDeleted(tokens, index, delCount) if relIndex + delCount < length =>
+            if (handleDeleteMessage(relIndex, tokens, index, delCount)) {
+              message.handled()
             }
-          }
-          invalidate(tokens)
-        case _ =>
-      }
+            invalidate(tokens)
+          case insMsg @ TokenChangeMessage.TokensInserted(tokens, _, insCount) if relIndex < length =>
+            if (!insMsg.hasBrackets && (!insMsg.hasNewlines || getNestDepth > 0)) {
+              getChildForIndex(relIndex) match {
+                case Some((offs, item)) if offs < 0 =>
+                  item.offset += insCount
+                  length += insCount
+                  message.handled()
+                case _ =>
+                  length += insCount
+                  message.handled()
+              }
+            }
+            invalidate(tokens)
+          case _ =>
+        }
+      else if (isDefinitionStatement)
+        invalidate(message.tokens)
   }
 
   protected def handleDeleteMessage(relIndex: Int, tokens: TokenArray, index: Int, delCount: Int): Boolean =
@@ -186,6 +190,8 @@ abstract class StructContainer extends StructElement {
     }
 
   protected[struct] def invalidate(tokens: TokenArray): Unit = {}
+
+  def isDefinitionStatement: Boolean = false
 
   def listImportedModules(modules: collection.mutable.ArrayBuffer[String]): Unit =
     for (child <- children)

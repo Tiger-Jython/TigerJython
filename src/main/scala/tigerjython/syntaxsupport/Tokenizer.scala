@@ -7,7 +7,7 @@
  */
 package tigerjython.syntaxsupport
 
-import tigerjython.syntaxsupport.tokens.Token
+import tigerjython.syntaxsupport.tokens.{Token, TokenType}
 
 /**
  * @author Tobias Kohn
@@ -15,6 +15,8 @@ import tigerjython.syntaxsupport.tokens.Token
 trait Tokenizer extends Iterator[Token] {
 
   def extendParseRange(length: Int): Unit
+
+  def getTokenTypeForName(s: String): TokenType.Value
 
   def seek(position: Int): Int
 

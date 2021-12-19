@@ -194,6 +194,23 @@ class PythonTokenizer(val document: SyntaxDocument) extends Tokenizer {
       Token(TokenType.NAME, s)
   }
 
+  def getTokenTypeForName(s: String): TokenType.Value = {
+    if (s == "def")
+      TokenType.DEF_KEYWORD
+    else if (s == "class")
+      TokenType.CLASS_KEYWORD
+    else if (s == "lambda")
+      TokenType.LAMBDA
+    else if (s == "repeat" && repeatIsKeyword)
+      TokenType.KEYWORD
+    else if (isKeyword(s))
+      TokenType.KEYWORD
+    else if (isBuiltinName(s))
+      TokenType.BUILTIN_NAME
+    else
+      TokenType.NAME
+  }
+
   protected def readNumber(): Token = {
     val start = source.currentPosition
     if (source.isSign())
