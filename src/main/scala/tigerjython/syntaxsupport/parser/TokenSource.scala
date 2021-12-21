@@ -7,7 +7,7 @@
  */
 package tigerjython.syntaxsupport.parser
 
-import tigerjython.syntaxsupport.struct.StructElement
+import tigerjython.syntaxsupport.struct.{StructElement, StructLine}
 import tigerjython.syntaxsupport.tokens._
 
 import scala.collection.BufferedIterator
@@ -19,19 +19,34 @@ class TokenSource(val source: TokenArray, val structElement: StructElement) exte
 
   protected val tokens: Array[Token] =
     if (structElement != null && structElement.length > 0) {
-      val idx = structElement.index
+      val idx = structElement.index max 0
       val result = collection.mutable.ArrayBuffer[Token]()
       for (i <- idx until ((idx + structElement.length) min source.length)) {
         val tkn = source(i)
-        if (tkn != null && tkn.tokenType != TokenType.WHITESPACE && tkn.tokenType != TokenType.COMMENT &&
-          tkn.tokenType != TokenType.NEWLINE)
-          result += tkn
+        if (tkn != null) {
+          if (tkn.tokenType == TokenType.NEWLINE) {
+            if (structElement.isInstanceOf[StructLine])
+              result += tkn
+          }
+          else if (tkn.tokenType != TokenType.WHITESPACE && tkn.tokenType != TokenType.COMMENT)
+            result += tkn
+        }
       }
       for (tkn <- result)
         tkn.annotation = false
       result.toArray
     } else
       Array()
+
+  def dump(): Unit = {
+    println("TokenSource:")
+    for ((token, i) <- tokens.zipWithIndex) {
+      if (i == _index)
+        print('|')
+      print(token)
+    }
+    println()
+  }
 
   private var _index: Int = 0
 

@@ -121,7 +121,7 @@ abstract class StructContainer extends StructElement {
   }
 
   def handleMessage(relIndex: Int, message: TokenChangeMessage): Unit =
-    if (0 <= relIndex && relIndex <= length) {
+    if (0 <= relIndex + offset && relIndex <= length) {
       passMessageToChildren(relIndex, message)
       if (!message.isHandled)
         message match {
@@ -148,9 +148,20 @@ abstract class StructContainer extends StructElement {
             invalidate(tokens)
           case _ =>
         }
-      else if (isDefinitionStatement)
-        invalidate(message.tokens)
-  }
+      else
+        message match {
+          case TokenChangeMessage.TokensDeleted(tokens, _, delCount) if relIndex + delCount < length =>
+            if (relIndex < 0)
+              length -= (relIndex + delCount)
+            else
+              length -= delCount
+            invalidate(tokens)
+          case TokenChangeMessage.TokensInserted(tokens, _, insCount) if relIndex < length =>
+            length += insCount
+            invalidate(tokens)
+          case _ =>
+        }
+    }
 
   protected def handleDeleteMessage(relIndex: Int, tokens: TokenArray, index: Int, delCount: Int): Boolean =
     if (children.nonEmpty)
@@ -175,8 +186,10 @@ abstract class StructContainer extends StructElement {
               case _ =>
                 parse(tokens, index)
             }
-          } else
+          } else {
             parse(tokens, index)
+            length -= delCount
+          }
           true
         case _ =>
           length -= delCount

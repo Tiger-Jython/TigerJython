@@ -7,7 +7,9 @@ the [JAR-file](https://github.com/Tiger-Jython/TigerJython/releases/download/v3.
 
 > This is an early access version that is not yet ready for classroom use!!!
 
-**This version of TigerJython requires JRE version 9+ and will not run with JRE 8.**
+**This version of TigerJython requires JRE version 11+ and will not run with JRE 8.**
+One of the main reasons is that the JavaFX libraries used here requires an up-to-date
+Java version.
 
 
 ## Features and Design
@@ -62,6 +64,19 @@ as published at the SIGCSE Technical Symposium 2020.  If you use TigerJython for
 TigerJython uses [`sbt`](https://www.scala-sbt.org/) to build the code.  Start `sbt` first and then use
 `compile` to compile the code and `assembly` to generate a JAR file containing all the necessary 
 libraries (such as Scala, Jython, etc).
+
+Note that this project depends on other sub-projects, which are included using symbolic links.  If you
+are running Windows, you might have to manually replace the links in the `resources` directory with the
+text files, etc. used for display.  There are three major sub-projects:
+- [TigerPython-Parser](https://github.com/Tobias-Kohn/TigerPython-Parser/)
+- [TigerJython-Localisation](https://github.com/Tiger-Jython/TigerJython-Localisation)
+- [TigerJython:Jython](https://github.com/Tiger-Jython/jython)
+
+Additionally, TigerJython also includes various libraries such as extended turtle graphics, etc.  You
+can find [some of these libraries on GitHub](https://github.com/Tiger-Jython/Aplu-Libraries), 
+but not all of them are open-sourced and generally available.  Please contact the authors if you require
+a copy of the full TigerJython support libraries (note: the editor and Jython will run perfectly fine 
+without these, but it will not provide the full functionality of TigerJython).
 
 By placing additional JARs into the `lib` subfolder, you can have additional files integrated into the
 project.

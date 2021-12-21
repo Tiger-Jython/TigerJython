@@ -70,7 +70,8 @@ osName := (System.getProperty("os.name") match {
 })
 
 // We need the newest version as it contains important fixes for Mac OS X
-val fxVersion = "14.0.1" //  "11-ea+25"
+// Actually, version 17.0.1 is out but due to a bug in JavaFX maven the current version of SBT cannot pull it :-(
+val fxVersion = "16" //  "11-ea+25"
 
 /*libraryDependencies += "org.openjfx" % "javafx-base" % fxVersion classifier osName.value
 libraryDependencies += "org.openjfx" % "javafx-controls" % fxVersion classifier osName.value
@@ -93,6 +94,13 @@ libraryDependencies += "org.openjfx" % "javafx-base" % fxVersion classifier "mac
 libraryDependencies += "org.openjfx" % "javafx-controls" % fxVersion classifier "mac"
 libraryDependencies += "org.openjfx" % "javafx-fxml" % fxVersion classifier "mac"
 libraryDependencies += "org.openjfx" % "javafx-graphics" % fxVersion classifier "mac"
+
+// In order to include OpenJFX for ARM architecture, we need at least version 17.  However, due to a bug it is currently
+// not possible.  We have to wait for updates to SBT/Maven before being able to pull the correct versions.
+/* libraryDependencies += "org.openjfx" % "javafx-base" % fxVersion classifier "linux-aarch64"
+libraryDependencies += "org.openjfx" % "javafx-controls" % fxVersion classifier "linux-aarch64"
+libraryDependencies += "org.openjfx" % "javafx-fxml" % fxVersion classifier "linux-aarch64"
+libraryDependencies += "org.openjfx" % "javafx-graphics" % fxVersion classifier "linux-aarch64" */
 
 // Other dependencies
 libraryDependencies += "org.fxmisc.richtext" % "richtextfx" % "0.10.5"

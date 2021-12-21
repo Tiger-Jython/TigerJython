@@ -1,5 +1,30 @@
 # Changelog
 
+### 3.0 Early Access Preview 12 (21 December 2021)
+
+Implemented:
+- Support for various additional built-in functions, such as, e.g. `playTone`;
+- Runs existing TigerJython programs based on `gturtle`, etc.;
+- Updated version of Jython core (external GitHub repo) - includes support for `color`
+  as a 'native' data type in TigerJython;
+
+Bug fixes:
+- Syntax highlighting was erroneous, in part due to unexpected behaviour from the
+  `RichTextFX` component used for the editor;
+
+Known issues:
+- Syntax highlighting colour schemes are tentative and only available in selected themes;
+- Does not work with ARM architectures because of a bug in `sbt`/`maven` that prevents us
+  from updating JavaFX to the required version 17;
+- Java emits a warning because we package JavaFX with out application (rather than 
+  providing external modules): 
+  `WARNING: Unsupported JavaFX configuration: classes were loaded from`.  This can be
+  ignored;
+
+### 3.0 Early Access Previews 9-11
+
+*A series of minor releases for internal testing with various bug fixes.*
+
 ### 3.0 Early Access Preview 8 (2 August 2021)
 
 Implemented:

@@ -30,10 +30,21 @@ sealed abstract class TokenChangeMessage {
 object TokenChangeMessage {
 
   // This is fired when a token has changed due to some smaller user input such as a user entering a number or name
-  case class TokenChanged(tokens: TokenArray, index: Int) extends TokenChangeMessage
+  case class TokenChanged(tokens: TokenArray, index: Int) extends TokenChangeMessage {
+
+    override def toString: String = {
+      s"TokenChanged($index, '${tokens(index)}')"
+    }
+  }
 
   // This is fired when a part of the text was deleted
-  case class TokensDeleted(tokens: TokenArray, index: Int, delCount: Int) extends TokenChangeMessage
+  case class TokensDeleted(tokens: TokenArray, index: Int, delCount: Int) extends TokenChangeMessage {
+
+    override def toString: String = {
+      val tkns = tokens.slice((index-1) max 0, (index+5) min tokens.length).mkString(", ")
+      s"TokensDeleted($index, $delCount, '$tkns')"
+    }
+  }
 
   // This is fired when new text was inserted
   case class TokensInserted(tokens: TokenArray, index: Int, insCount: Int) extends TokenChangeMessage {
@@ -50,6 +61,11 @@ object TokenChangeMessage {
           case _ =>
         }
       (brackets, newlines)
+    }
+
+    override def toString: String = {
+      val tkns = tokens.slice((index-1) max 0, (index+insCount+4) min tokens.length).take(12).mkString(", ")
+      s"TokensInserted($index, $insCount, '$tkns')"
     }
   }
 }

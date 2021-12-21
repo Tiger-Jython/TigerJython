@@ -16,7 +16,7 @@ import tigerjython.syntaxsupport.tokens._
  */
 class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
 
-  private var _lambdaNames = collection.mutable.ArrayBuffer[String]()
+  private val _lambdaNames = collection.mutable.ArrayBuffer[String]()
   private var _nameType: NameTokenType.Value = NameTokenType.UNKNOWN
   private var _source: TokenSource = _
 
@@ -25,6 +25,7 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
   def parse(source: TokenSource): StatementType =
     if (source != null) {
       _source = source
+      //source.dump()
       parseStmt()
     } else
       null

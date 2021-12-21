@@ -67,19 +67,19 @@ class SyntaxDocument {
       val (pos, index) = tokenIndexFromPosition(position)
       // Check for the special case where we are deleting whitespace, which requires no re-parsing
       tokens(index) match {
-        case whitespaceToken: WhitespaceToken if position + delLength <= pos + whitespaceToken.length =>
+        case whitespaceToken: WhitespaceToken if position + delLength <= pos + whitespaceToken.length && delLength < whitespaceToken.length =>
           whitespaceToken.length -= delLength
           text.delete(position, position + delLength)
           return
         case Token(TokenType.NEWLINE, len) if position == pos + len && index + 1 < tokens.length =>
           tokens(index + 1) match {
             case whitespaceToken: WhitespaceToken =>
-              if (whitespaceToken.length == delLength) {
+              /*if (whitespaceToken.length == delLength) {
                 tokens.remove(index + 1)
                 text.delete(position, position + delLength)
                 return
               }
-              else if (whitespaceToken.length > delLength) {
+              else*/ if (whitespaceToken.length > delLength) {
                 tokens(index + 1).length -= delLength
                 text.delete(position, position + delLength)
                 return
@@ -87,7 +87,7 @@ class SyntaxDocument {
             case _ =>
           }
         // Do not reparse names if we merely remove a single character
-        case token @ NameToken(TokenType.NAME, nameTokenType, tokenText) if pos < position &&
+        case token @ NameToken(TokenType.NAME, _, tokenText) if pos < position &&
             position + delLength < pos + tokenText.length =>
           val p = position - pos
           val s = new StringBuilder(tokenText).delete(p, p + delLength).toString()
@@ -165,6 +165,12 @@ class SyntaxDocument {
     } else
       -1
 
+  /**
+   * The `RichTextFX` component we use inserts control characters into the text before acting upon them.  Hence, when
+   * pressing the `delete` key, it first inserts `0x7F` and then deletes two characters.  These control characters
+   * upset the `SyntaxDocument` here.  Rather than ignoring these control characters while parsing the text, we simply
+   * throw away the messages of inserting them into our text in the first place.
+   */
   @inline
   private def _ignoreChar(c: Char): Boolean =
     if (c < ' ')
@@ -221,6 +227,10 @@ class SyntaxDocument {
               }
             case _ =>
           }
+        // Check if we are inserting a new line at the end of an existing line
+        if (insText == "\n" && tokens(index).tokenType == TokenType.NEWLINE) {
+          // ToDo
+        }
 
         val length =
           if (position == pos + tokens(index).length && index + 1 < tokens.length)
@@ -268,8 +278,10 @@ class SyntaxDocument {
           tokenizer.extendParseRange(l)
         }
       }
-      for (message <- tokens.createMessages())
+      for (message <- tokens.createMessages()) {
         struct.handleMessage(message.index, message)
+      }
+      StructLine.validateAstNodes()
     }
   }
 

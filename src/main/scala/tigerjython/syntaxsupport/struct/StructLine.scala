@@ -121,6 +121,11 @@ class StructLine extends StructContainer {
   }
 
   protected def invalidateAstNode(): Unit = {
+    //StructLine.linesWithInvalidatedAstNodes += this
+    validateAstNode()
+  }
+
+  protected def validateAstNode(): Unit = {
     val parser = getParser
     if (parser != null)
       astNode = parser.parse(this)
@@ -163,5 +168,13 @@ class StructLine extends StructContainer {
 }
 object StructLine {
 
+  private val linesWithInvalidatedAstNodes = collection.mutable.Set[StructLine]()
+
   def apply(): StructLine = new StructLine()
+
+  def validateAstNodes(): Unit = {
+    /*for (line <- linesWithInvalidatedAstNodes)
+      line.validateAstNode()
+    linesWithInvalidatedAstNodes.clear()*/
+  }
 }

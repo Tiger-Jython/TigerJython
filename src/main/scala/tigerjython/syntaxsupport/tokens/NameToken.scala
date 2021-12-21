@@ -7,7 +7,6 @@
  */
 package tigerjython.syntaxsupport.tokens
 
-import tigerjython.syntaxsupport.{SyntaxDocument, TokenVisitor}
 import tigerjython.syntaxsupport.struct.NameInfo
 
 /**
@@ -17,8 +16,15 @@ class NameToken(tt: TokenType.Value, private var _text: String) extends Token(tt
 
   private var _isStmtOnlyKeyword: Boolean = false
 
+  private var _nameTokenType: NameTokenType.Value = NameTokenType.UNKNOWN
+
   var nameInfo: NameInfo = _
-  var nameTokenType: NameTokenType.Value = NameTokenType.UNKNOWN
+  // var nameTokenType: NameTokenType.Value = NameTokenType.UNKNOWN
+
+  def nameTokenType: NameTokenType.Value = _nameTokenType
+  def nameTokenType_=(ntt: NameTokenType.Value): Unit = {
+    _nameTokenType = ntt
+  }
 
   override protected def getStyleName: String =
     tokenType match {

@@ -63,6 +63,20 @@ class StructProgram(val document: SyntaxDocument) extends StructContainer {
   protected def createParser(): StmtParser =
     new PythonStmtParser(document)
 
+  def dump(): Unit = {
+    println("=" * 70)
+    for ((child, j) <- children.zipWithIndex)
+      child match {
+        case line: StructLine =>
+          println(s"LINE $j: ")
+          for (i <- 0 until line.length)
+            print(line.getToken(i))
+          println()
+        case _ =>
+          println(s"LINE $j: ???")
+      }
+  }
+
   override protected def getDocument: SyntaxDocument = document
 
   def getFirstLineOfBlock(lineNo: Int): Int = {
@@ -100,7 +114,7 @@ class StructProgram(val document: SyntaxDocument) extends StructContainer {
     // Check for the special case where we are on the 'head' line of a composite statement
     if (i == lineNo && i+1 < children.length && this(i+1).indent > indent) {
       i = lineNo + 1
-      val indent = this(i+1).indent
+      val indent = this(i).indent
       while (i < children.length && this(i).hasIndent(indent))
         i += 1
       (getPhysicalLineOf(lineNo), getPhysicalLineOf(i))

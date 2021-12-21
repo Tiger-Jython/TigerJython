@@ -90,7 +90,7 @@ abstract class StructElement {
     else
       null
 
-  protected def getToken(relIndex: Int): Token =
+  def getToken(relIndex: Int): Token =
     _getToken(this.index + relIndex)
 
   def handleMessage(relIndex: Int, message: TokenChangeMessage): Unit
