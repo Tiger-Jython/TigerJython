@@ -121,6 +121,8 @@ object ExecuteClientConnection extends Communicator {
             Py.flushLine()
             sendMessage(ResultMessage(null, tag))
           } catch {
+            case r: RuntimeException if r.getMessage.contains("Java frame disposed") =>
+              sendMessage(ResultMessage(null, tag))
             case e: Exception =>
               sendMessage(ErrorResultMessage(e.toString, tag))
           } finally {
@@ -133,6 +135,8 @@ object ExecuteClientConnection extends Communicator {
             interpreter.exec(script)
             sendMessage(ResultMessage(null, tag))
           } catch {
+            case r: RuntimeException if r.getMessage.contains("Java frame disposed") =>
+              sendMessage(ResultMessage(null, tag))
             case e: Exception =>
               sendMessage(ErrorResultMessage(e.toString, tag))
           } finally {

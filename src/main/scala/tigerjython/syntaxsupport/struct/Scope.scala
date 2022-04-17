@@ -113,7 +113,7 @@ class Scope(var parentScope: Scope) {
           } else
             if (nameInfo.nameType == NameType.FREE)
               nameInfo.nameType = NameType.GLOBAL
-        case Some(_: NonlocalNameInfo) =>
+        case Some(_) =>
           // Nothing to do
         case None =>
           if (parentScope != null) {

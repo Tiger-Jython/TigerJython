@@ -4,6 +4,8 @@
  *  (c) 2020-2021, Tobias Kohn
  */
 
+import sbt.Package.ManifestAttributes
+
 // This function creates a `BuildInfo` object to make version and build information accessible to the application
 // at runtime.
 def generateBuildInfo(packageName: String,
@@ -32,14 +34,14 @@ def generateBuildInfo(packageName: String,
 
     Seq(file)
   }.taskValue
-  
+
 // Information about the application itself
 name := "TigerJython3"
 
 version := "3.0"
 
 // We use a recent version of Scala
-scalaVersion := "2.13.2"
+scalaVersion := "2.13.8"
 
 // Unfortunately, we need to limit the Java version as Java 8 is still fairly common
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
@@ -52,9 +54,12 @@ val buildDate = "%d %s %d".format(
   currentDate.getYear
 )
 
+Compile / packageBin / packageOptions +=
+  Package.ManifestAttributes("SplashScreen-Image" -> "resources/splash.png")
+
 val buildTag = "-SNAPSHOT"
 
-val buildVersion = "ea+12"
+val buildVersion = "ea+14"
 
 // This is needed to run/test the project without having to restart SBT afterwards
 run / fork := true
@@ -70,8 +75,7 @@ osName := (System.getProperty("os.name") match {
 })
 
 // We need the newest version as it contains important fixes for Mac OS X
-// Actually, version 17.0.1 is out but due to a bug in JavaFX maven the current version of SBT cannot pull it :-(
-val fxVersion = "16" //  "11-ea+25"
+val fxVersion = "18"
 
 /*libraryDependencies += "org.openjfx" % "javafx-base" % fxVersion classifier osName.value
 libraryDependencies += "org.openjfx" % "javafx-controls" % fxVersion classifier osName.value
@@ -95,15 +99,15 @@ libraryDependencies += "org.openjfx" % "javafx-controls" % fxVersion classifier 
 libraryDependencies += "org.openjfx" % "javafx-fxml" % fxVersion classifier "mac"
 libraryDependencies += "org.openjfx" % "javafx-graphics" % fxVersion classifier "mac"
 
-// In order to include OpenJFX for ARM architecture, we need at least version 17.  However, due to a bug it is currently
-// not possible.  We have to wait for updates to SBT/Maven before being able to pull the correct versions.
-/* libraryDependencies += "org.openjfx" % "javafx-base" % fxVersion classifier "linux-aarch64"
+// Unfortunately, the ARM architecture cannot be included at the same time as the intel version.  We have to create a
+// dedicated ARM version.
+/*libraryDependencies += "org.openjfx" % "javafx-base" % fxVersion classifier "linux-aarch64"
 libraryDependencies += "org.openjfx" % "javafx-controls" % fxVersion classifier "linux-aarch64"
 libraryDependencies += "org.openjfx" % "javafx-fxml" % fxVersion classifier "linux-aarch64"
-libraryDependencies += "org.openjfx" % "javafx-graphics" % fxVersion classifier "linux-aarch64" */
+libraryDependencies += "org.openjfx" % "javafx-graphics" % fxVersion classifier "linux-aarch64"*/
 
 // Other dependencies
-libraryDependencies += "org.fxmisc.richtext" % "richtextfx" % "0.10.5"
+libraryDependencies += "org.fxmisc.richtext" % "richtextfx" % "0.10.9"
 
 // We switch to our internal version of Jython
 // libraryDependencies += "org.python" % "jython-standalone" % "2.7.2"

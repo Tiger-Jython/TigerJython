@@ -50,6 +50,13 @@ class NotebookCell(val notebook: NotebookTab) extends BorderPane with EvalResult
     })
   }
 
+  def isEmpty: Boolean = {
+    val txt = editor.getText()
+    txt == null || txt == ""
+  }
+
+  def nonEmpty: Boolean = !isEmpty
+
   def recomputeHeight(): Unit =
     editor.recomputeHeight()
 
@@ -82,6 +89,9 @@ class NotebookCell(val notebook: NotebookTab) extends BorderPane with EvalResult
       result.getStyleClass.add("error")
       resultNode = result
     })
+
+  def setInput(text: String): Unit =
+    editor.setInitialText(text)
 
   def setResult(text: String): Unit =
     onFX(() => {

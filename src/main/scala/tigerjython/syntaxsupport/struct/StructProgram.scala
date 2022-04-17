@@ -232,6 +232,9 @@ class StructProgram(val document: SyntaxDocument) extends StructContainer {
 
   def notifyIndentationChanged(sender: StructLine, delta: Int): Unit = {
     var i = children.indexOf(sender)
+    // Special case: the first line cannot really be indented, i.e. any indentation there is an error
+    if (i == 0 && sender.indent > 0)
+      return
     sender.setParentScope(getParentScopeForLine(i))
     i += 1
     val baseIndent = if (delta < 0) sender.indent else sender.index - delta

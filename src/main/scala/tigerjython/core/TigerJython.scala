@@ -56,14 +56,16 @@ object TigerJython {
             i += 1
         }
       if (server.isDefined) {
+        java.awt.SplashScreen.getSplashScreen.close()
         val (port, id) = server.get
         tigerjython.remote.ExecuteClientConnection.initialize(port, id)
         JythonExecutor.initialize()
         JythonExecutor.runRemote()
       } else
-      if (runFile.isDefined)
+      if (runFile.isDefined) {
+        java.awt.SplashScreen.getSplashScreen.close()
         JythonExecutor.run(runFile.get)
-      else
+      } else
         startEditor(args)
     } else
       startEditor(args)

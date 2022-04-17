@@ -161,7 +161,7 @@ class StructLine extends StructContainer {
     }
 
   protected[struct] def setParentScope(scope: Scope): Unit =
-    if (astNode.isInstanceOf[StatementType.FUNC_DEF])
+    if (astNode.isInstanceOf[StatementType.FUNC_DEF] && this.scope != null)
       this.scope.setParentScope(scope)
     else
       this.scope = scope

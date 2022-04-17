@@ -8,7 +8,6 @@
 package tigerjython.ui.notebook
 
 import java.io.File
-
 import javafx.application.Platform
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.geometry.{Orientation, Pos}
@@ -23,6 +22,7 @@ import tigerjython.core.Preferences
 import tigerjython.execute.{Evaluator, ExecutionController, Executor, ExecutorFactory, InterpreterInstallations, TigerJythonExecutorFactory}
 import tigerjython.ui.{ImagePool, TabFrame, ZoomMixin}
 import tigerjython.ui.Utils.onFX
+import tigerjython.ui.notebook.json.JupyterNotebook
 
 /**
  * @author Tobias Kohn
@@ -109,6 +109,11 @@ class NotebookTab extends TabFrame with ExecutionController {
       null
 
   def appendToErrorOutput(s: String): Unit = {}
+
+  def clear(): Unit = {
+    cells.clear()
+    itemsBox.getChildren.clear()
+  }
 
   protected def createOutputPane: TextArea = {
     val result = new TextArea()
@@ -224,8 +229,9 @@ class NotebookTab extends TabFrame with ExecutionController {
     // println(text)
   }
 
-  def appendToOutput(text: String): Unit =
+  def appendToOutput(text: String): Unit = {
     outputPane.appendText(text)
+  }
 
   def clearOutput(): Unit = {}
 
@@ -234,6 +240,25 @@ class NotebookTab extends TabFrame with ExecutionController {
   def getExecutableFileAsString: String = null
 
   def getText: String = null
+
+  def loadJupyterNotebook(file: java.io.File): Unit = {
+    val nb = JupyterNotebook.loadFromFile(file)
+    if (nb != null) {
+      clear()
+      for (nb_cell <- nb.cells)
+        nb_cell match {
+          case json.CodeCell(text, _) =>
+            val cell = addCell()
+            cell.setInput(text)
+          case json.MarkdownCell(text) =>
+            val cell = addCell()
+            cell.setInput(text)
+          case _ =>
+        }
+      if (cells.isEmpty || cells.last.nonEmpty)
+        addCell()
+    }
+  }
 
   def updateRunStatus(executor: Executor, running: Boolean): Unit = {}
 }

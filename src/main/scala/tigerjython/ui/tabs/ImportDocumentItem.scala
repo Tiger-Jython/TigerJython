@@ -14,6 +14,7 @@ import javafx.stage.FileChooser
 import javafx.stage.FileChooser.ExtensionFilter
 import tigerjython.core.Configuration
 import tigerjython.files.Documents
+import tigerjython.ui.notebook.NotebookTab
 import tigerjython.ui.{TigerJythonApplication, editor}
 
 /**
@@ -30,18 +31,36 @@ class ImportDocumentItem(val parentFrame: OpenDocumentTab) extends DocumentItem 
     val result = new FileChooser()
     result.setInitialDirectory(Configuration.userHome.toFile)
     result.getExtensionFilters.addAll(
-      new ExtensionFilter("Python Files", "*.py"),
+      new ExtensionFilter("Python Files", "*.py", "*.ipynb"),
+      new ExtensionFilter("Python Modules", "*.py"),
+      new ExtensionFilter("IPython/Jupyter Notebooks", "*.ipynb"),
       new ExtensionFilter("All Files", "*.*")
     )
     result
   }
 
+  private def getFileExt(file: java.io.File): String = {
+    val filename = file.getName.toLowerCase
+    val idx = filename.lastIndexOf('.')
+    if (idx >= 0)
+      filename.drop(idx + 1)
+    else
+      ""
+  }
+
   def onClicked(): Unit = {
     val selectedFile = fileChooser.showOpenDialog(TigerJythonApplication.mainStage)
     if (selectedFile != null) {
-      val tab = editor.PythonEditorTab()
-      tab.loadDocument(Documents.importDocument(selectedFile))
-      TigerJythonApplication.tabManager.addTab(tab)
+      val fileExt = getFileExt(selectedFile)
+      if (fileExt == "ipynb") {
+        val tab = NotebookTab()
+        tab.loadJupyterNotebook(selectedFile)
+        TigerJythonApplication.tabManager.addTab(tab)
+      } else {
+        val tab = editor.PythonEditorTab()
+        tab.loadDocument(Documents.importDocument(selectedFile))
+        TigerJythonApplication.tabManager.addTab(tab)
+      }
     }
   }
 

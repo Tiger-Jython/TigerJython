@@ -111,6 +111,11 @@ class TigerJythonApplication extends Application {
       new Image(getClass.getClassLoader.getResourceAsStream("resources/%s_64.png".format(Configuration.appLogoName))),
       new Image(getClass.getClassLoader.getResourceAsStream("resources/%s_128.png".format(Configuration.appLogoName))),
     )
+    try {
+      java.awt.SplashScreen.getSplashScreen.close()
+    } catch {
+      case _: Throwable =>
+    }
     primaryStage.show()
     _mainStage = primaryStage
     _scene = scene

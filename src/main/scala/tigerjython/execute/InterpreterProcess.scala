@@ -20,7 +20,15 @@ import tigerjython.utils.OSProcess
  */
 class InterpreterProcess(cmd: String) extends OSProcess(cmd) {
 
-  var parent: Executor = _
+  private var _parent: Executor = _
+
+  def parent: Executor = _parent
+  def parent_=(p: Executor): Unit =
+    if (p != _parent) {
+      _parent = p
+      if (isRunning && timer == null)
+        started()
+    }
 
   var isClientProcess: Boolean = false
 

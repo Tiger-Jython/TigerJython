@@ -1,5 +1,27 @@
 # Changelog
 
+### 3.0 Early Access Preview 14 (April 2022)
+
+Implemented:
+- Load/import Jupyter notebooks (not all features are supported);
+
+Changes:
+- Added a splash-screen (using the old AWT framework, perhaps use a JavaFX Preloader instead);
+
+Bug fixes:
+- Indentation of the first line crashed the scope analyser;
+- Updated to `sbt` 1.6, Scala 2.13.8 and JavaFX 18, which now should include ARM support, 
+  although not simultaneous with IA-support and untested;
+- `print` in TigerJython-notebooks did not work properly;
+- Closing the frame when running a turtle program caused an error;
+
+Known issues:
+- Missing support for markdown-cells in notebooks;
+- Notebooks have no support for pictures, yet;
+- Missing an 'about' frame with information about the development team;
+- The splash-screen is still the old splash-screen from version 2;
+- The splash-screen is briefly shown whenever a new instance is started in the background;
+
 ### 3.0 Early Access Preview 12 (21 December 2021)
 
 Implemented:
@@ -16,7 +38,7 @@ Known issues:
 - Syntax highlighting colour schemes are tentative and only available in selected themes;
 - Does not work with ARM architectures because of a bug in `sbt`/`maven` that prevents us
   from updating JavaFX to the required version 17;
-- Java emits a warning because we package JavaFX with out application (rather than 
+- Java emits a warning because we package JavaFX with our application (rather than 
   providing external modules): 
   `WARNING: Unsupported JavaFX configuration: classes were loaded from`.  This can be
   ignored;
