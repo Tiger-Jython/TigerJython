@@ -10,7 +10,6 @@ package tigerjython.core
 import java.util.{Base64, Locale, Random}
 import java.util.prefs.{Preferences => JPreferences}
 
-import javafx.beans.property
 import javafx.beans.property._
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.scene.text.{Font, Text}
@@ -173,6 +172,8 @@ object Preferences {
     new PrefBooleanProperty(preferences, "syntaxcheck-deadcode", false)
 
   val userNumber: ReadOnlyStringProperty = new PrefStringProperty(preferences, "user-number")
+
+  val waitForWindowClosed: BooleanProperty = new PrefBooleanProperty(preferences, "wait-window-closed", true)
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }

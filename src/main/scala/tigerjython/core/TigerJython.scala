@@ -7,6 +7,7 @@
  */
 package tigerjython.core
 
+import tigerjython.execute.WindowMonitor
 import tigerjython.plugins.{EventManager, MainWindow}
 import tigerjython.ui.TigerJythonApplication
 import tigerjython.utils.OSPlatform
@@ -56,14 +57,14 @@ object TigerJython {
             i += 1
         }
       if (server.isDefined) {
-        java.awt.SplashScreen.getSplashScreen.close()
         val (port, id) = server.get
         tigerjython.remote.ExecuteClientConnection.initialize(port, id)
+        WindowMonitor.initialize()
         JythonExecutor.initialize()
         JythonExecutor.runRemote()
       } else
       if (runFile.isDefined) {
-        java.awt.SplashScreen.getSplashScreen.close()
+        WindowMonitor.initialize()
         JythonExecutor.run(runFile.get)
       } else
         startEditor(args)
@@ -84,10 +85,6 @@ object TigerJython {
           "You are using %s").format(Configuration.getFullJavaVersion)
       )*/
 
-    tigerjython.execute.PythonInstallations.initialize()
-    tigerjython.core.Configuration.initialize()
-    tigerjython.remote.ExecuteServer.initialize()
-    tigerjython.execute.TigerJythonProcess.initialize()
     tigerjython.ui.TigerJythonApplication.launchApplication(args)
   }
 }

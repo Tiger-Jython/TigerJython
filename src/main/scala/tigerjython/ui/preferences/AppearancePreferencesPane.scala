@@ -112,6 +112,7 @@ class AppearancePreferencesPane extends PreferencePane {
     result.getChildren.addAll(createBasicProperties(): _*)
     result.getChildren.addAll(createFontSelection(): _*)
     result.getChildren.addAll(createThemes(): _*)
+    result.setSpacing(4)
     new StackPane(result)
   }
 }

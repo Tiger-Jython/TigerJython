@@ -49,7 +49,7 @@ class ExecuteClientProxy(val socket: Socket) extends Communicator {
       case IDMessage(id) =>
         this._id = id
         ExecuteServer.addClient(this)
-      case QuitMessage() =>
+      case QuitMessage(_) =>
         ExecuteServer.removeClient(this)
       case ErrorResultMessage(errorMsg, tag) =>
         queryBuffer.get(tag) match {
@@ -58,6 +58,7 @@ class ExecuteClientProxy(val socket: Socket) extends Communicator {
           case None =>
             println(errorMsg)
         }
+      case ProgramDoneMessage(tag) =>
       case ResultMessage(result, tag) =>
         queryBuffer.remove(tag) match {
           case Some(onResult) =>
@@ -101,7 +102,7 @@ class ExecuteClientProxy(val socket: Socket) extends Communicator {
   }
 
   def quit(): Unit = {
-    sendMessage(QuitMessage())
+    sendMessage(QuitMessage(true))
     close()
   }
 

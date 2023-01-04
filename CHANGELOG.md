@@ -1,5 +1,19 @@
 # Changelog
 
+### 3.0 Beta 1 (January 2023)
+
+Implemented:
+- Proper splash-screen (using JavaFX);
+- It is possible to add (and remove) custom Python interpreters;
+- 'About' frame included inside preferences with links to web pages;
+- Waits for Swing/AWT windows to be closed before ending the running instance;
+
+Fixed issues:
+- Splash-screen is no longer shown when a new instance is started in the background;
+
+Bug fixes:
+- Could not correctly parse some dates for stored files;
+
 ### 3.0 Early Access Preview 14 (April 2022)
 
 Implemented:
@@ -21,6 +35,7 @@ Known issues:
 - Missing an 'about' frame with information about the development team;
 - The splash-screen is still the old splash-screen from version 2;
 - The splash-screen is briefly shown whenever a new instance is started in the background;
+- Add 'custom' Python implementations
 
 ### 3.0 Early Access Preview 12 (21 December 2021)
 

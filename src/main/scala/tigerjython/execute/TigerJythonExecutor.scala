@@ -44,7 +44,7 @@ class TigerJythonExecutor(val id: Int, override val controller: ExecutionControl
       val startTime = System.currentTimeMillis()
       proxy.executeFile(filename, (msg, isError) => {
         val runTime = System.currentTimeMillis() - startTime
-        proxy.sendMessage(QuitMessage())
+        proxy.sendMessage(QuitMessage(false))
         Thread.sleep(250)    // Leave some time for the output to appear in the editor window
         if (isError)
           controller.handleError(msg)

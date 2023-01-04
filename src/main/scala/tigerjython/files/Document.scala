@@ -10,11 +10,10 @@ package tigerjython.files
 import java.io.{File, FileWriter, PrintWriter}
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.{Files, Path, Paths}
-import java.text.{DateFormat, SimpleDateFormat}
+import java.text.{DateFormat, SimpleDateFormat, ParseException}
 import java.time.ZoneId
 import java.util.Date
 import java.util.prefs.{Preferences => JPreferences}
-
 import javafx.beans.property._
 import tigerjython.execute.{ExecLanguage, PythonCodeTranslator}
 import tigerjython.ui.{TabFrame, TigerJythonApplication}
@@ -81,8 +80,31 @@ class Document(protected val prefNode: JPreferences) {
   protected def formatDate(date: Date): String =
     new SimpleDateFormat("d MMM yyyy").format(date)
 
+  private final val MONTHS = Array(
+    "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"
+  )
+
   def getCreationDate: Date =
-    dateFormat.parse(prefNode.get("created", null))
+    try {
+      dateFormat.parse(prefNode.get("created", null))
+    } catch {
+      case _: ParseException =>
+        val date = prefNode.get("created", null)
+        if (date == null)
+          return null
+        try {
+          val parts = date.split(' ')
+          val day = parts(0).toInt
+          val month = MONTHS.indexOf(parts(1))
+          val year = parts(2).toInt
+          new Date(year - 1900, month, day)
+        } catch {
+          case _: IndexOutOfBoundsException =>
+            null
+          case _: NumberFormatException =>
+            null
+        }
+    }
 
   /**
    * Returns the dates of creation and last modification as a string that is as short as possible, i.e. either

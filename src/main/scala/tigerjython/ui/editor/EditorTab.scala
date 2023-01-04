@@ -249,6 +249,17 @@ abstract class EditorTab extends TabFrame with ExecutionController {
     result
   }
 
+  def reloadExecutionTargets(): Unit = {
+    targetButton.getItems.clear()
+    for (interpreter <- InterpreterInstallations.availableInterpreters) {
+      if (interpreter.title== "-")
+        targetButton.getItems.add(new SeparatorMenuItem())
+      else if (interpreter.factory != null && interpreter.factory.canExecute)
+        targetButton.getItems.add(createTargetMenuItem(interpreter.title, interpreter.icon, interpreter.factory))
+    }
+    targetButton.getItems.get(0).fire()
+  }
+
   def displayError(line: Int, msg: String): Unit =
     displayError(line, 0, msg)
 

@@ -54,6 +54,11 @@ trait TabManager {
   def focusChanged(receivingNode: Node): Unit
 
   /**
+   * This will be called when a new execution target has been added or removed.
+   */
+  def reloadExecutionTargets(): Unit
+
+  /**
    *
    * @param document
    */

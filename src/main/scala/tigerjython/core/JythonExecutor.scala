@@ -8,11 +8,11 @@
 package tigerjython.core
 
 import java.io.InputStream
-
 import org.python.core.Options
 import org.python.core.Py
 import org.python.core.util.CustomModuleFinder
 import org.python.util.PythonInterpreter
+import tigerjython.execute.WindowMonitor
 import tigerjython.jython
 import tigerjython.remote.ExecuteClientConnection
 
@@ -44,6 +44,12 @@ object JythonExecutor {
     initialize()
     interpreter = new PythonInterpreter()
     interpreter.execfile(filename)
+    if (Preferences.waitForWindowClosed.get) {
+      println("Waiting for windows to be closed...")
+      Thread.sleep(1000)
+      while (WindowMonitor.windowCount > 0)
+        Thread.sleep(100)
+    }
   }
 
   def runRemote(): Unit = {

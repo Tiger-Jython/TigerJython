@@ -32,6 +32,11 @@ object PythonInstallations {
   private var _selectedIndex: Int = 0
 
   /**
+   * This list contains all interpreters that were added by the user (rather than being detected automatically).
+   */
+  private val _customInterpreters = collection.mutable.ArrayBuffer[String]()
+
+  /**
    * Get the path of the internal Jython interpreter for execution.
    */
   def getInternalJythonPath: Path = {
@@ -50,7 +55,7 @@ object PythonInstallations {
    */
   private def extractVersion(versionString: String): Int = {
     val s = versionString.dropWhile(!_.isDigit).takeWhile(_.isDigit)
-    if (s.length >= 1 && (s(0) == '2' || s(0) == '3'))
+    if (s.nonEmpty && (s(0) == '2' || s(0) == '3'))
       s(0).toInt - '0'
     else
       0
@@ -90,8 +95,11 @@ object PythonInstallations {
       val process = new OSProcess(file)
       process.exec("--version")
       val output = process.waitForOutput()
-      if (output.length > 8 && output.drop(1).startsWith("ython ")) {
-        add(output.takeWhile(_ >= ' '), file.toPath)
+      if (output.length > 8 && output.takeWhile(_.isLetter).endsWith("ython")) {
+        val name = output.takeWhile(_ >= ' ')
+        add(name, file.toPath)
+        _customInterpreters += name
+        select(name)
         if (onSuccess != null)
           onSuccess()
       } else
@@ -139,18 +147,33 @@ object PythonInstallations {
     }).start()
   }
 
+  def isCustomInterpreter(name: String): Boolean =
+    _customInterpreters.contains(name)
+
   private def readPreferences(): Unit = {
     val p = Preferences.userNodeForPackage(getClass).node("Python")
     if (p != null) {
       val versions = collection.mutable.ArrayBuffer[(String, Path)]()
       for (version <- p.keys()) {
         val path = p.get(version, null)
-        if (path != null)
+        if (path != null) {
           versions += ((version, Paths.get(path)))
+          _customInterpreters += version
+        }
       }
       addVersions(versions.toArray)
     }
   }
+
+  def removeCustomInterpreter(name: String): Unit =
+    if (name != null && name != "" && _customInterpreters.contains(name)) {
+      _customInterpreters.remove(_customInterpreters.indexOf(name))
+      val p = Preferences.userNodeForPackage(getClass).node("Python")
+      if (p != null)
+        p.remove(name)
+      _availableVersions.remove(_availableVersions.indexOf(name))
+      _executablePaths.remove(name)
+    }
 
   def select(index: Int): Unit =
     if (0 <= index && index < _availableVersions.length) {

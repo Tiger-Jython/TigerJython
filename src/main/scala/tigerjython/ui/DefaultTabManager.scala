@@ -131,6 +131,19 @@ class DefaultTabManager extends TabPane with TabManager {
       showOrAdd(document.frame)
   }
 
+  def reloadExecutionTargets(): Unit = {
+    for (t <- getTabs.asScala)
+      t match {
+        case tab: Tab =>
+          tab.getContent match {
+            case editorTab: EditorTab =>
+              editorTab.reloadExecutionTargets()
+            case _ =>
+          }
+        case _ =>
+      }
+  }
+
   def saveAll(): Boolean = {
     for (t <- getTabs.asScala)
       t match {

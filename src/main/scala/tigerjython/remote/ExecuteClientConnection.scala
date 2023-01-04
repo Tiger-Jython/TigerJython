@@ -12,10 +12,10 @@ import java.lang.management.ManagementFactory
 import java.net.Socket
 import java.util.{Timer, TimerTask}
 import java.util.concurrent.ArrayBlockingQueue
-
 import org.python.core.{CodeFlag, CompileMode, CompilerFlags, Py, PyList, PyObject, __builtin__}
 import org.python.util.PythonInterpreter
-import tigerjython.core.Configuration
+import tigerjython.core.{Configuration, Preferences}
+import tigerjython.execute.WindowMonitor
 
 /**
  * This is the part of the communication that lives inside the client and connects to the main TigerJython server.
@@ -50,8 +50,8 @@ object ExecuteClientConnection extends Communicator {
 
   override protected def handleMessage(message: Message): Unit =
     message match {
-      case QuitMessage() =>
-        sendMessage(QuitMessage())
+      case QuitMessage(forceQuit) =>
+        sendMessage(QuitMessage(forceQuit))
         quit()
       case _: EvalMessage | _: ExecFileMessage | _: ExecMessage =>
         messageQueue.put(message)
@@ -119,7 +119,8 @@ object ExecuteClientConnection extends Communicator {
             flags.setUnicodeLiterals(true)
             __builtin__.execfile_flags(filename, locals, locals, flags)
             Py.flushLine()
-            sendMessage(ResultMessage(null, tag))
+            if (!waitForWindowClose(tag))
+              sendMessage(ResultMessage(null, tag))
           } catch {
             case r: RuntimeException if r.getMessage.contains("Java frame disposed") =>
               sendMessage(ResultMessage(null, tag))
@@ -133,7 +134,8 @@ object ExecuteClientConnection extends Communicator {
           try {
             timer.schedule(task, 0, 100)
             interpreter.exec(script)
-            sendMessage(ResultMessage(null, tag))
+            if (!waitForWindowClose(tag))
+              sendMessage(ResultMessage(null, tag))
           } catch {
             case r: RuntimeException if r.getMessage.contains("Java frame disposed") =>
               sendMessage(ResultMessage(null, tag))
@@ -144,6 +146,16 @@ object ExecuteClientConnection extends Communicator {
           }
         case _ =>
       }
+
+  private def waitForWindowClose(tag: Int): Boolean =
+    if (Preferences.waitForWindowClosed.get && WindowMonitor.windowCount > 0) {
+      sendMessage(ProgramDoneMessage(tag))
+      WindowMonitor.onAllWindowsClosed = () => {
+        sendMessage(ResultMessage(null, tag))
+      }
+      true
+    } else
+      false
 
   def quit(): Unit = {
     _socket.close()

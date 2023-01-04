@@ -92,6 +92,7 @@ class GeneralPreferencesPane extends PreferencePane {
     result.getChildren.addAll(createLanguageChooser(): _*)
     result.getChildren.addAll(createZoomingElements(): _*)
     result.getChildren.addAll(createServerElements(): _*)
+    result.setSpacing(4)
     new StackPane(result)
   }
 

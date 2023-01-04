@@ -22,10 +22,25 @@ object InterpreterInstallations {
 
   final val Separator = InterpreterInfo("-", null, null)
 
-  lazy val availableInterpreters: Array[InterpreterInfo] = {
+  private var cache: Array[InterpreterInfo] = _
+
+  def availableInterpreters: Array[InterpreterInfo] = synchronized {
+    if (cache == null)
+      cache = getAvailableInterpreters
+    cache
+  }
+
+  /**
+   * Invalidate the cache and therefore force the list of available interpreters to be re-evaluated.
+   */
+  def invalidateCache(): Unit = {
+    cache = null
+  }
+
+  private def getAvailableInterpreters: Array[InterpreterInfo] = {
     /*
      * We first collect all the Python interpreters and then sort and filter them.  TigerJython shall always be the
-     * first entry.  If there are entries for `Python 3.6` and `Python 3.6.4`, only tha latter is kept and the first
+     * first entry.  If there are entries for `Python 3.6` and `Python 3.6.4`, only the latter is kept and the first
      * is seen as a link to the second.  The same goes for `Python 3` and `Python 3.6`.
      *
      * This code also assigns a logo/icon to each interpreter.
@@ -50,6 +65,8 @@ object InterpreterInstallations {
             interpreters += InterpreterInfo(name, ImagePool.python_Logo,
               new CommandExecutorFactory(name, path, ExecLanguage.PYTHON_3))
         case _ =>
+          interpreters += InterpreterInfo(name, ImagePool.python2_Logo,
+            new CommandExecutorFactory(name, path, if (version < 3) ExecLanguage.PYTHON_2 else ExecLanguage.PYTHON_3))
       }
     if (result.nonEmpty)
       result += Separator
@@ -63,6 +80,7 @@ object InterpreterInstallations {
       result += interpreters.last
       result += Separator
     }
+
     // Add other devices that are not directly detectable
     result += InterpreterInfo("Micro:bit", ImagePool.microBit_Logo,
       new MicroDeviceExecutorFactory("Micro:bit", ExecLanguage.PYTHON_3))

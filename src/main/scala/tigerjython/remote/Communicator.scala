@@ -47,7 +47,11 @@ abstract class Communicator {
 
   def sendMessage(message: Message): Unit =
     if (socket != null && !socket.isClosed && message != null)
-      objectStream.writeObject(message)
+      try {
+        objectStream.writeObject(message)
+      } catch {
+        case _: SocketException =>
+      }
 
   def close(): Unit = synchronized {
     if (!socket.isClosed)

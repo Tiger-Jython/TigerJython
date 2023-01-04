@@ -41,7 +41,8 @@ class PreferencesTab protected () extends TabFrame {
       new GeneralPreferencesPane(),
       new AppearancePreferencesPane(),
       new PythonPreferencesPane(),
-      new StatusMessagesPane()
+      new StatusMessagesPane(),
+      new AboutPane()
     )
   }
 }

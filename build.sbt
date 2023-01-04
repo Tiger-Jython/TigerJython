@@ -41,7 +41,7 @@ name := "TigerJython3"
 version := "3.0"
 
 // We use a recent version of Scala
-scalaVersion := "2.13.8"
+scalaVersion := "2.13.10"
 
 // Unfortunately, we need to limit the Java version as Java 8 is still fairly common
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
@@ -55,11 +55,11 @@ val buildDate = "%d %s %d".format(
 )
 
 Compile / packageBin / packageOptions +=
-  Package.ManifestAttributes("SplashScreen-Image" -> "resources/splash.png")
+  Package.ManifestAttributes("JavaFX-Preloader-Class" -> "tigerjython.ui.TigerJythonPreloader")
 
 val buildTag = "-SNAPSHOT"
 
-val buildVersion = "ea+14"
+val buildVersion = "beta+1"
 
 // This is needed to run/test the project without having to restart SBT afterwards
 run / fork := true
@@ -75,7 +75,7 @@ osName := (System.getProperty("os.name") match {
 })
 
 // We need the newest version as it contains important fixes for Mac OS X
-val fxVersion = "18"
+val fxVersion = "19"
 
 /*libraryDependencies += "org.openjfx" % "javafx-base" % fxVersion classifier osName.value
 libraryDependencies += "org.openjfx" % "javafx-controls" % fxVersion classifier osName.value

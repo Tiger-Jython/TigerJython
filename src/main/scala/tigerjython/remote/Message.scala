@@ -25,9 +25,11 @@ case class IDMessage(id: Int) extends Message
 
 case class PingMessage(startTime: Long) extends Message
 
+case class ProgramDoneMessage(tag: Int) extends Message
+
 case class PongMessage(startTime: Long, echoTime: Long) extends Message
 
-case class QuitMessage() extends Message
+case class QuitMessage(forceQuit: Boolean) extends Message
 
 case class ResultMessage(result: String, tag: Int) extends Message
 
