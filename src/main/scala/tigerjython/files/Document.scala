@@ -80,30 +80,19 @@ class Document(protected val prefNode: JPreferences) {
   protected def formatDate(date: Date): String =
     new SimpleDateFormat("d MMM yyyy").format(date)
 
-  private final val MONTHS = Array(
-    "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"
-  )
-
   def getCreationDate: Date =
     try {
       dateFormat.parse(prefNode.get("created", null))
     } catch {
       case _: ParseException =>
+        // Work-around for https://bugs.openjdk.org/browse/JDK-8281302
         val date = prefNode.get("created", null)
-        if (date == null)
-          return null
-        try {
-          val parts = date.split(' ')
-          val day = parts(0).toInt
-          val month = MONTHS.indexOf(parts(1))
-          val year = parts(2).toInt
-          new Date(year - 1900, month, day)
-        } catch {
-          case _: IndexOutOfBoundsException =>
-            null
-          case _: NumberFormatException =>
-            null
-        }
+        if (date != null && date.contains("Sept"))
+          dateFormat.parse(date.replace("Sept", "Sep"))
+        else if (date != null && date.contains("Sep"))
+          dateFormat.parse(date.replace("Sep", "Sept"))
+        else
+          null
     }
 
   /**

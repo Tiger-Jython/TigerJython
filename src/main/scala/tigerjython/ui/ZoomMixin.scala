@@ -94,7 +94,7 @@ trait ZoomMixin { self: Node =>
   self.addEventFilter(ScrollEvent.ANY, (event: ScrollEvent) => {
     if (event.isControlDown) {
       val y = event.getDeltaY
-      val t = (y / event.getMultiplierY).toInt
+      val t = math.round(y / event.getMultiplierY).toInt
       if (t != 0) {
         val currentIndex = zoomIndex
         val index = ((currentIndex + t) max 0) min (zoomFactors.length - 1)

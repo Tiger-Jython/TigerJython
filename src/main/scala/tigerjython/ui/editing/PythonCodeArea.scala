@@ -9,13 +9,13 @@ package tigerjython.ui.editing
 
 import java.time.Duration
 import java.util.Optional
-
 import javafx.application.Platform
 import javafx.beans.value.ObservableValue
 import javafx.concurrent.Task
 import javafx.scene.input.{KeyCode, KeyEvent}
 import org.fxmisc.richtext._
 import org.fxmisc.richtext.model.{PlainTextChange, StyleSpans}
+import org.w3c.dom.events.MouseEvent
 import tigerjython.core.Preferences
 import tigerjython.plugins.EventManager
 import tigerjython.ui.Utils.onFX

@@ -8,11 +8,15 @@ Implemented:
 - 'About' frame included inside preferences with links to web pages;
 - Waits for Swing/AWT windows to be closed before ending the running instance;
 
+Changes:
+- Support for Java 8 has to be dropped because of the JavaFX dependencies;
+
 Fixed issues:
 - Splash-screen is no longer shown when a new instance is started in the background;
 
 Bug fixes:
 - Could not correctly parse some dates for stored files;
+- Zooming into Python editor did not work;
 
 ### 3.0 Early Access Preview 14 (April 2022)
 

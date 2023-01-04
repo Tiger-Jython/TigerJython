@@ -10,7 +10,7 @@ package tigerjython.ui.preferences
 import javafx.beans.property.{SimpleStringProperty, StringProperty}
 import javafx.geometry.Pos
 import javafx.scene.Node
-import javafx.scene.control.Label
+import javafx.scene.control.{Label, ScrollPane}
 import javafx.scene.image.{Image, ImageView}
 import javafx.scene.layout.{HBox, StackPane, VBox}
 import javafx.scene.text.{Font, FontWeight, Text, TextFlow}
@@ -35,8 +35,13 @@ class AboutPane extends PreferencePane {
     val imgBox = new HBox(imgView)
     imgBox.setAlignment(Pos.CENTER)
     result.getChildren.add(imgBox)
-    result.getChildren.add(new Label("TigerJython, Version " + BuildInfo.fullVersion))
-    result.getChildren.add(
+    result.getChildren.addAll(
+      createHeading("TigerJython"),
+      new Label("Version " + BuildInfo.fullVersion),
+      new TextFlow(
+        new Text("Copyright © 2012–2023, "),
+        new Weblink("TJGroup", "https://tjgroup.ch/"),
+      ),
       new TextFlow(
         new Text("Visit us on "),
         new Weblink("TigerJython Webpage", "https://tigerjython.ch/"),
@@ -45,20 +50,26 @@ class AboutPane extends PreferencePane {
       )
     )
     result.getChildren.addAll(
-      createHeading("Projects"),
-      new Weblink("Jython", "https://www.jython.org/")
+      new Label("   "),
+      createHeading("3rd-party Projects"),
+      new TextFlow(
+        new Weblink("Jython", "https://www.jython.org/"),
+        new Text("– the Python-implementation on the Java platform")
+      ),
+      new Weblink("RichTextFX", "https://github.com/FXMisc/RichTextFX")
     )
     result.getChildren.addAll(
+      new Label("   "),
       createHeading("Sponsors"),
       new Weblink("Klett und Balmer", "https://www.klett.ch/")
     )
     result.setSpacing(4)
-    new StackPane(result)
+    new ScrollPane(new StackPane(result))
   }
 
   private def createHeading(text: String): Text = {
     val result = new Text(text)
-    result.setFont(Font.font("monospaced", FontWeight.BOLD, 20))
+    result.setFont(Font.font(null, FontWeight.BOLD, 20))
     result
   }
 }

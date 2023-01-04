@@ -1,7 +1,7 @@
 /**
  *  This is the build-file for the _TigerJython_ Python environment.
  *
- *  (c) 2020-2021, Tobias Kohn
+ *  (c) 2020-2023, Tobias Kohn
  */
 
 import sbt.Package.ManifestAttributes
@@ -44,7 +44,7 @@ version := "3.0"
 scalaVersion := "2.13.10"
 
 // Unfortunately, we need to limit the Java version as Java 8 is still fairly common
-javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
+// javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 
 // Actual build information, such as the date of building the application
 val currentDate = java.time.LocalDate.now
@@ -57,7 +57,7 @@ val buildDate = "%d %s %d".format(
 Compile / packageBin / packageOptions +=
   Package.ManifestAttributes("JavaFX-Preloader-Class" -> "tigerjython.ui.TigerJythonPreloader")
 
-val buildTag = "-SNAPSHOT"
+val buildTag = ""
 
 val buildVersion = "beta+1"
 
@@ -65,14 +65,14 @@ val buildVersion = "beta+1"
 run / fork := true
 
 // Installing the correct JavaFX libraries is OS-dependent...
-val osName: SettingKey[String] = SettingKey[String]("osName")
+/*val osName: SettingKey[String] = SettingKey[String]("osName")
 
 osName := (System.getProperty("os.name") match {
   case name if name.startsWith("Linux") => "linux"
   case name if name.startsWith("Mac") => "mac"
   case name if name.startsWith("Windows") => "win"
   case _ => throw new Exception("Unknown platform!")
-})
+})*/
 
 // We need the newest version as it contains important fixes for Mac OS X
 val fxVersion = "19"
