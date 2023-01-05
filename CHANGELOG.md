@@ -9,7 +9,8 @@ Implemented:
 - Waits for Swing/AWT windows to be closed before ending the running instance;
 
 Changes:
-- Support for Java 8 has to be dropped because of the JavaFX dependencies;
+- Support for Java 8 has to be dropped because of the JavaFX dependencies.
+  TigerJython now requires Java 11;
 
 Fixed issues:
 - Splash-screen is no longer shown when a new instance is started in the background;

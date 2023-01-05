@@ -43,8 +43,7 @@ version := "3.0"
 // We use a recent version of Scala
 scalaVersion := "2.13.10"
 
-// Unfortunately, we need to limit the Java version as Java 8 is still fairly common
-// javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
+javacOptions ++= Seq("-source", "11", "-target", "11")
 
 // Actual build information, such as the date of building the application
 val currentDate = java.time.LocalDate.now
