@@ -9,14 +9,13 @@ package tigerjython.ui.editor
 
 import java.text.SimpleDateFormat
 import java.util.Calendar
-
 import javafx.application.Platform
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.geometry.{Orientation, Side}
 import javafx.scene._
 import javafx.scene.control._
 import javafx.scene.image.{Image, ImageView}
-import javafx.scene.layout.{BorderPane, HBox, Priority}
+import javafx.scene.layout.{BorderPane, HBox, Priority, VBox}
 import javafx.scene.paint.Color
 import javafx.scene.shape.{Circle, Line, Polygon, Rectangle, StrokeLineCap}
 import javafx.stage.FileChooser.ExtensionFilter
@@ -42,8 +41,10 @@ abstract class EditorTab extends TabFrame with ExecutionController {
   import tigerjython.ui.Utils._
 
   protected val editor: CodeArea = createEditorNode
+  protected val editorContents: VBox = new VBox()
   protected val errorPane: OutputPane = createErrorPane
   protected var errorPopup: Popup = _
+  protected val findBar = new FindBar(this)
   protected val infoPane: TabPane = new TabPane()
   protected val logPane: OutputPane = new DefaultOutputPane(this, "log")
   protected val nameBox: Node = createNameBox
@@ -92,13 +93,15 @@ abstract class EditorTab extends TabFrame with ExecutionController {
     infoPane.getTabs.addAll(outputPane, errorPane, logPane)
     infoPane.setSide(Side.BOTTOM)
     splitPane.setOrientation(Orientation.VERTICAL)
-    splitPane.getItems.addAll(scrollPane, infoPane)
+    editorContents.getChildren.add(scrollPane)
+    splitPane.getItems.addAll(editorContents, infoPane)
     mainBox.setCenter(splitPane)
     mainBox.prefHeightProperty.bind(this.heightProperty)
     splitPane.prefWidthProperty.bind(this.widthProperty)
     editor.prefWidthProperty.bind(mainBox.widthProperty)
     editor.prefHeightProperty.bind(mainBox.heightProperty.subtract(infoPane.heightProperty))
     getChildren.add(mainBox)
+    splitPane.setDividerPosition(0, 0.75)
   }
 
   def appendToErrorOutput(s: String): Unit = {
@@ -170,14 +173,18 @@ abstract class EditorTab extends TabFrame with ExecutionController {
   }
 
   protected def createNameBox: Node = {
-    val navEdit = new NavigatorTextField()
+    val navEdit = new NavigatorTextField(this)
     navEdit.captionProperty().bindBidirectional(caption)
     val downloadButton = new Button()
     downloadButton.setGraphic(createDownloadImage)
     downloadButton.getStyleClass.add("download-text-btn")
     downloadButton.setOnAction(_ => downloadToFile())
+    val duplicateButton = new Button()
+    duplicateButton.setGraphic(createDuplicateImage)
+    duplicateButton.getStyleClass.add("download-text-btn")
+    duplicateButton.setOnAction(_ => duplicateFile())
     val result = new HBox()
-    result.getChildren.addAll(navEdit, downloadButton)
+    result.getChildren.addAll(navEdit, downloadButton, duplicateButton)
     result
   }
 
@@ -193,6 +200,44 @@ abstract class EditorTab extends TabFrame with ExecutionController {
       line.setStrokeLineCap(StrokeLineCap.ROUND)
     result.getChildren.addAll(lines: _*)
     result
+  }
+
+  protected def createDuplicateImage: Node = {
+    val result = new Group()
+    val lines = Array(
+      new Line(-4, -2, 0, -2),
+      new Line(0, -2, 2, 0),
+      new Line(2, 0, 2, 6),
+      new Line(2, 6, -4, 6),
+      new Line(-4, 6, -4, -2),
+
+      new Line(0, -2, 0, 0),
+      new Line(0, 0, 2, 0),
+
+      new Line(-2, -2, -2, -4),
+      new Line(-2, -4, 2, -4),
+      new Line(2, -4, 4, -2),
+      new Line(4, -2, 4, 4),
+      new Line(4, 4, 2, 4),
+
+      new Line(2, -4, 2, -2),
+      new Line(2, -2, 4, -2)
+    )
+    for (line <- lines)
+      line.setStrokeLineCap(StrokeLineCap.ROUND)
+    result.getChildren.addAll(lines: _*)
+    result
+  }
+
+  def findText(showReplace: Boolean): Unit = {
+    editorContents.getChildren.add(findBar)
+    Platform.runLater(() => {
+      findBar.findText.requestFocus()
+    })
+  }
+
+  def hideAuxPanels(): Unit = {
+    editorContents.getChildren.remove(findBar)
   }
 
   protected def createPrefGraphic(): Node = {
@@ -247,6 +292,10 @@ abstract class EditorTab extends TabFrame with ExecutionController {
     prefButton.setOnAction(_ => TigerJythonApplication.currentApplication.showPreferences())
     result.getItems.addAll(runButton, stopButton, filler1, nameBox, filler2, targetButton, prefButton)
     result
+  }
+
+  def focusOnEditor(): Unit = {
+    editor.requestFocus()
   }
 
   def reloadExecutionTargets(): Unit = {
@@ -310,6 +359,11 @@ abstract class EditorTab extends TabFrame with ExecutionController {
       new ExtensionFilter("All Files", "*.*")
     )
     result
+  }
+
+  def duplicateFile(): Unit = {
+    val duplicate = document.duplicate()
+    manager.openDocument(duplicate)
   }
 
   def downloadToFile(): Unit =
@@ -416,6 +470,8 @@ abstract class EditorTab extends TabFrame with ExecutionController {
       document.open(this)
       caption.setValue(document.name.get)
       caption.bindBidirectional(document.name)
+      splitPane.setDividerPosition(0, document.splitterPos.get())
+      splitPane.getDividers.get(0).positionProperty().bindBidirectional(document.splitterPos)
       selectTargetForDocument()
     }
 

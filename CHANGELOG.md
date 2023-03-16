@@ -1,5 +1,24 @@
 # Changelog
 
+### 3.0 Beta 2 (March 2023)
+
+Implemented:
+- Documents (programs) can be duplicated so as to work on a copy while retaining the 'original';
+
+Changes:
+- Name field is wider and you can press `Enter` now to get back to the editor;
+- The program editor now occupies 75% of the entire window (instead of only half) and the position of the splitter is 
+  saved and restored;
+
+Bug fixes / fixed issues:
+- TigerJython freezes when some combination of brackets/parentheses is entered.  This was due to the parser being 
+  stuck (e.g. because of non-matching parentheses and brackets), which should now be avoided;
+
+Known issues:
+- Search/find and replace are still missing;
+- Code completion is not implemented, yet;
+- It seems possible to have two programs with the same name in the system;
+
 ### 3.0 Beta 1 (January 2023)
 
 Implemented:
@@ -12,10 +31,8 @@ Changes:
 - Support for Java 8 has to be dropped because of the JavaFX dependencies.
   TigerJython now requires Java 11;
 
-Fixed issues:
+Bug fixes / fixed issues:
 - Splash-screen is no longer shown when a new instance is started in the background;
-
-Bug fixes:
 - Could not correctly parse some dates for stored files;
 - Zooming into Python editor did not work;
 

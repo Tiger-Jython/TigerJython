@@ -100,12 +100,32 @@ object Documents {
       documents.remove(idx)
   }
 
+  def makeDocumentNameUnique(name: String): String =
+    if (findDocumentWithName(name).isDefined) {
+      if (name.toLowerCase.endsWith("(copy)") || name.toLowerCase.endsWith("(kopie)")) {
+        var i = 2
+        val n = name.dropRight(1) + " %d)"
+        while (findDocumentWithName(n.format(i)).isDefined)
+          i += 1
+        n.format(i)
+      } else {
+        var i = 2
+        while (findDocumentWithName(name + " " + i.toString).isDefined)
+          i += 1
+        name + " " + i.toString
+      }
+    } else
+      name
+
   protected[files]
   def makeNameUnique(name: String, index: Int = 0): String = {
     val n =
-      if (index > 0)
-        "%s (%d)".format(name, index)
-      else
+      if (index > 0) {
+        if (name.toLowerCase.endsWith("(copy)"))
+          "%s %d)".format(name.dropRight(5), index)
+        else
+          "%s (%d)".format(name, index)
+      } else
         name
     for (document <- documents)
       if (document.name.get == n) {

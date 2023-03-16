@@ -19,7 +19,7 @@ import tigerjython.ui.editing._
  *
  * @author Tobias Kohn
  */
-class PythonEditor extends PythonCodeArea with ZoomMixin {
+class PythonEditor(val editorTab: PythonEditorTab) extends PythonCodeArea with ZoomMixin {
 
   protected val gutterRect = new Rectangle()
 
@@ -51,6 +51,19 @@ class PythonEditor extends PythonCodeArea with ZoomMixin {
 
   private def autoSaveAsync(): Task[Unit] =
     BackgroundSaver.execute(onAutoSave)
+
+  override def findText(): Unit =
+    editorTab.findText(false)
+
+  override def findAndReplaceText(): Unit =
+    editorTab.findText(true)
+
+  override def hideAuxPanels(): Unit =
+    editorTab.hideAuxPanels()
+
+  override def showCodeCompletion(): Unit = {
+    println("sorry, code completion is not implemented, yet :,-(")
+  }
 
   var onAutoSave: ()=>Unit = _
 }

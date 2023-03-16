@@ -20,13 +20,22 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
   private var _nameType: NameTokenType.Value = NameTokenType.UNKNOWN
   private var _source: TokenSource = _
 
+  // Used to determine whether the parser is stuck somewhere
+  private val _marks = collection.mutable.Map[Int, Int]()
+
   protected def source: TokenSource = _source
 
   def parse(source: TokenSource): StatementType =
     if (source != null) {
       _source = source
+      _marks.clear()
       //source.dump()
-      parseStmt()
+      try {
+        parseStmt()
+      } catch {
+        case ParserStuckException =>
+          null
+      }
     } else
       null
 
@@ -298,7 +307,7 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
       parseDictItem()
   }
 
-  protected def parseExpr(): Unit =
+  protected def parseExpr(): Unit = {
     if (source.headTokenType == TokenType.KEYWORD)
       source.head match {
         case NameToken(TokenType.KEYWORD, _, "yield") =>
@@ -310,7 +319,11 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
     else if (source.headTokenType == TokenType.LAMBDA)
       parseLambda()
     else
-      while (source.hasNext)
+      while (source.hasNext) {
+        val cnt = _marks.getOrElseUpdate(source.index, 0)
+        _marks(source.index) = cnt + 1
+        if (cnt > 10)
+          throw ParserStuckException
         source.headTokenType match {
           case TokenType.NAME | TokenType.BUILTIN_NAME =>
             readExtName() match {
@@ -329,6 +342,11 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
                   parseGenerator()
                 else if (source.expectComma())
                   parseExprList()
+                else if (source.expectColon()) {
+                  parseExpr()
+                  if (source.expectColon())
+                    parseExpr()
+                }
                 else if (left.bracket == '(' && !(source.prev eq left))
                   left._isData = false
                 source.expectRightBracket(left)
@@ -342,6 +360,8 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
             }
           case TokenType.RIGHT_BRACKET | TokenType.DELIMITER | TokenType.COLON | TokenType.COMMA |
                TokenType.DEF_KEYWORD | TokenType.CLASS_KEYWORD | TokenType.ASSIGNMENT =>
+            //println("[PythonStmtParser@%s] 354 -- %s".format(Thread.currentThread().getName, source.head.toString))
+            //throw new RuntimeException("something's wrong here")
             return
           case TokenType.KEYWORD =>
             if (source.expectKeyword("if")) {
@@ -355,6 +375,8 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
           case _ =>
             source.skip()
         }
+      }
+  }
 
   protected def parseExprList(): Unit = {
     parseExpr()
@@ -419,6 +441,10 @@ class PythonStmtParser(val document: SyntaxDocument) extends StmtParser {
 
   protected def parseSliceList(): Unit = {
     parseExpr()
+    if (source.expectColon())
+      parseExpr()
+    if (source.expectColon())
+      parseExpr()
     if (source.expectComma())
       parseSliceList()
   }

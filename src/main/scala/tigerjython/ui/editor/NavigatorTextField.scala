@@ -8,10 +8,10 @@
 package tigerjython.ui.editor
 
 import java.lang
-
 import javafx.beans.property.{SimpleStringProperty, StringProperty}
 import javafx.beans.value.{ChangeListener, ObservableValue}
 import javafx.scene.control.TextField
+import javafx.scene.input.KeyCode
 import tigerjython.files.Documents
 
 /**
@@ -20,7 +20,7 @@ import tigerjython.files.Documents
  *
  * @author Tobias Kohn
  */
-class NavigatorTextField extends TextField {
+class NavigatorTextField(val parentTab: EditorTab) extends TextField {
 
   private val existingNames = collection.mutable.Set[String]()
 
@@ -36,6 +36,7 @@ class NavigatorTextField extends TextField {
 
   {
     getStyleClass.add("navigator-text")
+    setPrefWidth(300.0)
   }
 
   focusedProperty().addListener(new ChangeListener[lang.Boolean] {
@@ -58,6 +59,11 @@ class NavigatorTextField extends TextField {
     override def changed(observableValue: ObservableValue[_ <: String], oldValue: String, newValue: String): Unit = {
       if (newValue != textProperty().get)
         textProperty().set(newValue)
+    }
+  })
+  setOnKeyPressed(keyEvent => {
+    if (keyEvent.getCode == KeyCode.ENTER) {
+      parentTab.focusOnEditor()
     }
   })
 }

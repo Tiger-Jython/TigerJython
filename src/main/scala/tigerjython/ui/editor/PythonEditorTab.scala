@@ -26,7 +26,7 @@ class PythonEditorTab extends EditorTab {
   }
 
   protected def createEditorNode: CodeArea = {
-    val result = new PythonEditor()
+    val result = new PythonEditor(this)
     result.onAutoSave = autoSave
     _syntaxDocument = result.syntaxDocument
     result

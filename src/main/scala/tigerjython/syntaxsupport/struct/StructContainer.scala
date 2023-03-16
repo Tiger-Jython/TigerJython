@@ -18,6 +18,9 @@ abstract class StructContainer extends StructElement {
 
   protected val children: ArrayBuffer[StructElement] = new ArrayBuffer[StructElement]()
 
+  override def toString: String =
+    "%s([%s])".format(getClass.getSimpleName, children.map(_.toString).mkString(", "))
+
   private def notifyLengthAdjusted(sender: StructElement, delta: Int): Unit =
     if (!(sender eq children.last)) {
       val idx = children.indexOf(sender)

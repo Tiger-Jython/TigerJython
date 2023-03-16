@@ -58,7 +58,7 @@ Compile / packageBin / packageOptions +=
 
 val buildTag = ""
 
-val buildVersion = "beta+1"
+val buildVersion = "beta+2"
 
 // This is needed to run/test the project without having to restart SBT afterwards
 run / fork := true
@@ -106,7 +106,7 @@ libraryDependencies += "org.openjfx" % "javafx-fxml" % fxVersion classifier "lin
 libraryDependencies += "org.openjfx" % "javafx-graphics" % fxVersion classifier "linux-aarch64"*/
 
 // Other dependencies
-libraryDependencies += "org.fxmisc.richtext" % "richtextfx" % "0.10.9"
+libraryDependencies += "org.fxmisc.richtext" % "richtextfx" % "0.11.0" // 0.10.9"
 
 // We switch to our internal version of Jython
 // libraryDependencies += "org.python" % "jython-standalone" % "2.7.2"

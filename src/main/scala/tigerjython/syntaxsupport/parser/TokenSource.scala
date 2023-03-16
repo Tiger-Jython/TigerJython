@@ -38,6 +38,9 @@ class TokenSource(val source: TokenArray, val structElement: StructElement) exte
     } else
       Array()
 
+  override def toString: String =
+    "TokenSource(%d, [%s])".format(_index, tokens.mkString(", "))
+
   def dump(): Unit = {
     println("TokenSource:")
     for ((token, i) <- tokens.zipWithIndex) {

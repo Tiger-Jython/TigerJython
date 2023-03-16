@@ -61,6 +61,27 @@ class Document(protected val prefNode: JPreferences) {
 
   val execTarget: StringProperty = new PrefStringProperty(prefNode, "exec-target", "")
 
+  /**
+   * Creates a clone/duplicate of the present document and returns the newly created copy.
+   */
+  def duplicate(): Document = {
+    val name = Documents.makeNameUnique({
+      val name = this.name.getValue
+      if (name.toLowerCase.endsWith("(copy)") || name.toLowerCase.endsWith("(kopie)"))
+        name
+      else
+        name + " (copy)"
+    })
+    val result = Documents.createDocument()
+    result.name.setValue(name)
+    result.caretPosition.setValue(this.caretPosition.getValue)
+    result.description.setValue(this.description.getValue)
+    result.execTarget.setValue(this.execTarget.getValue)
+    result.splitterPos.setValue(this.splitterPos.getValue)
+    result.text.setValue(this.text.getValue)
+    result
+  }
+
   def exists: Boolean =
     path match {
       case Some(p) =>
@@ -314,6 +335,8 @@ class Document(protected val prefNode: JPreferences) {
 
   def show(): Unit =
     TigerJythonApplication.tabManager.openDocument(this)
+
+  val splitterPos: DoubleProperty = new PrefDoubleProperty(prefNode, "splitter-pos", 0.75)
 
   val text: StringProperty = new PrefTextProperty(prefNode, "text")
 }

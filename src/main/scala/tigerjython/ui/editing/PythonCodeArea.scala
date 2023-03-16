@@ -152,6 +152,14 @@ class PythonCodeArea extends CodeArea {
       case code @ (KeyCode.LEFT | KeyCode.RIGHT | KeyCode.UP | KeyCode.DOWN |
                    KeyCode.PAGE_UP | KeyCode.PAGE_DOWN | KeyCode.HOME | KeyCode.END) =>
         EventManager.fireOnKeyPressed(getCaretPosition, code.toString)
+      case KeyCode.F if key.isControlDown =>
+        findText()
+      case KeyCode.R if key.isControlDown =>
+        findAndReplaceText()
+      case KeyCode.SPACE if key.isControlDown =>
+        showCodeCompletion()
+      case KeyCode.ESCAPE =>
+        hideAuxPanels()
       case _ =>
     }
   )
@@ -265,4 +273,12 @@ class PythonCodeArea extends CodeArea {
       getUndoManager.mark()
       selectRange(0, 0)
     })
+
+  def findText(): Unit = {}
+
+  def findAndReplaceText(): Unit = {}
+
+  def hideAuxPanels(): Unit = {}
+
+  def showCodeCompletion(): Unit = {}
 }
