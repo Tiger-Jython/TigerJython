@@ -53,10 +53,10 @@ class PythonEditor(val editorTab: PythonEditorTab) extends PythonCodeArea with Z
     BackgroundSaver.execute(onAutoSave)
 
   override def findText(): Unit =
-    editorTab.findText(false)
+    editorTab.showFindText(false)
 
   override def findAndReplaceText(): Unit =
-    editorTab.findText(true)
+    editorTab.showFindText(true)
 
   override def hideAuxPanels(): Unit =
     editorTab.hideAuxPanels()

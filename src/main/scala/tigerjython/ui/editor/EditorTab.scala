@@ -40,7 +40,7 @@ abstract class EditorTab extends TabFrame with ExecutionController {
 
   import tigerjython.ui.Utils._
 
-  protected val editor: CodeArea = createEditorNode
+  val editor: CodeArea = createEditorNode
   protected val editorContents: VBox = new VBox()
   protected val errorPane: OutputPane = createErrorPane
   protected var errorPopup: Popup = _
@@ -229,15 +229,16 @@ abstract class EditorTab extends TabFrame with ExecutionController {
     result
   }
 
-  def findText(showReplace: Boolean): Unit = {
-    editorContents.getChildren.add(findBar)
+  def showFindText(showReplace: Boolean): Unit = {
     Platform.runLater(() => {
-      findBar.findText.requestFocus()
+      editorContents.getChildren.add(findBar)
+      findBar.activate()
     })
   }
 
   def hideAuxPanels(): Unit = {
     editorContents.getChildren.remove(findBar)
+    editor.requestFocus()
   }
 
   protected def createPrefGraphic(): Node = {

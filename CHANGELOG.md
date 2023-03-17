@@ -4,6 +4,7 @@
 
 Implemented:
 - Documents (programs) can be duplicated so as to work on a copy while retaining the 'original';
+- Implemented basic search/find functionality;
 
 Changes:
 - Name field is wider and you can press `Enter` now to get back to the editor;
