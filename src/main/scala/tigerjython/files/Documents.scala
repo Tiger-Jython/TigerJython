@@ -102,7 +102,7 @@ object Documents {
 
   def makeDocumentNameUnique(name: String): String =
     if (findDocumentWithName(name).isDefined) {
-      if (name.toLowerCase.endsWith("(copy)") || name.toLowerCase.endsWith("(kopie)")) {
+      if (name.toLowerCase.endsWith("(copy)")) {
         var i = 2
         val n = name.dropRight(1) + " %d)"
         while (findDocumentWithName(n.format(i)).isDefined)
@@ -122,7 +122,7 @@ object Documents {
     val n =
       if (index > 0) {
         if (name.toLowerCase.endsWith("(copy)"))
-          "%s %d)".format(name.dropRight(5), index)
+          "%s %d)".format(name.dropRight(1), index)
         else
           "%s (%d)".format(name, index)
       } else

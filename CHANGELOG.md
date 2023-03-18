@@ -16,9 +16,7 @@ Bug fixes / fixed issues:
   stuck (e.g. because of non-matching parentheses and brackets), which should now be avoided;
 
 Known issues:
-- Search/find and replace are still missing;
 - Code completion is not implemented, yet;
-- It seems possible to have two programs with the same name in the system;
 
 ### 3.0 Beta 1 (January 2023)
 
