@@ -42,6 +42,8 @@ class PythonEditor(val editorTab: PythonEditorTab) extends PythonCodeArea with Z
     gutterRect.heightProperty.bind(this.heightProperty)
     gutterRect.getStyleClass.add("lineno")
 
+    initializeZoom()
+
     this.multiPlainChanges()
       .successionEnds(Duration.ofMillis(2500))
       .supplyTask(() => autoSaveAsync())

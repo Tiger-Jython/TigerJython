@@ -1,5 +1,10 @@
 # Changelog
 
+### 3.0 Beta 3 (May+ 2023)
+
+Bug fixes / fixed issues:
+- Changing the font size does not affect newly created documents and is not persistent.
+
 ### 3.0 Beta 2 (March 2023)
 
 Implemented:

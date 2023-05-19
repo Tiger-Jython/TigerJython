@@ -43,6 +43,13 @@ trait ZoomMixin { self: Node =>
     ))
   }
 
+  /**
+   * This is called to make sure the global properties are correctly applied.
+   */
+  protected def initializeZoom(): Unit = {
+    setZoomIndex(zoomIndex)
+  }
+
   Preferences.fontFamily.addListener(new ChangeListener[String] {
     override def changed(observableValue: ObservableValue[_ <: String], oldValue: String, newValue: String): Unit = {
       setZoomIndex(zoomIndex)
